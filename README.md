@@ -4,7 +4,7 @@ A FOSS EDR Alternative implemented in Python using psutil and some Windows modul
 
 installation (assumes you have python 3.11 or later)
 
-1. install the dependencies in requirements.txt using pip
+1. install the dependencies in the requirements file using pip
 2. run agent.py to start logging locally (please do this on a D: drive under Windows or something other than the C: drive)
 
 Collects the following by default:
