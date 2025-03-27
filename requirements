@@ -1,6 +1,10 @@
+datetime
+ipaddress
 ipwhois
+logging
 psutil
 psycopgp
+pywin32
 requests
 schedule
 win32con
