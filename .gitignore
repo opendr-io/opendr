@@ -1,0 +1,75 @@
+*.log
+*.pyc
+*.csv
+*.txt
+*.cer
+*.crt
+*.crl
+*.pfx
+*.p12
+*.pml
+*.csv
+
+# OpenDR logs
+*logs/
+*ready/
+*tmp-endpoint-info/
+*tmp-network/
+*tmp-process/
+*tmp-software-inventory/
+*tmp-user-info/
+
+# API keys and credentials
+*.env
+.env
+.env.local
+.env.production
+.env.development
+*.secret
+*.credentials
+config/secrets.yml
+
+# SSH keys
+*.pem
+*.key
+*.pub
+id_rsa
+id_rsa.pub
+id_ecdsa
+id_ecdsa.pub
+id_ed25519
+id_ed25519.pub
+.ssh/
+
+# VS Code
+.vscode/
+
+# JetBrains IDEs (PyCharm, IntelliJ, etc.)
+.idea/
+
+# Sublime
+*.sublime-workspace
+*.sublime-project
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+.env/
+*.egg-info/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# OS-specific files
+.DS_Store           # macOS
+Thumbs.db           # Windows
+
+# Environment files
+.env
+.env.*
+
+
