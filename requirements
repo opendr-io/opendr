@@ -1,0 +1,11 @@
+ipwhois
+psutil
+psycopgp
+requests
+schedule
+win32con
+win32event
+win32evtlog
+win32evtlogutil
+win32security
+win32security
