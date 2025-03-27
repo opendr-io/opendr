@@ -3,12 +3,9 @@ ipaddress
 ipwhois
 logging
 psutil
-psycopgp
 pywin32
 requests
 schedule
-shutil
-ssl
 win32con
 win32event
 win32evtlog
