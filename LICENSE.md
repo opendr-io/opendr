@@ -1,4 +1,4 @@
-Copyright (C) 2024 by the Cyberdyne Ventures research group.
+Copyright (C) 2024 by certain members of the Cyberdyne Ventures research group (Alan, Ani, Craig.)
 License model is creative commons.
 
 Sharing is permitted — users may copy and redistribute the material in any medium or format.

@@ -1,10 +1,8 @@
 ![logo](/img/opendr.png?raw=true "text")  
 # OpenDR
-A FOSS EDR Alternative implemented in Python using psutil and some Windows modules. 
+A FOSS EDR Alternative implemented in Python using psutil and some Windows modules. Installation (assumes you have python 3.11 or later:)
 
-installation (assumes you have python 3.11 or later)
-
-1. install the dependencies in requirements.txt using pip
+1. install the dependencies in the requirements file using pip
 2. run agent.py to start logging locally (please do this on a D: drive under Windows or something other than the C: drive)
 
 Collects the following by default:
@@ -26,7 +24,7 @@ Coming soon:
 
 About data privacy;
 
-By default, OpenDR logs locally to the file system. Please run it on a D: drive under Windows to avoid consuming space on the C: drive; it can generate 10-25 MB of logs per day. *By default, no data leaves the host* unless you decide to use the database option. OPenDR has no cloud service of any kind at present. The endpoint modole logs hostname, IP address, SID and instance ID information for correlation and hunting purposes. This module is optional and can be disabled if you don't want these things logged.
+By default, OpenDR logs locally to the file system. Please run it on a D: drive under Windows to avoid consuming space on the C: drive; it can generate 10-25 MB of logs per day. *By default, no data leaves the host* unless you decide to use the database option. OpenDR has no cloud service of any kind at present. The endpoint module logs hostname, IP address, SID and instance ID information for correlation and hunting purposes. This module is optional and can be disabled if you don't want these things logged.
 
 Database options: agents can optionally ship events to a Postgres database if you want centralized collection (this database can run wherever you wish.) Setup scripts and shippers are included and this will be covered in forthcoming docs.
 
