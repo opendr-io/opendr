@@ -7,4 +7,3 @@ pywin32
 psycopg[binary]
 requests
 schedule
-

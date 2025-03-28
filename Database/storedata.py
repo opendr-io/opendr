@@ -1,6 +1,4 @@
 import re
-import ssl
-import shutil
 import psycopg
 
 class StoreData:
