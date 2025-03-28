@@ -5,65 +5,65 @@ PostgreSQL Setup Guide
     [Postgres
     Download](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
 
-![](media/image1.png){width="5.373915135608049in"
-height="2.719682852143482in"}
+    <img width="387" alt="image" src="https://github.com/user-attachments/assets/9d6166dc-50e6-4dc5-a80a-2b48024bb9f8" />
+
 
 2.  Once you have downloaded the file double click on the executable to
     start the installation process. When the installation window pops
     up, keep selecting next until you reach the following window.
 
-![](media/image2.png){width="4.630225284339457in"
-height="3.7057206911636045in"}
+    <img width="334" alt="image" src="https://github.com/user-attachments/assets/49ef5f70-525a-4cfa-a3d6-008c32a8d5f8" />
+
 
 3.  Once you arrive here change the installation directory to the D
     drive as shown in the image below and click next
 
-![](media/image3.png){width="4.715956911636045in"
-height="3.6949759405074367in"}
+    <img width="340" alt="image" src="https://github.com/user-attachments/assets/d4edb066-027a-435b-8f51-232ba4858118" />
+
 
 4.  In the following window make sure that all the items are select as
     shown below and click Next
 
-![](media/image4.png){width="4.482294400699913in"
-height="3.6939501312335956in"}
+    <img width="323" alt="image" src="https://github.com/user-attachments/assets/9226c156-0e4b-4af5-859f-f2df600adf0d" />
+
 
 5.  In the following page make sure that the data directory in also in
     the D drive as shown below and click Next
 
-![](media/image5.png){width="3.982678258967629in"
-height="3.2431583552055994in"}
+    <img width="286" alt="image" src="https://github.com/user-attachments/assets/1477ada4-7e71-41e5-9730-1fa0b2131fe4" />
+
 
 6.  In the following page you will be prompted to enter a root password
     for Postgres. Enter a password of your choosing and click Next
 
-![](media/image6.png){width="4.558752187226597in"
-height="3.6737740594925636in"}
+    <img width="328" alt="image" src="https://github.com/user-attachments/assets/cdf018bf-b20b-4b3a-a6b9-4a95ce8d47aa" />
+
 
 7.  In the following page you will be prompted for a port number. Leave
     the default and click Next
 
-![](media/image7.png){width="4.3456321084864395in"
-height="3.5408858267716536in"}
+    <img width="313" alt="image" src="https://github.com/user-attachments/assets/8b8a1264-de7e-4843-80c6-c9bb07664327" />
+
 
 8.  The next window will ask for the locale. Keep the default selection
     and click Next
 
-![](media/image8.png){width="4.327707786526684in"
-height="3.442169728783902in"}
+    <img width="312" alt="image" src="https://github.com/user-attachments/assets/1742259d-acad-4af8-ae61-a21295f12a2f" />
+
 
 9.  Keep clicking Next and you will see the installation happening as
     shown below. This may take a few minutes
 
-![](media/image9.png){width="4.54955927384077in"
-height="3.627350174978128in"}
+    <img width="328" alt="image" src="https://github.com/user-attachments/assets/5a2b9e76-8b9f-4212-9dd5-da6c9ea3d64e" />
+
 
 10. Once the installation is done, you will reach the following page.
     You can keep the checkbox selected or deselect it if you feel you
     don't need any additional tools. Once you've made your decision
     click Finish.
 
-![](media/image10.png){width="3.8561198600174977in"
-height="3.1143110236220473in"}
+    <img width="278" alt="image" src="https://github.com/user-attachments/assets/dc86f92f-4531-4ab9-bf0e-c7bc4ed0f2e9" />
+
 
 Setup Keys for SSL
 
@@ -205,25 +205,24 @@ Beekeeper Studio Installation
 2.  Once installed open Beekeeper Studio and select Postgres under
     "Connection Type" in the dropdown menu
 
-![](media/image11.png){width="4.130237314085739in"
-height="2.603903105861767in"}
+    <img width="297" alt="image" src="https://github.com/user-attachments/assets/8ca1c58c-fe15-4647-ac11-c174e1f471bf" />
+
 
 3.  Once you have selected that enter the IP address and port number
     along with your credentials and default database you are attempting
     to connect to as shown below.
 
-![](media/image12.png){width="4.737689195100613in"
-height="2.986868985126859in"}
+    <img width="341" alt="image" src="https://github.com/user-attachments/assets/b65aa850-b482-48e4-baf1-d1bad0ea6910" />
+
 
 4.  To connect to the database using TLS toggle and expand "Enable TLS"
     as shown below
 
-![](media/image13.png){width="5.718104768153981in"
-height="3.6049715660542434in"}
+    <img width="412" alt="image" src="https://github.com/user-attachments/assets/cb08cfec-818c-438e-a747-7f6e8c8c8f9a" />
+
 
 5.  Once expanded enter your key and certificate file along with your
     database credentials to connect to the database. Uncheck "Reject
     Unauthorized" if using self-signed certificates as shown below
 
-![](media/image14.png){width="5.651995844269466in"
-height="3.5632917760279965in"}
+    <img width="405" alt="image" src="https://github.com/user-attachments/assets/b69986cf-92fe-491c-ace9-efbebc91e6d0" />
