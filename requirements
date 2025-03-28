@@ -3,7 +3,7 @@ ipaddress
 ipwhois
 logging
 psutil
-psycopgp
 pywin32
+psycopg[binary]
 requests
 schedule
