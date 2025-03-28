@@ -1,4 +1,4 @@
-PostgreSQL Setup Guide
+**PostgreSQL Setup**
 
 1.  Go to the following link to download Postgres and select the one
     based on the operating system you are running and download the 17.4🡪
@@ -65,7 +65,8 @@ PostgreSQL Setup Guide
     <img width="278" alt="image" src="https://github.com/user-attachments/assets/dc86f92f-4531-4ab9-bf0e-c7bc4ed0f2e9" />
 
 
-Setup Keys for SSL
+
+**Setup Keys for SSL**
 
 1.  Here are the commands to create the key and certificate to use with
     Postgres. This would require you to have OpenSSL installed on your
@@ -88,7 +89,8 @@ Setup Keys for SSL
 > postgres-ca.key -CAcreateserial -out postgres-server.crt -days 365
 > -sha256
 
-Postgres TLS Setup
+
+**Postgres TLS Setup**
 
 1.  When configuring TLS for Postgres go to the postgresql.conf file.
     This would be in the directory Postgres was installed in. The
@@ -178,7 +180,8 @@ Postgres TLS Setup
 >
 > max_connections = 100
 
-Database Setup
+
+**Database Setup**
 
 The purpose of running this setup is to initialize the database with the
 appropriate tables and users with the correct permissions to be able to
@@ -197,7 +200,8 @@ agent by running the following command:
 
 python agent.py
 
-Beekeeper Studio Installation
+
+**Beekeeper Studio Installation**
 
 1.  Go to the following link to install Beekeeper Studio: [Beekeeper
     Studio Installation](https://www.beekeeperstudio.io/get)
