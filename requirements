@@ -6,4 +6,9 @@ psutil
 psycopgp
 pywin32
 requests
+<<<<<<< HEAD
 schedule
+=======
+schedule
+shutil
+>>>>>>> 90f782e982cdd38fe7da9f5141f55f910e8d9a38
