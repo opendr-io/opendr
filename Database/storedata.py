@@ -7,7 +7,7 @@ class StoreData:
     self.port = ''
     self.db = ''
     self.user = ''
-    self.password=""
+    self.password=''
     self.sslmode = ''
     self.sslrootcert = ''
     self.users_log_counter = 0
@@ -100,7 +100,7 @@ class StoreData:
           pattern = r'(\w+):([^|]+)(?:[,|]|$)'
           matches = re.findall(pattern, line)
           data = {key.strip(): value.strip() for key, value in matches}
-          final_params = [data.get('timestamp'), '', data.get('hostname'), data.get('ec2_instance_id'), data.get('private_ips'), data.get('public_ip'), '', '', '', '', data.get('sid')]
+          final_params = [data.get('timestamp'), '', data.get('hostname'), data.get('ec2_instance_id'), data.get('private_ips'), data.get('public_ip'), '', '', '', '', data.get('computer_sid')]
           fillers = ("%s," * 11)[:-1]
           print(final_params)
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
@@ -108,7 +108,8 @@ class StoreData:
           connection.commit()
   
   def store_user_info(self, filename):
-    table = 'endpointinfo(timestmp, event, hostname, ec2instanceid, privateips, publicip, username, onterminal, fromhostname, logintime, sid)'
+    tables = ['endpointinfo(timestmp, event, hostname, ec2instanceid, privateips, publicip, username, onterminal, fromhostname, logintime, sid)',
+    'systemevents(timestmp, event, pid, name, hostname, ppid, parent, username, dnsname, dnsdate, sourceip, sourceport, destip, destport, asname, status, onterminal, fromhostname, logintime, sid)']
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
         lines = file.readlines()
@@ -118,8 +119,20 @@ class StoreData:
           pattern = r'(\w+):([^|]+)(?:[,|]|$)'
           matches = re.findall(pattern, line)
           data = {key.strip(): value.strip() for key, value in matches}
-          final_params = [data.get('timestamp'), data.get('event'), data.get('hostname'), '', '', '', data.get('username'), data.get('on_terminal'), data.get('from_hostname'), data.get('at_login_time'), '']
-          fillers = ("%s," * 11)[:-1]
-          sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
-          connection.execute(sqlInsertStatement, final_params)
-          connection.commit()
+          final_params = [[data.get('timestamp'), data.get('event'), data.get('hostname'), '', '', '', data.get('username'), data.get('on_terminal'), data.get('from_hostname'), data.get('at_login_time'), data.get('sid')], 
+          [data.get('timestamp'), data.get('event'), '', '', data.get('hostname'), '', '', data.get('username'), '', '', '', '', '', '', '', '', data.get('on_terminal'), data.get('from_hostname'), data.get('at_login_time'), data.get('sid')]]
+          fillers = [("%s," * 11)[:-1], ("%s," * 20)[:-1]]
+          sqlInsertStatements = ['INSERT INTO ' + tables[0] + ' VALUES('+fillers[0]+')', 'INSERT INTO ' + tables[1] + ' VALUES('+fillers[1]+')']
+          try:
+            connection.execute(sqlInsertStatements[0], final_params[0])
+            connection.execute(sqlInsertStatements[1], final_params[1])
+            connection.commit()
+            self.users_log_counter += 1
+            with open('successfulstorage/successful-endpointinfolog-insertion.log', 'a') as file:
+              file.write(f"Successful Database Writes: {self.users_log_counter} \n")
+          except Exception as e:
+            self.failed_users_log_counter += 1
+            with open('failedstorage/unsuccessful-endpointinfolog-insertion.log', 'a') as file:
+              file.write(f"Unsuccessful Database Writes: {self.failed_users_log_counter} \n")
+              file.write(f"File: {filename} \n Line Attemped On: {final_params[0]} \n SQL Statement: {sqlInsertStatements[0]} \n\n")
+              file.write(f"File: {filename} \n Line Attemped On: {final_params[1]} \n SQL Statement: {sqlInsertStatements[1]} \n\n")
