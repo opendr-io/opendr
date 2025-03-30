@@ -51,13 +51,13 @@
     <img width="312" alt="image" src="https://github.com/user-attachments/assets/1742259d-acad-4af8-ae61-a21295f12a2f" />
 
 
-9.  Keep clicking Next and you will see the installation happening as
+10.  Keep clicking Next and you will see the installation happening as
     shown below. This may take a few minutes
 
     <img width="328" alt="image" src="https://github.com/user-attachments/assets/5a2b9e76-8b9f-4212-9dd5-da6c9ea3d64e" />
 
 
-10. Once the installation is done, you will reach the following page.
+11. Once the installation is done, you will reach the following page.
     You can keep the checkbox selected or deselect it if you feel you
     don't need any additional tools. Once you've made your decision
     click Finish.
