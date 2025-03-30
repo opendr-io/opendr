@@ -225,8 +225,9 @@ python agent.py
     <img width="412" alt="image" src="https://github.com/user-attachments/assets/cb08cfec-818c-438e-a747-7f6e8c8c8f9a" />
 
 
-5.  Once expanded enter your key and certificate file along with your
+5.  Once expanded enter your certificate file along with your
     database credentials to connect to the database. Uncheck "Reject
     Unauthorized" if using self-signed certificates as shown below
 
-    <img width="405" alt="image" src="https://github.com/user-attachments/assets/b69986cf-92fe-491c-ace9-efbebc91e6d0" />
+    ![image](https://github.com/user-attachments/assets/e59e1554-a55f-4f8a-aebd-a06be95dd5dd)
+
