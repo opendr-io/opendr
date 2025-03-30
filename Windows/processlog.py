@@ -38,8 +38,8 @@ def log_existing_processes(logger):
           parent_name = parent.name()
 
       log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-        f"event: existing process | "
-        f"pid: {pid} | name: {proc_name} | hostname: {hostname} | ppid: {parent_pid} | parent: {parent_name} | username: {user} | sid: {sid}")
+        f"hostname: {hostname} | username: {user} | event: existing process | "
+        f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | sid: {sid}")
     except (psutil.NoSuchProcess, psutil.AccessDenied):
       continue  # Ignore processes that vanish before logging
 
@@ -76,8 +76,8 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
             parent_name: str = parent.name()
 
         log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-          f"event: process created | "
-          f"pid: {pid} | name: {proc_name} | hostname: {hostname} | ppid: {parent_pid} | parent: {parent_name} | username: {user} | sid: {sid}"
+          f"hostname: {hostname} | username: {user} | event: process created | "
+          f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | sid: {sid}"
         )
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue
@@ -101,8 +101,9 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
             f"pid: {pid} | name: {proc_name} | hostname: {hostname} | ppid: {parent_pid} | parent: {parent_name} | username: {user} | sid: {sid}")
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-          f"event: process terminated | "
-          f"pid: {pid} | name: | hostname: | ppid: | parent: | username: | sid: {sid}")
+          f"hostname: {hostname} | username: {user} | event: process terminated | "
+          f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | sid: {sid}")
+          #f"pid: {pid} | name: | hostname: | ppid: | parent: | username: | sid: {sid}")
 
     # Print the current running total of log lines every 10 seconds
     if int(time.time()) % 10 == 0:

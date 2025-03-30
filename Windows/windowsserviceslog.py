@@ -26,11 +26,11 @@ def log_services(log_directory, ready_directory):
     if info['status'] == 'running': 
       service_info = (
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-        f"hostname: {hostname} | sid: {computer_sid} | "
-        f"servicename:{info['name']!r} | displayname:{info['display_name']!r} | "
+        f"hostname: {hostname} | username: {info['username']} | "
+        f"pid: {info['pid']} | servicename:{info['name']!r} | displayname:{info['display_name']!r} | "
         f"status: {info['status']} | start: {info['start_type']} | "
-        f"username: {info['username']} | pid: {info['pid']} | "
-        f"executable: {info['binpath']}"
+        f"executable: {info['binpath']} | "
+        f"sid: {computer_sid} | "
       )
       logger.info(service_info)
       log_line_count += 1

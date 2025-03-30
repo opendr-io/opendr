@@ -44,8 +44,9 @@ def log_installed_software(log_directory, ready_directory):
   for name, version in get_installed_software():
       log_entry = (
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-        f"hostname: {hostname} | sid: {sid} | instanceid: {instance_id} | "
-        f"program: {name} | version: {version}"
+        f"hostname: {hostname} | "
+        f"program: {name} | version: {version} | "
+        f"instanceid: {instance_id} | sid: {sid}"
       )
       logger.info(log_entry)
       log_line_count += 1
