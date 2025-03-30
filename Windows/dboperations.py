@@ -3,6 +3,7 @@ import time
 import shutil
 import schedule
 from pathlib import Path
+os.path.append('../')
 from Database.storedata import StoreData
 
 def directory_cleanup():
