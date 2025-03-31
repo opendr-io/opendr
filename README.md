@@ -1,6 +1,6 @@
 ![logo](/img/opendr.png?raw=true "text")  
 # OpenDR
-A FOSS EDR Alternative implemented in Python using psutil and some Windows modules. Installation (assumes you have python 3.11 or later:)
+A FOSS Endpoint Detection and Response (EDR) alternative implemented in Python using psutil and some Windows modules. Installation (assumes you have python 3.11 or later:)
 
 1. install the dependencies in the requirements file using pip
 2. run agent.py to start logging locally (please do this on a D: drive under Windows or something other than the C: drive)
