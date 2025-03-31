@@ -70,7 +70,6 @@ if process_matches:
     print("\n" + "="*50)
     print(f"{alert_title}\n{alert_message}")
     print("Matching log entries:\n")
-    print("\n".join(process_matches))
     for process_match in process_matches:
         print(process_match)
     print("="*50)
