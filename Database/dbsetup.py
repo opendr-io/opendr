@@ -22,7 +22,7 @@ def setup_postgres_tables():
       cursor.execute("""CREATE TABLE endpointinfo (id serial PRIMARY KEY, timestmp text, hostname text,  ec2instanceid text, privateips text, publicip text, event text, username text,
       onterminal text, fromhostname text, logintime text, sid text)""")
       cursor.execute("""CREATE TABLE systemevents (id serial PRIMARY KEY, timestmp text, event text, pid integer, name text, hostname text, ppid text,
-      parent text, username text, dnsname text, dnsdate text, sourceip text, sourceport text, destip text, destport text, asname text, status text, sid text)""")
+      parent text, username text, dnsname text, dnsdate text, sourceip text, sourceport text, destip text, destport text, asname text, status text, onterminal text, fromhostname text, logintime text, sid text)""")
       print('Tables Created!')
       cursor.execute("CREATE USER agent WITH PASSWORD 'Agent!123'")
       cursor.execute("CREATE USER app WITH PASSWORD 'user!123'")
