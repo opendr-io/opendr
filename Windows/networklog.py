@@ -15,23 +15,30 @@ sid = attr.get_computer_sid()
 hostname = attr.get_hostname()
 
 def log_connection(logger, event, conn):
-  """Logs a network connection event (created/terminated/initial)."""
-  process_name = attr.get_process_name(conn.pid)
-  global log_line_count
+    """Logs a network connection event (created/terminated/existing)."""
+    process_name = attr.get_process_name(conn.pid)
+    global log_line_count
 
-  # Check if the remote address exists
-  remote_ip = conn.raddr[0] if conn.raddr else "N/A"
-  remote_port = conn.raddr[1] if conn.raddr else "N/A"
+    # Get remote address
+    remote_ip = conn.raddr[0] if conn.raddr else "N/A"
+    remote_port = conn.raddr[1] if conn.raddr else "N/A"
 
-  logger.info(
-    f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-    f"hostname: {hostname} | event: {event} | pid: {conn.pid} | "
-    f"process: {process_name} | "
-    f"sourceip: {conn.laddr[0]} | sourceport: {conn.laddr[1]} | "
-    f"destip: {remote_ip} | destport: {remote_port} | "
-    f"status: {conn.status} | sid: {sid}"
-  )
-  log_line_count += 1
+    # Get username if possible
+    try:
+        username = psutil.Process(conn.pid).username()
+    except (psutil.NoSuchProcess, psutil.AccessDenied):
+        username = "N/A"
+
+    logger.info(
+        f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+        f"hostname: {hostname} |  username: {username}  | "
+        f"event: {event} | process: {process_name}   pid: {conn.pid} | "       
+        f"sourceip: {conn.laddr[0]} | sourceport: {conn.laddr[1]} | "
+        f"destip: {remote_ip} | destport: {remote_port} | "
+        f"status: {conn.status} | sid: {sid}"
+    )
+
+    log_line_count += 1
 
 def log_initial_connections(log_directory, ready_directory):
   """Log all currently active connections before starting real-time monitoring."""
@@ -40,7 +47,7 @@ def log_initial_connections(log_directory, ready_directory):
   try:
     connections = psutil.net_connections(kind='inet')
   except Exception as e:
-    logging.error(f"Error retrieving initial network connections: {e}")
+    logging.error(f"Error retrieving existing network connections: {e}")
     return {}
 
   initial_connections = {}
@@ -54,7 +61,7 @@ def log_initial_connections(log_directory, ready_directory):
     key = (conn.pid, conn.laddr, conn.raddr, conn.status)
     initial_connections[key] = conn
     
-    log_connection(logger, "initial connection", conn)
+    log_connection(logger, "existing connection", conn)
   return initial_connections, logger, last_minute  # Return initial snapshot for comparison in monitoring
 
 def monitor_network_connections(log_directory, ready_directory, interval):
