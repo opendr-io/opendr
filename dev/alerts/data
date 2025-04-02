@@ -1,8 +1,0 @@
-
-timestamp: 2025-03-30 14:02:27 | hostname: foo | event: connection created | pid: 0 | process: System Idle Process | sourceip: 10.10.10.10| sourceport: 4320 | destip: 104.237.62.213 | destport: 443 | status: TIME_WAIT | sid:
-timestamp: 2025-03-30 15:02:27 | hostname: foo | event: connection created | pid: 11520 | process: python.exe | sourceip: 10.10.10.10 | sourceport: 4320 | destip: 104.237.62.213 | destport: 443 | status: ESTABLISHED | sid: 
-
-
-timestamp: 2025-03-27 14:48:57 | event: process created | pid: 5524 | name: cmd.exe | hostname: foo | ppid: 3540 | parent: python.exe | username: foo | sid: 
-timestamp: 2025-03-27 14:49:00 | event: process created | pid: 11444 | name: python.exe | hostname: foo | ppid: 3540 | parent: python.exe | username: foo | sid: 
-timestamp: 2025-03-30 14:49:20 | event: process created | pid: 16240 | name: cmd.exe | hostname: foo | ppid: 9808 | parent: python.exe | username: foo| sid: 
