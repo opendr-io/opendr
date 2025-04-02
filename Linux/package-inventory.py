@@ -1,5 +1,13 @@
 import subprocess
 import shutil
+import os
+import time
+import common.attributes as attr
+import common.logger as logfunc
+from datetime import datetime
+
+hostname = attr.get_hostname()
+uuid = attr.get_system_uuid()
 
 def get_rpm_packages():
     try:
@@ -53,24 +61,37 @@ def get_installed_packages():
         elif shutil.which("rpm"):
             return get_rpm_packages()
         else:
-            return [{
-                "name": "Unknown",
-                "version": "-",
-                "architecture": "-",
-                "description": "Unsupported package manager"
-            }]
+            print("Unsupported package manager")
+            return []
     except Exception as e:
-        return [{
-            "name": "Error",
-            "version": "-",
-            "architecture": "-",
-            "description": f"Failed to retrieve packages: {str(e)}"
-        }]
-    
-# write the inventory to a file
-# todo: handle the different field names from rpm and dpkg
-packages = get_installed_packages()
-with open("installed_packages.txt", "a", encoding="utf-8") as f:  # 'a' = append mode
-    for pkg in packages:
-        f.write(f"name: {pkg['name']} | version: {pkg['version']} | architecture: {pkg['architecture']} | description: {pkg['description']}\n")
+        print(f"Failed to retrieve packages: {str(e)}")
+        return []
 
+log_line_count = 0
+
+def log_data(log_directory, ready_directory):
+    while True:
+        logger = logfunc.setup_logging(log_directory, ready_directory, "SoftwareMonitor", "installed_software")
+        global log_line_count
+        packages = get_installed_packages()
+        for pkg in packages:
+            logger.info((
+                    f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | hostname: {hostname} | "
+                    f"name: {pkg['name']} | version: {pkg['version']} | architecture: {pkg['architecture']} | "
+                    f"description: {pkg['description']} | uuid: {uuid}"
+                    ))
+            log_line_count += 1
+        logfunc.enter_debug_logs('software-inventory', f"Running total log lines written: {log_line_count}  \n")
+        logfunc.clear_handlers(log_directory, ready_directory, logger)
+        time.sleep(3600)  # Log every 60 minutes - or choose an interval
+
+def run():
+    log_directory = 'tmp-software-inventory'
+    ready_directory = 'ready'
+    debug_generator_directory = 'debuggeneratorlogs'
+    os.makedirs(debug_generator_directory, exist_ok=True)
+    os.makedirs(log_directory, exist_ok=True)
+    os.makedirs(ready_directory, exist_ok=True)
+    log_data(log_directory, ready_directory)
+
+run()
