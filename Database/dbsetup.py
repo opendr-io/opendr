@@ -2,9 +2,9 @@ import psycopg
 from pathlib import Path
 from storedata import StoreData
 
-def setup_postgres_tables():
-  applications_table = 'applications(timestmp, hostname, sid, ec2instanceid, program, servicename, displayname, status, start, username, pid, executable)'
-  system_events_table = 'systemevents(timestmp, hostname, event, pid, process, sid, username, executable, commandline, dnsname, dnsdate, sourceip, sourceport, destip, destport, asname, status, onterminal, fromhostname, logintime)'
+def setup_postgres_tables() -> None:
+  applications_table: str = 'applications(timestmp, hostname, sid, ec2instanceid, program, servicename, displayname, status, start, username, pid, executable)'
+  system_events_table: str = 'systemevents(timestmp, hostname, event, pid, process, sid, username, executable, commandline, dnsname, dnsdate, sourceip, sourceport, destip, destport, asname, status, onterminal, fromhostname, logintime)'
   print('Initiating Database Connection')
   with psycopg.connect() as connection:
     print('Connection Made!')

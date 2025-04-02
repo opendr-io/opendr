@@ -4,29 +4,29 @@ import shutil
 import schedule
 from pathlib import Path
 from Database.storedata import StoreData
+from typing import NoReturn
 
-def directory_cleanup():
-  directory = 'done/ready'
+def directory_cleanup() -> None:
+  directory: str = 'done/ready'
   with os.scandir(directory) as files:
     for file in files:
       if(file.is_file()):
         os.unlink(file.path)
 
-def monitor_directory(dir, pat):
+def monitor_directory(dir, pat) -> NoReturn:
   dataStorage = StoreData()
   path = Path(dir)
-  processed_files = set()
+  processed_files: set[Path] = set()
   schedule.every(30).minutes.do(directory_cleanup)
   while True:
     try:
-      current_files = set(path.glob(pat))
-      new_files = current_files - processed_files
+      current_files: set[Path] = set(path.glob(pat))
+      new_files: set[Path] = current_files - processed_files
       if not new_files:
         time.sleep(30)
         continue            
       for new_file in new_files:
-        fn = str(new_file)
-        file_type = None
+        fn: str = str(new_file)
         if('process' in fn):
           dataStorage.store_process_events(fn)
         elif('network' in fn):
@@ -46,10 +46,10 @@ def monitor_directory(dir, pat):
       print(f"Error: {e}")
       time.sleep(1)
       
-def run():
+def run() -> NoReturn:
   os.makedirs('done/ready', exist_ok=True)
-  directory = 'ready'
-  pat = '*.log'
+  directory: str = 'ready'
+  pat: str = '*.log'
   monitor_directory(directory, pat)
 
 run()
