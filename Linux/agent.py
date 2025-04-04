@@ -7,13 +7,13 @@ import sys
 def run():
   def execute_scripts(script):
     print(script)
-    result = subprocess.run(['python', script], capture_output=True, text=True)
+    result = subprocess.run(['python3', script], capture_output=True, text=True)
     return script, result.stdout, result.stderr
   # this section governs local vs databse mode - default is local
-  generators = ['processlog.py', 'softwareinventorylog.py', 'endpointinfolog.py', 'networklog.py', 'windowsserviceslog.py']
+  generators = ['process-logger.py', 'package-inventory.py', 'linux-endpoint-info.py', 'network-logger.py', 'linux-services.py']
   # this generator is for database mode
-  # generators = ['softwareinventorylog.py', 'endpointinfolog.py', 'userinfolog.py', 'processlog.py', 'networklog.py', 'windowsserviceslog.py', 'dboperations.py']
-  print('Starting Genereators')
+  # generators = ['process-logger.py', 'package-inventory.py', 'linux-endpoint-info.py', 'network-logger.py', 'linux-services.py' 'dboperations.py']
+  print('Starting Generators')
   with concurrent.futures.ThreadPoolExecutor(len(generators)) as executor:
     results = executor.map(execute_scripts, generators)
     for script, stdout, stderr in results:

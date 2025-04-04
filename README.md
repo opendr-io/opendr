@@ -1,8 +1,9 @@
 ![logo](/img/opendr.png?raw=true "text")  
 # OpenDR
-A FOSS Endpoint Detection and Response (EDR) alternative implemented in Python using psutil and some Windows modules. Installation (assumes you have python 3.11 or later:)
+A FOSS Endpoint Detection and Response (EDR) alternative implemented in Python using psutil and some Windows modules. Setup:
 
-1. install the dependencies in the requirements file using pip
+0. Requires Python 3.9 - 3.12. 3.13 will be supported in the near future. 
+1. install the dependencies in the requirements file using pip install -r requirements (pref in a venv)
 2. run agent.py to start logging locally (please do this on a D: drive under Windows or something other than the C: drive)
 
 Collects the following by default:
@@ -11,8 +12,9 @@ Collects the following by default:
 - network events with process info
 - endpoint info including IP address and instance IDs
 - endpoint SID (Windows)
-- running services (Windows)
-- installed software (Windows)
+- endpoint UUID (Linux)
+- running services
+- installed software
 
 Coming soon:
 
@@ -20,7 +22,6 @@ Coming soon:
 - new services
 - drivers and new drivers
 - malware detections
-- a Linux agent version
 
 About data privacy;
 
