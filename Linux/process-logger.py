@@ -101,10 +101,10 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
         log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
             f"pid: {pid} | name: {proc_name} | hostname: {hostname} | ppid: {parent_pid} | parent: {parent_name} | username: {user} | uuid: {uuid}")
       except (psutil.NoSuchProcess, psutil.AccessDenied):
-        log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-          f"hostname: {hostname} | username: {user} | event: process terminated | "
-          f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | uuid: {uuid}")
-          #f"pid: {pid} | name: | hostname: | ppid: | parent: | username: | uuid: {uuid}")
+        continue
+        #log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+          #f"hostname: {hostname} | username: {user} | event: process terminated | "
+          #f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | uuid: {uuid}")
 
     # Print the current running total of log lines every 10 seconds
     if int(time.time()) % 10 == 0:

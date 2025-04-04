@@ -1,7 +1,7 @@
 import socket
 import requests
 import psutil
-import win32security
+#import win32security
 import os
 
 def get_hostname() -> str:
