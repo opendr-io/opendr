@@ -6,9 +6,9 @@ def execute_scripts(script):
     result = subprocess.run(['python', script], capture_output=True, text=True)
     return script, result.stdout, result.stderr
 
-def run():
+def run() -> None:
   # this section governs local vs database mode - default is local
-  generators = ['processlog.py', 'softwareinventorylog.py', 'endpointinfolog.py', 'networklog.py', 'windowsserviceslog.py']
+  generators: list[str] = ['processlog.py', 'softwareinventorylog.py', 'endpointinfolog.py', 'networklog.py', 'windowsserviceslog.py']
   # this generator is for database mode
   # generators = ['softwareinventorylog.py', 'endpointinfolog.py', 'userinfolog.py', 'processlog.py', 'networklog.py', 'windowsserviceslog.py', 'dboperations.py']
   print('Starting Generators')

@@ -5,11 +5,12 @@ import time
 import common.attributes as attr
 import common.logger as logfunc
 from datetime import datetime
+from typing import NoReturn
 
-hostname = attr.get_hostname()
+hostname: str = attr.get_hostname()
 uuid = attr.get_system_uuid()
 
-def get_rpm_packages():
+def get_rpm_packages() -> list[dict]:
     try:
         output = subprocess.check_output(
             ['rpm', '-qa', '--qf', '%{NAME}\t%{VERSION}-%{RELEASE}\t%{ARCH}\t%{SUMMARY}\n'],
@@ -31,7 +32,7 @@ def get_rpm_packages():
     except subprocess.CalledProcessError:
         return []
         
-def get_debian_packages():
+def get_debian_packages() -> list[dict]:
     try:
         output = subprocess.check_output(
             ['dpkg-query', '-W', '-f=${Package}\t${Version}\t${Architecture}\t${Description}\n'],
@@ -67,9 +68,9 @@ def get_installed_packages():
         print(f"Failed to retrieve packages: {str(e)}")
         return []
 
-log_line_count = 0
+log_line_count: int = 0
 
-def log_data(log_directory, ready_directory):
+def log_data(log_directory: str, ready_directory: str) -> NoReturn:
     while True:
         logger = logfunc.setup_logging(log_directory, ready_directory, "SoftwareMonitor", "installed_software")
         global log_line_count
@@ -85,10 +86,10 @@ def log_data(log_directory, ready_directory):
         logfunc.clear_handlers(log_directory, ready_directory, logger)
         time.sleep(3600)  # Log every 60 minutes - or choose an interval
 
-def run():
-    log_directory = 'tmp-software-inventory'
-    ready_directory = 'ready'
-    debug_generator_directory = 'debuggeneratorlogs'
+def run() -> NoReturn:
+    log_directory: str = 'tmp-software-inventory'
+    ready_directory: str = 'ready'
+    debug_generator_directory: str = 'debuggeneratorlogs'
     os.makedirs(debug_generator_directory, exist_ok=True)
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)

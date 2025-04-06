@@ -1,16 +1,15 @@
 import subprocess
 import concurrent.futures
-import os
-import signal
-import sys
+from typing import Any
 
-def run():
-  def execute_scripts(script):
+def execute_scripts(script) -> tuple[Any, str, str]:
     print(script)
     result = subprocess.run(['python3', script], capture_output=True, text=True)
     return script, result.stdout, result.stderr
+
+def run() -> None:
   # this section governs local vs databse mode - default is local
-  generators = ['process-logger.py', 'package-inventory.py', 'linux-endpoint-info.py', 'network-logger.py', 'linux-services.py']
+  generators: list[str] = ['process-logger.py', 'package-inventory.py', 'linux-endpoint-info.py', 'network-logger.py', 'linux-services.py']
   # this generator is for database mode
   # generators = ['process-logger.py', 'package-inventory.py', 'linux-endpoint-info.py', 'network-logger.py', 'linux-services.py' 'dboperations.py']
   print('Starting Generators')
@@ -22,4 +21,5 @@ def run():
       if(stderr):
         print(f"Errors from {script}:")
         print(stderr)
+
 run()

@@ -1,19 +1,17 @@
 import os
 import psutil
 import time
-import logging
 from datetime import datetime
-from pathlib import Path
 import common.attributes as attr
 from common.logger import check_logging_interval, enter_debug_logs
+from typing import NoReturn
 
 # Global counter for log lines written
 log_line_count = 0
 
 # Retrieve system details once
-#sid = attr.get_computer_sid()
 uuid = attr.get_system_uuid()
-hostname = attr.get_hostname()
+hostname: str = attr.get_hostname()
 
 def log_message(logger, message):
   """Logs a message and updates the global line counter."""
@@ -21,7 +19,7 @@ def log_message(logger, message):
   logger.info(message)
   log_line_count += 1  # Increment counter
 
-def log_existing_processes(logger):
+def log_existing_processes(logger) -> None:
   """Logs all currently running processes at script startup."""
   #log_message(logger, f"Logging all existing processes at startup on {hostname} with uuid: {uuid}")
   for proc in psutil.process_iter(attrs=['pid', 'name', 'exe', 'username', 'cmdline']):
@@ -44,10 +42,10 @@ def log_existing_processes(logger):
     except (psutil.NoSuchProcess, psutil.AccessDenied):
       continue  # Ignore processes that vanish before logging
 
-def monitor_process_events(log_directory, ready_directory, interval=1):
+def monitor_process_events(log_directory: str, ready_directory: str, interval: float=1.0) -> NoReturn:
   """Monitors process creation and termination events while tracking log lines written."""
   logger, last_minute = check_logging_interval(log_directory, ready_directory, "ProcessMonitor", "process", None, None)
-  previous_processes = set(psutil.pids())
+  previous_processes: set[int] = set(psutil.pids())
 
   # Log all running processes at startup
   log_existing_processes(logger)
@@ -56,16 +54,15 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
     # # Check if the minute has changed to rotate the log file
     logger, last_minute = check_logging_interval(log_directory, ready_directory, "ProcessMonitor", "process", logger, last_minute)
 
-    current_processes = set(psutil.pids()) 
-    created_processes = current_processes - previous_processes
-    terminated_processes = previous_processes - current_processes
+    current_processes: set[int] = set(psutil.pids()) 
+    created_processes: set[int] = current_processes - previous_processes
+    terminated_processes: set[int] = previous_processes - current_processes
 
     # Log created processes
     for pid in created_processes:
       try:
         proc = psutil.Process(pid)
         proc_info = proc.as_dict(attrs=['pid', 'name', 'username'])
-        pid = proc_info.get('pid', 'N/A')
         proc_name: str = proc_info.get('name', 'Unknown')
         user: str = proc_info.get('username', 'N/A')
 
@@ -88,7 +85,6 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
       try:
         proc = psutil.Process(pid)
         proc_info = proc.as_dict(attrs=['pid', 'name', 'username'])
-        pid = proc_info.get('pid', 'N/A')
         proc_name: str = proc_info.get('name', 'Unknown')
         user: str = proc_info.get('username', 'N/A')
         # Handle cases where the parent process is None
@@ -115,9 +111,9 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
     time.sleep(interval)
 
 def run():
-  log_directory = 'tmp-process'
-  ready_directory = 'ready'
-  debug_generator_directory = 'debuggeneratorlogs'
+  log_directory: str = 'tmp-process'
+  ready_directory: str = 'ready'
+  debug_generator_directory: str = 'debuggeneratorlogs'
   os.makedirs(debug_generator_directory, exist_ok=True)
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)

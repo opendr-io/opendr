@@ -1,13 +1,13 @@
 import time
 from datetime import datetime
 import os
-from pathlib import Path
 import common.attributes as attr
 import common.logger as logfunc
+from typing import NoReturn
 
-log_line_count = 0
+log_line_count: int = 0
 
-def log_data(log_directory, ready_directory):
+def log_data(log_directory: str, ready_directory: str) -> NoReturn:
   while True:
     logger = logfunc.setup_logging(log_directory, ready_directory, "EndpointMonitor", "endpoint")
     global log_line_count
@@ -22,11 +22,12 @@ def log_data(log_directory, ready_directory):
     log_line_count += 1
     logfunc.enter_debug_logs('endpoint-info', f"Running total log lines written: {log_line_count}  \n")
     logfunc.clear_handlers(log_directory, ready_directory, logger)
-    time.sleep(6000)  # Log every 60 minutes - or choose an interval
-def run():
-  log_directory = 'tmp-endpoint-info'
-  ready_directory = 'ready'
-  debug_generator_directory = 'debuggeneratorlogs'
+    time.sleep(3600)  # Log every 60 minutes - or choose an interval
+
+def run() -> NoReturn:
+  log_directory: str = 'tmp-endpoint-info'
+  ready_directory: str = 'ready'
+  debug_generator_directory: str = 'debuggeneratorlogs'
   os.makedirs(debug_generator_directory, exist_ok=True)
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
