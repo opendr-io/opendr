@@ -32,7 +32,7 @@ def log_connection(logger, event, conn):
     logger.info(
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
         f"hostname: {hostname} |  username: {username}  | "
-        f"event: {event} | process: {process_name}   pid: {conn.pid} | "       
+        f"event: {event} | name: {process_name} | pid: {conn.pid} | "
         f"sourceip: {conn.laddr[0]} | sourceport: {conn.laddr[1]} | "
         f"destip: {remote_ip} | destport: {remote_port} | "
         f"status: {conn.status} | sid: {sid}"

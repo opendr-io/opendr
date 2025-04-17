@@ -48,7 +48,7 @@ class StoreData:
           pattern = r'(\w+):([^|]+)(?:[,|]|$)'
           matches = re.findall(pattern, line)
           data = {key.strip(): value.strip() for key, value in matches}
-          final_params = [data.get('timestamp'),  data.get('event'), data.get('pid'), '', data.get('hostname'), data.get('ppid'), data.get('parent'), '', '', '',
+          final_params = [data.get('timestamp'),  data.get('event'), data.get('pid'), data.get('name'), data.get('hostname'), '', '', '', '', '',
           data.get('sourceip'), data.get('sourceport'), data.get('destip'), data.get('destport'), '', data.get('status'), data.get('sid')]
           fillers = ("%s," * 17)[:-1]
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
