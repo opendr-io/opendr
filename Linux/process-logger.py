@@ -11,7 +11,8 @@ from common.logger import check_logging_interval, enter_debug_logs
 log_line_count = 0
 
 # Retrieve system details once
-sid = attr.get_computer_sid()
+#sid = attr.get_computer_sid()
+uuid = attr.get_system_uuid()
 hostname = attr.get_hostname()
 
 def log_message(logger, message):
@@ -22,7 +23,7 @@ def log_message(logger, message):
 
 def log_existing_processes(logger):
   """Logs all currently running processes at script startup."""
-  #log_message(logger, f"Logging all existing processes at startup on {hostname} with SID: {sid}")
+  #log_message(logger, f"Logging all existing processes at startup on {hostname} with uuid: {uuid}")
   for proc in psutil.process_iter(attrs=['pid', 'name', 'exe', 'username', 'cmdline']):
     try:
       proc_info = proc.as_dict(attrs=['pid', 'name', 'username'])
@@ -39,7 +40,7 @@ def log_existing_processes(logger):
 
       log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
         f"hostname: {hostname} | username: {user} | event: existing process | "
-        f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | sid: {sid}")
+        f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | uuid: {uuid}")
     except (psutil.NoSuchProcess, psutil.AccessDenied):
       continue  # Ignore processes that vanish before logging
 
@@ -77,7 +78,7 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
 
         log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
           f"hostname: {hostname} | username: {user} | event: process created | "
-          f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | sid: {sid}"
+          f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | uuid: {uuid}"
         )
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue
@@ -98,9 +99,12 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
             parent_name: str = parent.name()
 
         log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-            f"pid: {pid} | name: {proc_name} | hostname: {hostname} | ppid: {parent_pid} | parent: {parent_name} | username: {user} | sid: {sid}")
+            f"pid: {pid} | name: {proc_name} | hostname: {hostname} | ppid: {parent_pid} | parent: {parent_name} | username: {user} | uuid: {uuid}")
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue
+        #log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+          #f"hostname: {hostname} | username: {user} | event: process terminated | "
+          #f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | uuid: {uuid}")
 
     # Print the current running total of log lines every 10 seconds
     if int(time.time()) % 10 == 0:

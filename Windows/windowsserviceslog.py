@@ -27,7 +27,7 @@ def log_services(log_directory, ready_directory):
       service_info = (
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
         f"hostname: {hostname} | username: {info['username']} | "
-        f"pid: {info['pid']} | servicename:{info['name']!r} | displayname:{info['display_name']!r} | "
+        f"pid: {info['pid']} | servicename: {info['name']!r} | displayname: {info['display_name']!r} | "
         f"status: {info['status']} | start: {info['start_type']} | "
         f"executable: {info['binpath']} | "
         f"sid: {computer_sid} | "
