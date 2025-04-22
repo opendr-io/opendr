@@ -7,7 +7,7 @@ class StoreData:
     self.port = ''
     self.db = ''
     self.user = ''
-    self.password=""
+    self.password=''
     self.sslmode = ''
     self.sslrootcert = ''
     self.users_log_counter = 0
@@ -35,7 +35,6 @@ class StoreData:
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
-
 
   def store_network_events(self, filename):
     table = 'systemevents(timestmp, event, pid, name, hostname, ppid, parent, username, dnsname, dnsdate, sourceip, sourceport, destip, destport, asname, status, sid)'
