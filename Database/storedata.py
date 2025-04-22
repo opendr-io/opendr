@@ -7,7 +7,7 @@ class StoreData:
     self.port = ''
     self.db = ''
     self.user = ''
-    self.password=""
+    self.password=''
     self.sslmode = ''
     self.sslrootcert = ''
     self.users_log_counter = 0
@@ -36,7 +36,6 @@ class StoreData:
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
 
-
   def store_network_events(self, filename):
     table = 'systemevents(timestmp, event, pid, name, hostname, ppid, parent, username, dnsname, dnsdate, sourceip, sourceport, destip, destport, asname, status, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
@@ -48,7 +47,7 @@ class StoreData:
           pattern = r'(\w+):([^|]+)(?:[,|]|$)'
           matches = re.findall(pattern, line)
           data = {key.strip(): value.strip() for key, value in matches}
-          final_params = [data.get('timestamp'),  data.get('event'), data.get('pid'), '', data.get('hostname'), data.get('ppid'), data.get('parent'), '', '', '',
+          final_params = [data.get('timestamp'),  data.get('event'), data.get('pid'), data.get('name'), data.get('hostname'), '', '', data.get('username'), '', '',
           data.get('sourceip'), data.get('sourceport'), data.get('destip'), data.get('destport'), '', data.get('status'), data.get('sid')]
           fillers = ("%s," * 17)[:-1]
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'

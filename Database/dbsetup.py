@@ -1,6 +1,5 @@
 import psycopg
 from pathlib import Path
-from storedata import StoreData
 
 def setup_postgres_tables():
   applications_table = 'applications(timestmp, hostname, sid, ec2instanceid, program, servicename, displayname, status, start, username, pid, executable)'
