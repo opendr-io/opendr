@@ -3,7 +3,7 @@ import configparser
 import pathlib
 
 config = configparser.ConfigParser()
-config.read(pathlib.Path(__file__).parent.absolute() / "dbconfig.ini")
+config.read(pathlib.Path(__file__).parent.absolute() / "../dbconfig.ini")
 
 def setup_postgres_tables():
   applications_table = 'applications(timestmp, hostname, sid, ec2instanceid, program, servicename, displayname, status, start, username, pid, executable)'

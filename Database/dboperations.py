@@ -8,7 +8,7 @@ import configparser
 import pathlib
 
 config = configparser.ConfigParser()
-config.read(pathlib.Path(__file__).parent.absolute() / "dbconfig.ini")
+config.read(pathlib.Path(__file__).parent.absolute() / "../dbconfig.ini")
 
 def directory_cleanup():
   directory = 'done/ready'
