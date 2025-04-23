@@ -7,7 +7,7 @@ class StoreData:
     self.port = ''
     self.db = ''
     self.user = ''
-    self.password=''
+    self.password = ''
     self.sslmode = ''
     self.sslrootcert = ''
     self.users_log_counter = 0
