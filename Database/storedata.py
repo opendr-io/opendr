@@ -1,15 +1,20 @@
 import re
 import psycopg
+import configparser
+import pathlib
+
+config = configparser.ConfigParser()
+config.read(pathlib.Path(__file__).parent.absolute() / "../dbconfig.ini")
 
 class StoreData:
   def __init__(self):
-    self.host = ''
-    self.port = ''
-    self.db = ''
-    self.user = ''
-    self.password = ''
-    self.sslmode = ''
-    self.sslrootcert = ''
+    self.host = config.get('Database', 'HostName')
+    self.port = config.get('Database', 'PortNumber', fallback='4000')
+    self.db = config.get('Database', 'DatabaseName', fallback='opendr')
+    self.user = config.get('Database', 'AgentUserName', fallback='agent')
+    self.password = config.get('Database', 'AgentPassword')
+    self.sslmode = 'verify-ca'
+    self.sslrootcert = config.get('Database', 'SSLRootCert')
     self.users_log_counter = 0
     self.endpoint_log_counter = 0
     self.network_log_counter = 0

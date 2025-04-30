@@ -10,6 +10,9 @@ import pathlib
 config = configparser.ConfigParser()
 config.read(pathlib.Path(__file__).parent.absolute() / "../dbconfig.ini")
 
+db_interval = config.getint('Database', 'DatabaseInterval', fallback=30)
+cleanup_interval = config.getint('Database', 'CleanupInterval', fallback=30)
+
 def directory_cleanup():
   directory = 'done/ready'
   with os.scandir(directory) as files:
@@ -18,11 +21,10 @@ def directory_cleanup():
         os.unlink(file.path)
 
 def monitor_directory(dir, pat):
-  db_interval = config.getint('Database', 'DatabaseInterval', fallback=30)
   dataStorage = StoreData()
   path = Path(dir)
   processed_files = set()
-  schedule.every(30).minutes.do(directory_cleanup)
+  schedule.every(cleanup_interval).minutes.do(directory_cleanup)
   while True:
     try:
       current_files = set(path.glob(pat))
