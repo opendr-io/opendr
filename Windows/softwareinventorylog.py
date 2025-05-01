@@ -62,6 +62,7 @@ def run():
   os.makedirs(debug_generator_directory, exist_ok=True)
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
+  logfunc.move_existing_temp_files(log_directory, ready_directory)
   while True:
     log_installed_software(log_directory, ready_directory)
     time.sleep(43200)  # Twice a day by default, can be increased or decreased

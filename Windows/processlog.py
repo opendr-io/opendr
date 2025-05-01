@@ -5,7 +5,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 import common.attributes as attr
-from common.logger import check_logging_interval, enter_debug_logs
+from common.logger import check_logging_interval, enter_debug_logs, move_existing_temp_files
 
 # Global counter for log lines written
 log_line_count = 0
@@ -117,6 +117,7 @@ def run():
   os.makedirs(debug_generator_directory, exist_ok=True)
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
+  move_existing_temp_files(log_directory, ready_directory)
   # Run the monitor with a 0.1-second interval
   monitor_process_events(log_directory, ready_directory, interval=0.1)
 

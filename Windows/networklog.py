@@ -5,7 +5,7 @@ import time
 import logging
 import ipaddress
 import common.attributes as attr
-from common.logger import check_logging_interval, enter_debug_logs
+from common.logger import check_logging_interval, enter_debug_logs, move_existing_temp_files
 
 # Global counter for log lines written
 log_line_count = 0
@@ -107,6 +107,7 @@ def run():
   ready_directory = 'ready'
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
+  move_existing_temp_files(log_directory, ready_directory)
   monitor_network_connections(log_directory, ready_directory, interval=0.1)
 
 run()

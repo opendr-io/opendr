@@ -55,6 +55,24 @@ def check_logging_interval(*args) -> tuple[logging.Logger, int]:
         last_interval= current_interval
     return logger, last_interval
 
+def move_existing_temp_files(log_directory, ready_directory):
+    try:
+        for entry in os.listdir(log_directory):
+            full_path = os.path.join(log_directory, entry)
+            if('nt' in os.name):
+                file = str(full_path).rsplit('\\')[-1]
+            else:
+                file = str(full_path).rsplit('/')[-1]
+            log_path: str = os.path.join(log_directory, file)
+            ready_path: str = os.path.join(ready_directory, file)
+            Path(log_path).rename(ready_path)
+    except FileNotFoundError:
+        print(f"Error: The directory '{dir}' was not found.")
+    except PermissionError:
+        print(f"Error: Permission denied to access '{dir}'.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 def enter_debug_logs(file_name: str, debug_string: str) -> None:
     with open(f'debuggeneratorlogs/{file_name}-debug.log', 'a') as file:
         file.write(debug_string)

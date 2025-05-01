@@ -45,6 +45,7 @@ def run():
   os.makedirs(debug_generator_directory, exist_ok=True)
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
+  move_existing_temp_files(log_directory, ready_directory)
   print('windowsserviceslog running')
   while True:
     log_services(log_directory, ready_directory)
