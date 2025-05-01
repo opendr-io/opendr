@@ -92,6 +92,7 @@ def run():
     os.makedirs(debug_generator_directory, exist_ok=True)
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)
+    logfunc.move_existing_temp_files(log_directory, ready_directory)
     log_data(log_directory, ready_directory)
 
 run()
