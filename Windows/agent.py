@@ -12,7 +12,7 @@ def run():
   # this section governs local vs databse mode - default is local
   generators = ['processlog.py', 'softwareinventorylog.py', 'endpointinfolog.py', 'networklog.py', 'windowsserviceslog.py']
   # this generator is for database mode
-  # generators = ['dboperations.py', 'softwareinventorylog.py', 'endpointinfolog.py', 'userinfolog.py', 'processlog.py', 'networklog.py', 'windowsserviceslog.py']
+  # generators = ['softwareinventorylog.py', 'endpointinfolog.py', 'userinfolog.py', 'processlog.py', 'networklog.py', 'windowsserviceslog.py', 'dboperations.py']
   print('Starting Genereators')
   with concurrent.futures.ThreadPoolExecutor(len(generators)) as executor:
     results = executor.map(execute_scripts, generators)
