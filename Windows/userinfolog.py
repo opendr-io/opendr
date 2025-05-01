@@ -25,7 +25,7 @@ def monitor_logged_in_users(log_directory, ready_directory, interval):
                     f"timestamp: {login_time} | "
                     f"hostname: {hostname} | "
                     f"event: user detected | username: {user.name} | "
-                    f"from sourceip: {user.host or 'n/a'} | "
+                    f"sourceip: {user.host or 'n/a'} | "
                     f"sid: {sid} "
                 )
                 seen_users.add(user_entry)  

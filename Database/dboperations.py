@@ -45,7 +45,7 @@ def monitor_directory(dir, pat):
           dataStorage.store_installed_applications(fn)
         elif('endpoint' in fn):
           dataStorage.store_endpoint_info(fn)
-        elif('users' in fn):
+        elif('user' in fn):
           dataStorage.store_user_info(fn)
         processed_files.add(new_file)
         schedule.run_pending()
