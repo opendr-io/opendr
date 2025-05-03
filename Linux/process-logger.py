@@ -44,7 +44,7 @@ def log_existing_processes(logger) -> None:
 
 def monitor_process_events(log_directory: str, ready_directory: str, interval: float=1.0) -> NoReturn:
   """Monitors process creation and termination events while tracking log lines written."""
-  logger, last_minute = check_logging_interval(log_directory, ready_directory, "ProcessMonitor", "process", None, None)
+  logger, last_interval = check_logging_interval(log_directory, ready_directory, "ProcessMonitor", "process", None, None)
   previous_processes: set[int] = set(psutil.pids())
 
   # Log all running processes at startup
@@ -52,7 +52,7 @@ def monitor_process_events(log_directory: str, ready_directory: str, interval: f
 
   while True:
     # # Check if the minute has changed to rotate the log file
-    logger, last_minute = check_logging_interval(log_directory, ready_directory, "ProcessMonitor", "process", logger, last_minute)
+    logger, last_interval = check_logging_interval(log_directory, ready_directory, "ProcessMonitor", "process", logger, last_interval)
 
     current_processes: set[int] = set(psutil.pids()) 
     created_processes: set[int] = current_processes - previous_processes
@@ -118,6 +118,7 @@ def run():
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
   # Run the monitor with a 0.1-second interval
-  monitor_process_events(log_directory, ready_directory, interval=0.1)
+  interval = attr.get_config_value('Linux', 'ProcessInterval', 0.1, 'float')
+  monitor_process_events(log_directory, ready_directory, interval)
 
 run()

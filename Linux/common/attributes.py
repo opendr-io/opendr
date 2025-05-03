@@ -3,6 +3,11 @@ import requests
 import psutil
 #import win32security
 import os
+import configparser
+import pathlib
+
+config = configparser.ConfigParser()
+config.read(pathlib.Path(__file__).parent.absolute() / "../../agentconfig.ini")
 
 def get_hostname() -> str:
     return socket.gethostname()
@@ -67,3 +72,16 @@ def get_system_uuid() -> dict[str, str]:
             "uuid": None,
             "source": "UUID not found in either path"
         }
+
+def get_config_value(section: str, key: str, default, type: str='str'):
+    match type:
+        case 'str':
+            return config.get(section, key, fallback=default)
+        case 'int':
+            return config.getint(section, key, fallback=default)
+        case 'float':
+            return config.getfloat(section, key, fallback=default)
+        case 'bool':
+            return config.getboolean(section, key, fallback=default)
+        case _:
+            return config.get(section, key, fallback=default)

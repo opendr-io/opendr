@@ -1,5 +1,10 @@
 import subprocess
 import concurrent.futures
+import configparser
+import pathlib
+
+config = configparser.ConfigParser()
+config.read(pathlib.Path(__file__).parent.absolute() / "../agentconfig.ini")
 
 def execute_scripts(script):
     print(script)
@@ -8,9 +13,9 @@ def execute_scripts(script):
 
 def run() -> None:
   # this section governs local vs database mode - default is local
-  generators: list[str] = ['processlog.py', 'softwareinventorylog.py', 'endpointinfolog.py', 'networklog.py', 'windowsserviceslog.py']
-  # this generator is for database mode
-  # generators = ['softwareinventorylog.py', 'endpointinfolog.py', 'userinfolog.py', 'processlog.py', 'networklog.py', 'windowsserviceslog.py', 'dboperations.py']
+  generators = config.get('Windows', 'Scripts', fallback='').split(', ')
+  if config.getboolean('Windows', 'RunDatabaseOperations', fallback=False):
+    generators.append('dboperations.py')
   print('Starting Generators')
   with concurrent.futures.ThreadPoolExecutor(len(generators)) as executor:
     results = executor.map(execute_scripts, generators)

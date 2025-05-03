@@ -60,11 +60,12 @@ def run() -> NoReturn:
   log_directory: str = 'tmp-software-inventory'
   ready_directory: str = 'ready'
   debug_generator_directory: str = 'debuggeneratorlogs'
+  interval = attr.get_config_value('Windows', 'SoftwareInterval', 43200.0, 'float')
   os.makedirs(debug_generator_directory, exist_ok=True)
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
   while True:
     log_installed_software(log_directory, ready_directory)
-    time.sleep(43200)  # Twice a day by default, can be increased or decreased
+    time.sleep(interval)  # Twice a day by default, can be increased or decreased
 
 run()

@@ -1,6 +1,11 @@
 import subprocess
 import concurrent.futures
 from typing import Any
+import configparser
+import pathlib
+
+config = configparser.ConfigParser()
+config.read(pathlib.Path(__file__).parent.absolute() / "../agentconfig.ini")
 
 def execute_scripts(script) -> tuple[Any, str, str]:
     print(script)
@@ -8,10 +13,10 @@ def execute_scripts(script) -> tuple[Any, str, str]:
     return script, result.stdout, result.stderr
 
 def run() -> None:
-  # this section governs local vs databse mode - default is local
-  generators: list[str] = ['process-logger.py', 'package-inventory.py', 'linux-endpoint-info.py', 'network-logger.py', 'linux-services.py']
-  # this generator is for database mode
-  # generators = ['process-logger.py', 'package-inventory.py', 'linux-endpoint-info.py', 'network-logger.py', 'linux-services.py' 'dboperations.py']
+  # this section governs local vs database mode - default is local
+  generators = config.get('Linux', 'Scripts', fallback='').split(', ')
+  if config.getboolean('Linux', 'RunDatabaseOperations', fallback=False):
+    generators.append('dboperations.py')
   print('Starting Generators')
   with concurrent.futures.ThreadPoolExecutor(len(generators)) as executor:
     results = executor.map(execute_scripts, generators)

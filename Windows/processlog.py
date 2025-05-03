@@ -45,7 +45,7 @@ def log_existing_processes(logger: logging.Logger) -> None:
 
 def monitor_process_events(log_directory: str, ready_directory: str, interval: float=1.0) -> NoReturn:
   """Monitors process creation and termination events while tracking log lines written."""
-  logger, last_minute = check_logging_interval(log_directory, ready_directory, "ProcessMonitor", "process", None, None)
+  logger, last_interval = check_logging_interval(log_directory, ready_directory, "ProcessMonitor", "process", None, None)
   previous_processes: set[int] = set(psutil.pids())
 
   # Log all running processes at startup
@@ -53,7 +53,7 @@ def monitor_process_events(log_directory: str, ready_directory: str, interval: f
 
   while True:
     # # Check if the minute has changed to rotate the log file
-    logger, last_minute = check_logging_interval(log_directory, ready_directory, "ProcessMonitor", "process", logger, last_minute)
+    logger, last_interval = check_logging_interval(log_directory, ready_directory, "ProcessMonitor", "process", logger, last_interval)
 
     current_processes: set[int] = set(psutil.pids()) 
     created_processes = current_processes - previous_processes
@@ -100,10 +100,7 @@ def monitor_process_events(log_directory: str, ready_directory: str, interval: f
         log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
             f"pid: {pid} | name: {proc_name} | hostname: {hostname} | ppid: {parent_pid} | parent: {parent_name} | username: {user} | sid: {sid}")
       except (psutil.NoSuchProcess, psutil.AccessDenied):
-        log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-          f"hostname: {hostname} | username: {user} | event: process terminated | "
-          f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | sid: {sid}")
-          #f"pid: {pid} | name: | hostname: | ppid: | parent: | username: | sid: {sid}")
+        continue
 
     # Print the current running total of log lines every 10 seconds
     if int(time.time()) % 10 == 0:
@@ -120,7 +117,8 @@ def run() -> NoReturn:
   os.makedirs(debug_generator_directory, exist_ok=True)
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
-  # Run the monitor with a 0.1 second interval
-  monitor_process_events(log_directory, ready_directory, interval=0.1)
+  # Run the monitor with a 0.1-second interval
+  interval = attr.get_config_value('Windows', 'ProcessInterval', 0.1, 'float')
+  monitor_process_events(log_directory, ready_directory, interval)
 
 run()

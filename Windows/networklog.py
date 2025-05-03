@@ -34,7 +34,7 @@ def log_connection(logger: logging.Logger, event: str, conn) -> None:
     logger.info(
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
         f"hostname: {hostname} |  username: {username}  | "
-        f"event: {event} | process: {process_name}   pid: {conn.pid} | "       
+        f"event: {event} | name: {process_name} | pid: {conn.pid} | "
         f"sourceip: {conn.laddr[0]} | sourceport: {conn.laddr[1]} | "
         f"destip: {remote_ip} | destport: {remote_port} | "
         f"status: {conn.status} | sid: {sid}"
@@ -44,7 +44,7 @@ def log_connection(logger: logging.Logger, event: str, conn) -> None:
 
 def log_initial_connections(log_directory: str, ready_directory: str) -> tuple[dict, logging.Logger, int]:
   """Log all currently active connections before starting real-time monitoring."""
-  logger, last_minute = check_logging_interval(log_directory, ready_directory, "NetworkMonitor", "network", None, None)
+  logger, last_interval  = check_logging_interval(log_directory, ready_directory, "NetworkMonitor", "network", None, None)
 
   try:
     connections = psutil.net_connections(kind='inet')
@@ -64,14 +64,14 @@ def log_initial_connections(log_directory: str, ready_directory: str) -> tuple[d
     initial_connections[key] = conn
     
     log_connection(logger, "existing connection", conn)
-  return initial_connections, logger, last_minute  # Return initial snapshot for comparison in monitoring
+  return initial_connections, logger, last_interval   # Return initial snapshot for comparison in monitoring
 
 def monitor_network_connections(log_directory: str, ready_directory: str, interval: float) -> NoReturn:
   """Continuously monitor new and terminated connections, rotating logs every minute."""
-  previous_connections, logger, last_minute = log_initial_connections(log_directory, ready_directory)  # Log all existing connections first
+  previous_connections, logger, last_interval  = log_initial_connections(log_directory, ready_directory)  # Log all existing connections first
   
   while True:
-    logger, last_minute = check_logging_interval(log_directory, ready_directory, "NetworkMonitor", "network", logger, last_minute)
+    logger, last_interval = check_logging_interval(log_directory, ready_directory, "NetworkMonitor", "network", logger, last_interval)
 
     current_connections = {}
     try:
@@ -109,6 +109,9 @@ def run() -> NoReturn:
   ready_directory: str = 'ready'
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
-  monitor_network_connections(log_directory, ready_directory, interval=0.1)
+
+  interval = attr.get_config_value('Windows', 'NetworkInterval', 0.1, 'float')
+  monitor_network_connections(log_directory, ready_directory, interval)
+
 
 run()
