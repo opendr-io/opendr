@@ -1,15 +1,20 @@
 import re
 import psycopg
+import configparser
+import pathlib
+
+config = configparser.ConfigParser()
+config.read(pathlib.Path(__file__).parent.absolute() / "../dbconfig.ini")
 
 class StoreData:
   def __init__(self):
-    self.host = ''
-    self.port = ''
-    self.db = ''
-    self.user = ''
-    self.password=''
-    self.sslmode = ''
-    self.sslrootcert = ''
+    self.host = config.get('Database', 'HostName')
+    self.port = config.get('Database', 'PortNumber', fallback='4000')
+    self.db = config.get('Database', 'DatabaseName', fallback='opendr')
+    self.user = config.get('Database', 'AgentUserName', fallback='agent')
+    self.password = config.get('Database', 'AgentPassword')
+    self.sslmode = 'verify-ca'
+    self.sslrootcert = config.get('Database', 'SSLRootCert')
     self.users_log_counter = 0
     self.endpoint_log_counter = 0
     self.network_log_counter = 0
@@ -107,7 +112,7 @@ class StoreData:
           connection.commit()
   
   def store_user_info(self, filename):
-    table = 'endpointinfo(timestmp, event, hostname, ec2instanceid, privateips, publicip, username, onterminal, fromhostname, logintime, sid)'
+    table = 'systemevents(timestmp, event, pid, name, hostname, ppid, parent, username, dnsname, dnsdate, sourceip, sourceport, destip, destport, asname, status, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
         lines = file.readlines()
@@ -117,8 +122,9 @@ class StoreData:
           pattern = r'(\w+):([^|]+)(?:[,|]|$)'
           matches = re.findall(pattern, line)
           data = {key.strip(): value.strip() for key, value in matches}
-          final_params = [data.get('timestamp'), data.get('event'), data.get('hostname'), '', '', '', data.get('username'), data.get('on_terminal'), data.get('from_hostname'), data.get('at_login_time'), '']
-          fillers = ("%s," * 11)[:-1]
+          final_params = [data.get('timestamp'), data.get('event'), '', '', data.get('hostname'), '', '',
+                          data.get('username'), '', '', data.get('sourceip'), '', '', '', '', '', data.get('sid')]
+          fillers = ("%s," * 17)[:-1]
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()

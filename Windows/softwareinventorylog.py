@@ -56,6 +56,7 @@ def log_installed_software(log_directory, ready_directory):
   logfunc.clear_handlers(log_directory, ready_directory, logger)
 
 def run():
+  interval = attr.get_config_value('Windows', 'SoftwareInterval', 43200.0, 'float')
   log_directory = 'tmp-software-inventory'
   ready_directory = 'ready'
   debug_generator_directory = 'debuggeneratorlogs'
@@ -65,6 +66,6 @@ def run():
   logfunc.move_existing_temp_files(log_directory, ready_directory)
   while True:
     log_installed_software(log_directory, ready_directory)
-    time.sleep(43200)  # Twice a day by default, can be increased or decreased
+    time.sleep(interval)  # Twice a day by default, can be increased or decreased
 
 run()

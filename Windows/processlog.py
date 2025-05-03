@@ -1,9 +1,7 @@
 import os
 import psutil
 import time
-import logging
 from datetime import datetime
-from pathlib import Path
 import common.attributes as attr
 from common.logger import check_logging_interval, enter_debug_logs, move_existing_temp_files
 
@@ -45,7 +43,7 @@ def log_existing_processes(logger):
 
 def monitor_process_events(log_directory, ready_directory, interval=1):
   """Monitors process creation and termination events while tracking log lines written."""
-  logger, last_minute = check_logging_interval(log_directory, ready_directory, "ProcessMonitor", "process", None, None)
+  logger, last_interval = check_logging_interval(log_directory, ready_directory, "ProcessMonitor", "process", None, None)
   previous_processes = set(psutil.pids())
 
   # Log all running processes at startup
@@ -53,7 +51,7 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
 
   while True:
     # # Check if the minute has changed to rotate the log file
-    logger, last_minute = check_logging_interval(log_directory, ready_directory, "ProcessMonitor", "process", logger, last_minute)
+    logger, last_interval = check_logging_interval(log_directory, ready_directory, "ProcessMonitor", "process", logger, last_interval)
 
     current_processes = set(psutil.pids()) 
     created_processes = current_processes - previous_processes
@@ -119,6 +117,7 @@ def run():
   os.makedirs(ready_directory, exist_ok=True)
   move_existing_temp_files(log_directory, ready_directory)
   # Run the monitor with a 0.1-second interval
-  monitor_process_events(log_directory, ready_directory, interval=0.1)
+  interval = attr.get_config_value('Windows', 'ProcessInterval', 0.1, 'float')
+  monitor_process_events(log_directory, ready_directory, interval)
 
 run()
