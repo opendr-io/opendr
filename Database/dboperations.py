@@ -4,6 +4,14 @@ import shutil
 import schedule
 from pathlib import Path
 from storedata import StoreData
+import configparser
+import pathlib
+
+config = configparser.ConfigParser()
+config.read(pathlib.Path(__file__).parent.absolute() / "../dbconfig.ini")
+
+db_interval = config.getint('Database', 'DatabaseInterval', fallback=30)
+cleanup_interval = config.getint('Database', 'CleanupInterval', fallback=30)
 
 def directory_cleanup():
   directory = 'done/ready'
@@ -16,13 +24,13 @@ def monitor_directory(dir, pat):
   dataStorage = StoreData()
   path = Path(dir)
   processed_files = set()
-  schedule.every(30).minutes.do(directory_cleanup)
+  schedule.every(cleanup_interval).minutes.do(directory_cleanup)
   while True:
     try:
       current_files = set(path.glob(pat))
       new_files = current_files - processed_files
       if not new_files:
-        time.sleep(30)
+        time.sleep(db_interval)
         continue            
       for new_file in new_files:
         fn = str(new_file)
@@ -37,14 +45,14 @@ def monitor_directory(dir, pat):
           dataStorage.store_installed_applications(fn)
         elif('endpoint' in fn):
           dataStorage.store_endpoint_info(fn)
-        elif('users' in fn):
+        elif('user' in fn):
           dataStorage.store_user_info(fn)
         processed_files.add(new_file)
         schedule.run_pending()
-        shutil.move(fn, 'done/'+fn)
+        shutil.move(fn, 'done/' + fn)
     except Exception as e:
       print(f"Error: {e}")
-      time.sleep(1)
+      time.sleep(db_interval)
       
 def run():
   os.makedirs('done/ready', exist_ok=True)

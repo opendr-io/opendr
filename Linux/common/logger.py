@@ -4,6 +4,7 @@ import logging
 import random
 from pathlib import Path
 from typing import Optional
+from attributes import get_config_value
 
 def setup_logging(log_directory: str, ready_directory: str, logger_name: str, file_name: str) -> logging.Logger:
     """Configures logging to write to a new file every minute."""
@@ -41,6 +42,18 @@ def clear_handlers(log_directory: str, ready_directory: str, logger: logging.Log
             print(e)
             continue
 
+def fetch_interval() -> int:
+    interval = get_config_value('General', 'LoggingInterval', 'minute')
+    match interval:
+        case 'minute':
+            return datetime.now().minute
+        case 'hour':
+            return datetime.now().hour
+        case 'day':
+            return datetime.now().day
+        case _:
+            return datetime.now().minute
+
 def check_logging_interval(*args) -> tuple[logging.Logger, int]:
     log_directory: str
     ready_directory: str
@@ -49,10 +62,10 @@ def check_logging_interval(*args) -> tuple[logging.Logger, int]:
     logger: Optional[logging.Logger]
     last_interval: Optional[int]
     log_directory, ready_directory, logger_name, file_name, logger, last_interval = args
-    current_interval: int = datetime.now().day # Defaults to daily logs for running locally; change to minute for database shippping
+    current_interval: int = fetch_interval() # Defaults to daily logs for running locally; change to minute for database shippping
     if current_interval != last_interval:  # Rotate log file at the start of a new minute
         logger = setup_logging(log_directory, ready_directory, logger_name, file_name)
-        last_interval= current_interval
+        last_interval = current_interval
     return logger, last_interval
 
 def enter_debug_logs(file_name: str, debug_string: str) -> None:

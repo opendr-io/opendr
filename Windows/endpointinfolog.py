@@ -1,13 +1,13 @@
 import time
 from datetime import datetime
 import os
-from pathlib import Path
 import common.attributes as attr
 import common.logger as logfunc
 
 log_line_count = 0
 
 def log_data(log_directory, ready_directory):
+  interval = attr.get_config_value('Windows', 'EndpointInterval', 43200.0, 'float')
   while True:
     logger = logfunc.setup_logging(log_directory, ready_directory, "EndpointMonitor", "endpoint")
     global log_line_count
@@ -22,7 +22,8 @@ def log_data(log_directory, ready_directory):
     log_line_count += 1
     logfunc.enter_debug_logs('endpoint-info', f"Running total log lines written: {log_line_count}  \n")
     logfunc.clear_handlers(log_directory, ready_directory, logger)
-    time.sleep(6000)  # Log every 60 minutes - or choose an interval
+    time.sleep(interval)  # Log every 12 hours - or choose an interval
+
 def run():
   log_directory = 'tmp-endpoint-info'
   ready_directory = 'ready'
