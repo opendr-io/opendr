@@ -54,6 +54,7 @@ def fetch_hotfixes(log_directory, ready_directory):
     ]
     dfh = dfh[[col for col in desired_order if col in dfh.columns]]
     dfh["event"] = "hotfix"
+    dfh["sid"] = attr.get_computer_sid()
     lines = dfh.apply(format_row_with_keys, axis=1)
     for line in lines:
         logger.info(line)

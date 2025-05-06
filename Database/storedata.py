@@ -130,7 +130,7 @@ class StoreData:
           connection.commit()
 
   def store_hotfix_info(self, filename):
-    table = 'endpointinfo(timestmp, event, hostname, ec2instanceid, privateips, publicip, username, onterminal, fromhostname, logintime, sid)'
+    table = 'applications(timestmp, hostname, pid, ec2instanceid, program, servicename, displayname, status, start, username, executable, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
         lines = file.readlines()
@@ -140,8 +140,8 @@ class StoreData:
           pattern = r'(\w+):([^|]+)(?:[,|]|$)'
           matches = re.findall(pattern, line)
           data = {key.strip(): value.strip() for key, value in matches}
-          final_params = [data.get('timestamp'), data.get('event'), data.get('hostname'), '', '', '', data.get('username'), '', '', '', '']
-          fillers = ("%s," * 11)[:-1]
+          final_params = [data.get('timestamp'), data.get('hostname'), '', '', '', data.get('name'), '', data.get('description'), '', data.get('username'), '', data.get('sid')]
+          fillers = ("%s," * 12)[:-1]
           print(final_params)
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
           connection.execute(sqlInsertStatement, final_params)
