@@ -3,6 +3,7 @@ import pandas as pd
 import json
 import os
 import time
+from datetime import datetime
 import common.attributes as attr
 import common.logger as logfunc
 
@@ -53,11 +54,13 @@ def fetch_hotfixes(log_directory, ready_directory):
         "description"
     ]
     dfh = dfh[[col for col in desired_order if col in dfh.columns]]
+    dfh['timestamp'] = dfh['timestamp'].apply(lambda x: datetime.strptime(x, '%d %B %Y %H:%M:%S').strftime('%Y-%m-%d %H:%M:%S'))
     dfh["event"] = "hotfix"
     dfh["sid"] = attr.get_computer_sid()
     lines = dfh.apply(format_row_with_keys, axis=1)
     for line in lines:
         logger.info(line)
+    logfunc.clear_handlers(log_directory, ready_directory, logger)
 
 def run():
     interval = attr.get_config_value('Windows', 'HotfixInterval', 43200.0, 'float')
