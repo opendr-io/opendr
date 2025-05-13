@@ -18,24 +18,27 @@ def log_services(log_directory, ready_directory, interval):
     hostname = attr.get_hostname()
     computer_sid = attr.get_computer_sid()
     global log_line_count
-    previous_services = [service.pid for service in psutil.win_service_iter()]
+    previous_services = [str((service.pid(), service.name())) for service in psutil.win_service_iter()]
     while True:
         logger, last_interval = logfunc.check_logging_interval(log_directory, ready_directory, "NewServiceMonitor", "newservice", logger, last_interval)
 
         for service in psutil.win_service_iter():
-            info = service.as_dict()
-            if info['pid'] not in previous_services: 
-                service_info = (
-                    f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-                    f"hostname: {hostname} | username: {info['username']} | "
-                    f"pid: {info['pid']} | servicename: {info['name']!r} | displayname: {info['display_name']!r} | "
-                    f"status: {info['status']} | start: {info['start_type']} | "
-                    f"executable: {info['binpath']} | "
-                    f"sid: {computer_sid} | "
-                )
-                logger.info(service_info)
-                log_line_count += 1
-                previous_services.append(info['pid'])
+            try:
+                info = service.as_dict()
+                if str((info['pid'], info['name'])) not in previous_services: 
+                    service_info = (
+                        f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                        f"hostname: {hostname} | username: {info['username']} | "
+                        f"pid: {info['pid']} | servicename: {info['name']!r} | displayname: {info['display_name']!r} | "
+                        f"status: {info['status']} | start: {info['start_type']} | "
+                        f"executable: {info['binpath']} | "
+                        f"sid: {computer_sid} | "
+                    )
+                    logger.info(service_info)
+                    log_line_count += 1
+                    previous_services.append(info['pid'])
+            except Exception as e:
+                print(e)
         time.sleep(interval)
 
 def run():

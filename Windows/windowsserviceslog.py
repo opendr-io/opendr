@@ -22,18 +22,21 @@ def log_services(log_directory, ready_directory):
   # print(f"Logging to: {log_file}")  # Print log filename for tracking
 
   for service in psutil.win_service_iter():
-    info = service.as_dict()
-    if info['status'] == 'running': 
-      service_info = (
-        f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-        f"hostname: {hostname} | username: {info['username']} | "
-        f"pid: {info['pid']} | servicename: {info['name']!r} | displayname: {info['display_name']!r} | "
-        f"status: {info['status']} | start: {info['start_type']} | "
-        f"executable: {info['binpath']} | "
-        f"sid: {computer_sid} | "
-      )
-      logger.info(service_info)
-      log_line_count += 1
+    try:
+      info = service.as_dict()
+      if info['status'] == 'running': 
+        service_info = (
+          f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+          f"hostname: {hostname} | username: {info['username']} | "
+          f"pid: {info['pid']} | servicename: {info['name']!r} | displayname: {info['display_name']!r} | "
+          f"status: {info['status']} | start: {info['start_type']} | "
+          f"executable: {info['binpath']} | "
+          f"sid: {computer_sid} | "
+        )
+        logger.info(service_info)
+        log_line_count += 1
+    except Exception as e:
+      print(e)
 
   logfunc.enter_debug_logs('windows-services', f"Running total log lines written: {log_line_count}  \n")
   logfunc.clear_handlers(log_directory, ready_directory, logger)
