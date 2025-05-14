@@ -54,7 +54,7 @@ def fetch_hotfixes(log_directory, ready_directory):
         "description"
     ]
     dfh = dfh[[col for col in desired_order if col in dfh.columns]]
-    dfh['timestamp'] = dfh['timestamp'].apply(lambda x: parse(x))
+    dfh['timestamp'] = dfh['timestamp'].apply(lambda x: parse(x) if x else '')
     dfh["event"] = "hotfix"
     dfh["sid"] = attr.get_computer_sid()
     lines = dfh.apply(format_row_with_keys, axis=1)
