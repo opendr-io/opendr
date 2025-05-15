@@ -25,7 +25,7 @@ def log_services(log_directory, ready_directory, interval):
         for service in psutil.win_service_iter():
             try:
                 info = service.as_dict()
-                if str((info['pid'], info['name'])) not in previous_services: 
+                if str((info['pid'], info['name'])) not in previous_services:
                     service_info = (
                         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
                         f"hostname: {hostname} | username: {info['username']} | "
@@ -36,7 +36,7 @@ def log_services(log_directory, ready_directory, interval):
                     )
                     logger.info(service_info)
                     log_line_count += 1
-                    previous_services.append(info['pid'])
+                    previous_services.append(str((info['pid'], info['name'])))
             except Exception as e:
                 print(e)
         time.sleep(interval)
