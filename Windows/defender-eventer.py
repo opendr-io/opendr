@@ -70,7 +70,6 @@ def fetch_defender_events(log_directory, ready_directory):
 
     dfwdf = dfwdf.rename(columns={
         "timestamp": "timestamp",
-        "event_id": "eventID",
         "message": "description",
         "For more information please see the following": "references",
         "Name": "title",
@@ -94,7 +93,7 @@ def fetch_defender_events(log_directory, ready_directory):
         "category",
         "executable",
         "file_path",
-        "eventID", 
+        "event_id", 
         "threat_id",
         "origin",
         "type",
