@@ -59,7 +59,7 @@ def log_data(log_directory, ready_directory):
         time.sleep(interval)  # Log every 60 minutes - or choose an interval
 
 def run():
-    log_directory = 'tmp-linux-services'
+    log_directory = 'tmp-linux-services' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory = 'ready'
     debug_generator_directory = 'debuggeneratorlogs'
     os.makedirs(debug_generator_directory, exist_ok=True)
