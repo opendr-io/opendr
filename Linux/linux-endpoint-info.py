@@ -1,7 +1,6 @@
 import time
 from datetime import datetime
 import os
-from pathlib import Path
 import common.attributes as attr
 import common.logger as logfunc
 
@@ -26,7 +25,7 @@ def log_data(log_directory, ready_directory):
     time.sleep(interval)  # Log every 60 minutes - or choose an interval
 
 def run():
-  log_directory = 'tmp-endpoint-info'
+  log_directory = 'tmp-endpoint-info' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
   ready_directory = 'ready'
   debug_generator_directory = 'debuggeneratorlogs'
   os.makedirs(debug_generator_directory, exist_ok=True)
