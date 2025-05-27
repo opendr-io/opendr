@@ -113,7 +113,7 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
     time.sleep(interval)
 
 def run():
-  log_directory = 'tmp-process'
+  log_directory = 'tmp-process' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
   ready_directory = 'ready'
   debug_generator_directory = 'debuggeneratorlogs'
   os.makedirs(debug_generator_directory, exist_ok=True)

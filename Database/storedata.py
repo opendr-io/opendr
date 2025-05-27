@@ -123,6 +123,21 @@ class StoreData:
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
 
+  def store_new_service(self, filename):
+    table = 'applications(timestmp, hostname, pid, ec2instanceid, program, servicename, displayname, status, start, username, executable, sid)'
+    with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
+      with open(filename, 'r') as file:
+        lines = file.readlines()
+        for line in lines:
+          if(not line):
+            continue
+          data = self.find_pattern(line)
+          final_params = [data.get('timestamp'),  data.get('hostname'), data.get('pid'), '', '', data.get('servicename'), data.get('displayname'), data.get('status'), data.get('start'), data.get('username'),  data.get('executable'), data.get('sid')]
+          fillers = ("%s," * 12)[:-1]
+          sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
+          connection.execute(sqlInsertStatement, final_params)
+          connection.commit()
+
   def store_hotfix_info(self, filename):
     table = 'applications(timestmp, hostname, pid, ec2instanceid, program, servicename, displayname, status, start, username, executable, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
