@@ -147,7 +147,7 @@ class StoreData:
           connection.commit()
   
   def store_defender_info(self, filename):
-    table = 'systemalerts(timestmp, event, username, title, severity, category, executable, filepath, eventid, threatid, origin, type, source, description, references, sid)'
+    table = 'systemalerts(timestmp, event, username, title, severity, category, executable, filepath, eventid, threatid, origin, type, source, description, reference, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
         lines = file.readlines()
