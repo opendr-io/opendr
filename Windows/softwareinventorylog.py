@@ -57,7 +57,7 @@ def log_installed_software(log_directory, ready_directory):
 
 def run():
   interval = attr.get_config_value('Windows', 'SoftwareInterval', 43200.0, 'float')
-  log_directory = 'tmp-software-inventory'
+  log_directory = 'tmp-software-inventory' if attr.get_config_value('Windows', 'RunDatabaseOperations', False, 'bool') else 'tmp'
   ready_directory = 'ready'
   debug_generator_directory = 'debuggeneratorlogs'
   os.makedirs(debug_generator_directory, exist_ok=True)
