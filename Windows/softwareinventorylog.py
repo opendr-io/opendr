@@ -57,10 +57,10 @@ def log_installed_software(log_directory: str, ready_directory: str) -> None:
   logfunc.clear_handlers(log_directory, ready_directory, logger)
 
 def run() -> NoReturn:
-  log_directory: str = 'tmp-software-inventory'
+  interval: float = attr.get_config_value('Windows', 'SoftwareInterval', 43200.0, 'float')
+  log_directory: str = 'tmp-software-inventory' if attr.get_config_value('Windows', 'RunDatabaseOperations', False, 'bool') else 'tmp'
   ready_directory: str = 'ready'
   debug_generator_directory: str = 'debuggeneratorlogs'
-  interval = attr.get_config_value('Windows', 'SoftwareInterval', 43200.0, 'float')
   os.makedirs(debug_generator_directory, exist_ok=True)
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)

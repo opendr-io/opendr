@@ -23,27 +23,30 @@ def log_services(log_directory: str, ready_directory: str) -> None:
   # print(f"Logging to: {log_file}")  # Print log filename for tracking
 
   for service in psutil.win_service_iter():
-    info = service.as_dict()
-    if info['status'] == 'running': 
-      service_info = (
-        f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-        f"hostname: {hostname} | username: {info['username']} | "
-        f"pid: {info['pid']} | servicename: {info['name']!r} | displayname: {info['display_name']!r} | "
-        f"status: {info['status']} | start: {info['start_type']} | "
-        f"executable: {info['binpath']} | "
-        f"sid: {computer_sid} | "
-      )
-      logger.info(service_info)
-      log_line_count += 1
+    try:
+      info = service.as_dict()
+      if info['status'] == 'running': 
+        service_info = (
+          f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+          f"hostname: {hostname} | username: {info['username']} | "
+          f"pid: {info['pid']} | servicename: {info['name']!r} | displayname: {info['display_name']!r} | "
+          f"status: {info['status']} | start: {info['start_type']} | "
+          f"executable: {info['binpath']} | "
+          f"sid: {computer_sid} | "
+        )
+        logger.info(service_info)
+        log_line_count += 1
+    except Exception as e:
+      print(e)
 
   logfunc.enter_debug_logs('windows-services', f"Running total log lines written: {log_line_count}  \n")
   logfunc.clear_handlers(log_directory, ready_directory, logger)
 
 def run() -> NoReturn:
-  log_directory: str = 'tmp-windows-services'
+  interval: float = attr.get_config_value('Windows', 'ServiceInterval', 43200.0, 'float')
+  log_directory: str = 'tmp-windows-services' if attr.get_config_value('Windows', 'RunDatabaseOperations', False, 'bool') else 'tmp'
   ready_directory: str = 'ready'
   debug_generator_directory: str = 'debuggeneratorlogs'
-  interval = attr.get_config_value('Windows', 'ServiceInterval', 43200.0, 'float')
   os.makedirs(debug_generator_directory, exist_ok=True)
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)

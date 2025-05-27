@@ -111,7 +111,7 @@ def monitor_process_events(log_directory: str, ready_directory: str, interval: f
     time.sleep(interval)
 
 def run() -> NoReturn:
-  log_directory: str = 'tmp-process'
+  log_directory: str = 'tmp-process' if attr.get_config_value('Windows', 'RunDatabaseOperations', False, 'bool') else 'tmp'
   ready_directory: str = 'ready'
   debug_generator_directory: str = 'debuggeneratorlogs'
   os.makedirs(debug_generator_directory, exist_ok=True)

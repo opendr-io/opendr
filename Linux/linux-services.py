@@ -60,7 +60,7 @@ def log_data(log_directory: str, ready_directory: str) -> NoReturn:
         time.sleep(interval)  # Log every 60 minutes - or choose an interval
 
 def run() -> NoReturn:
-    log_directory: str = 'tmp-linux-services'
+    log_directory: str = 'tmp-linux-services' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory: str = 'ready'
     debug_generator_directory: str = 'debuggeneratorlogs'
     os.makedirs(debug_generator_directory, exist_ok=True)
