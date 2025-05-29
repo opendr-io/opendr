@@ -1,0 +1,7 @@
+{
+    "May-25" : [
+        "CREATE TABLE systemalerts (id serial PRIMARY KEY, timestmp text, event text, username text, title text, severity text, category text, executable text, filepath text, eventid integer, threatid integer, origin text, type text, source text, description text, reference text, sid text)",
+        "ALTER TABLE applications ADD event text;"
+        ]
+
+}
