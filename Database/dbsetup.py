@@ -20,7 +20,8 @@ def setup_postgres_tables():
   with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'), dbname=config.get('Database', 'DatabaseName', fallback='opendr'),
                       user=config.get('Database', 'RootDatabaseUserName', fallback='postgres'), password=config.get('Database', 'RootDatabasePassword')) as connection:
     with connection.cursor() as cursor:
-      cursor.execute("""CREATE TABLE applications (id serial PRIMARY KEY, timestmp text, hostname text, ec2instanceid text, program text, servicename text, displayname text, status text, start text, username text, pid TEXT, executable text, sid text)""")
+      cursor.execute("""CREATE TABLE applications (id serial PRIMARY KEY, timestmp text, hostname text, event text, ec2instanceid text, program text, servicename text, 
+                    displayname text, status text, start text, username text, pid TEXT, executable text, sid text)""")
       cursor.execute("""CREATE TABLE endpointinfo (id serial PRIMARY KEY, timestmp text, hostname text,  ec2instanceid text, privateips text, publicip text, event text, username text,
         onterminal text, fromhostname text, logintime text, sid text)""")
       cursor.execute("""CREATE TABLE systemevents (id serial PRIMARY KEY, timestmp text, event text, pid integer, name text, hostname text, ppid text,
