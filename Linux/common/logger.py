@@ -4,7 +4,7 @@ import logging
 import random
 from pathlib import Path
 from typing import Optional
-from attributes import get_config_value
+from common.attributes import get_config_value
 
 def setup_logging(log_directory: str, ready_directory: str, logger_name: str, file_name: str) -> logging.Logger:
     """Configures logging to write to a new file every minute."""
