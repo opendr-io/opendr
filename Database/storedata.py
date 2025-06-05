@@ -30,7 +30,7 @@ class StoreData:
     return data
 
   def store_process_events(self, filename):
-    table = 'systemevents(timestmp, event, pid, name, hostname, ppid, parent, username, dnsname, dnsdate, sourceip, sourceport, destip, destport, asname, status, sid)'
+    table = 'systemevents(timestmp, event, pid, name, hostname, ppid, parent, username, dnsname, dnsdate, sourceip, sourceport, destip, destport, asname, status, exe, cmdline, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
         lines = file.readlines()
@@ -40,14 +40,14 @@ class StoreData:
           data = self.find_pattern(line)
           final_params = [data.get('timestamp'),  data.get('event'), data.get('pid'), data.get('name'), data.get('hostname'), data.get('ppid'), data.get('parent'), data.get('username')]
           final_params[9:9] = [''] * 8
-          final_params.append(data.get('sid'))
-          fillers = ("%s," * 17)[:-1]
+          final_params.extend([ data.get('exe'),  data.get('cmdline'), data.get('sid')])
+          fillers = ("%s," * 19)[:-1]
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
 
   def store_network_events(self, filename):
-    table = 'systemevents(timestmp, event, pid, name, hostname, ppid, parent, username, dnsname, dnsdate, sourceip, sourceport, destip, destport, asname, status, sid)'
+    table = 'systemevents(timestmp, event, pid, name, hostname, ppid, parent, username, dnsname, dnsdate, sourceip, sourceport, destip, destport, asname, status, exe, cmdline, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
         lines = file.readlines()
@@ -56,8 +56,8 @@ class StoreData:
             continue
           data = self.find_pattern(line)
           final_params = [data.get('timestamp'),  data.get('event'), data.get('pid'), data.get('name'), data.get('hostname'), '', '', data.get('username'), '', '',
-          data.get('sourceip'), data.get('sourceport'), data.get('destip'), data.get('destport'), '', data.get('status'), data.get('sid')]
-          fillers = ("%s," * 17)[:-1]
+          data.get('sourceip'), data.get('sourceport'), data.get('destip'), data.get('destport'), '', data.get('status'), '', '', data.get('sid')]
+          fillers = ("%s," * 19)[:-1]
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
@@ -108,7 +108,7 @@ class StoreData:
           connection.commit()
 
   def store_user_info(self, filename):
-    table = 'systemevents(timestmp, event, pid, name, hostname, ppid, parent, username, dnsname, dnsdate, sourceip, sourceport, destip, destport, asname, status, sid)'
+    table = 'systemevents(timestmp, event, pid, name, hostname, ppid, parent, username, dnsname, dnsdate, sourceip, sourceport, destip, destport, asname, status, exe, cmdline, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
         lines = file.readlines()
@@ -117,8 +117,8 @@ class StoreData:
             continue
           data = self.find_pattern(line)
           final_params = [data.get('timestamp'), data.get('event'), '', '', data.get('hostname'), '', '',
-                          data.get('username'), '', '', data.get('sourceip'), '', '', '', '', '', data.get('sid')]
-          fillers = ("%s," * 17)[:-1]
+                          data.get('username'), '', '', data.get('sourceip'), '', '', '', '', '', '', '',data.get('sid')]
+          fillers = ("%s," * 19)[:-1]
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
