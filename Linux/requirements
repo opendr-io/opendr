@@ -2,7 +2,6 @@ datetime
 ipaddress
 ipwhois
 psutil
-pywin32
 psycopg[binary]
 requests
 schedule
