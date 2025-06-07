@@ -3,9 +3,14 @@ import pandas as pd
 import json
 import os
 import time
-from dateutil.parser import parse
+from datetime import datetime
 import common.attributes as attr
 import common.logger as logfunc
+
+timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+hostname = attr.get_hostname()
+computer_sid = attr.get_computer_sid() or ''
+ec2_instance_id = attr.get_ec2_instance_id() or ''
 
 # format output
 def format_row_with_keys(row):
@@ -58,17 +63,22 @@ def fetch_drivers(log_directory, ready_directory):
         'Signer': 'signer'
     })
 
-    desired_order = [
-        "timestamp",
-        "name",
-        "hostname",
-        "username",
-        "description"
-    ]
-    dfd = dfd[[col for col in desired_order if col in dfd.columns]]
-    dfd['timestamp'] = dfd['timestamp'].apply(lambda x: parse(x) if x else '')
+    dfd['timestamp'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     dfd["event"] = "driver"
     dfd["sid"] = attr.get_computer_sid()
+    dfd["timestamp"] = timestamp
+    dfd["hostname"] = hostname
+    dfd["computer_sid"] = computer_sid
+    dfd["ec2_instance_id"] = ec2_instance_id
+
+    final_order = [
+    "timestamp", "hostname", 
+    "name", "desc", "class_guid", "compat_id", "device_class", "device_id", "device_name",
+    "driver_provider", "driver_version", "friendly_name", "hardware_id", "inf_name",
+    "is_signed", "location", "manufacturer", "pdo", "signer", "event", "sid",
+     "computer_sid", "ec2_instance_id",
+    ]
+    dfd = dfd[[col for col in final_order if col in dfd.columns]]
     lines = dfd.apply(format_row_with_keys, axis=1)
     for line in lines:
         logger.info(line)
@@ -76,7 +86,7 @@ def fetch_drivers(log_directory, ready_directory):
 
 def run():
     #interval = attr.get_config_value('Windows', 'driverInterval', 43200.0, 'float')
-    interval = 60
+    interval = 43200
     log_directory = 'tmp-windows-drivers'
     ready_directory = 'ready'
     debug_generator_directory = 'debuggeneratorlogs'
