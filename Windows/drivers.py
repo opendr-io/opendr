@@ -72,10 +72,10 @@ def fetch_drivers(log_directory, ready_directory):
     dfd["ec2_instance_id"] = ec2_instance_id
 
     final_order = [
-    "timestamp", "hostname", 
-    "name", "desc", "class_guid", "compat_id", "device_class", "device_id", "device_name",
+    "timestamp", "hostname", 'event',
+    "name", "desc", "signer","class_guid", "compat_id", "device_class", "device_id",  "device_name",
     "driver_provider", "driver_version", "friendly_name", "hardware_id", "inf_name",
-    "is_signed", "location", "manufacturer", "pdo", "signer", "event", "sid",
+    "is_signed", "location", "manufacturer", "pdo",  "sid",
      "computer_sid", "ec2_instance_id",
     ]
     dfd = dfd[[col for col in final_order if col in dfd.columns]]
@@ -86,8 +86,8 @@ def fetch_drivers(log_directory, ready_directory):
 
 def run():
     #interval = attr.get_config_value('Windows', 'driverInterval', 43200.0, 'float')
-    interval = 43200
-    log_directory = 'tmp-windows-drivers'
+    interval = 60
+    log_directory = 'tmp-windows-drivers' if attr.get_config_value('Windows', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory = 'ready'
     debug_generator_directory = 'debuggeneratorlogs'
     os.makedirs(debug_generator_directory, exist_ok=True)

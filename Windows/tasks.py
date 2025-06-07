@@ -1,5 +1,6 @@
-import os
 import subprocess
+import pandas as pd
+import os
 import csv
 import io
 import time
@@ -7,66 +8,79 @@ from datetime import datetime
 import common.attributes as attr
 import common.logger as logfunc
 
-log_line_count = 0
+def format_row_with_keys(row):
+    return " | ".join(f"{col}: {row[col]}" for col in row.index if pd.notna(row[col]))
 
-def get_scheduled_tasks():
-    """Retrieve all scheduled tasks using schtasks with CSV output."""
-    result = subprocess.run(
+def fetch_scheduled_tasks(log_directory, ready_directory):
+    logger = logfunc.setup_logging(log_directory, ready_directory, "TaskMonitor", "scheduled_task")
+
+    # Run schtasks with verbose CSV output
+    proc = subprocess.run(
         ['schtasks', '/query', '/fo', 'CSV', '/v'],
-        capture_output=True, text=True, encoding='utf-8'
+        capture_output=True, text=True, check=True
     )
+    tasks = list(csv.DictReader(io.StringIO(proc.stdout)))
 
-    # Parse CSV output
-    tasks = []
-    try:
-        reader = csv.DictReader(io.StringIO(result.stdout))
-        for row in reader:
-            tasks.append(row)
-    except csv.Error as e:
-        print("CSV parsing error:", e)
-    return tasks
+    if not tasks:
+        return
 
-def log_scheduled_tasks(log_directory, ready_directory):
-    """Logs scheduled tasks with system metadata."""
-    logger = logfunc.setup_logging(log_directory, ready_directory, "TaskMonitor", "scheduled_tasks")
-    hostname = attr.get_hostname()
-    sid = attr.get_computer_sid()
-    instance_id = attr.get_ec2_instance_id()
+    # Load into DataFrame
+    dft = pd.DataFrame(tasks)
 
-    global log_line_count
-    tasks = get_scheduled_tasks()
+    # Trim and normalize fields
+    dft = dft.rename(columns={
+        'TaskName': 'task_name',
+        'Status': 'status',
+        'Last Run Time': 'last_run',
+        'Next Run Time': 'next_run',
+        'Task To Run': 'task_to_run',
+        'Schedule': 'schedule',
+        'Author': 'author',
+        'Start Time': 'start_time'
+    })
 
-    for task in tasks:
-        log_entry = (
-            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-            f"hostname: {hostname} | "
-            f"taskname: {task.get('TaskName')} | "
-            f"status: {task.get('Status')} | "
-            f"last_run: {task.get('Last Run Time')} | "
-            f"next_run: {task.get('Next Run Time')} | "
-            f"task_to_run: {task.get('Task To Run')} | "
-            f"schedule: {task.get('Schedule')} | "
-            f"author: {task.get('Author')} | "
-            f"start_time: {task.get('Start Time')} | "
-            f"instanceid: {instance_id} | sid: {sid}"
-        )
-        logger.info(log_entry)
-        log_line_count += 1
-        if int(time.time()) % 10 == 0:
-            logfunc.enter_debug_logs('task-inventory', f"Running total log lines written: {log_line_count}  \n")
+    keep = [
+        'task_name', 'status', 'last_run', 'next_run',
+        'task_to_run', 'schedule', 'author', 'start_time'
+    ]
+    dft = dft[[col for col in keep if col in dft.columns]]
+
+    # Add system metadata
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    dft['timestamp'] = timestamp
+    dft['hostname'] = attr.get_hostname()
+    dft['computer_sid'] = attr.get_computer_sid() or ''
+    dft['ec2_instance_id'] = attr.get_ec2_instance_id() or ''
+    dft['event'] = 'scheduled_task'
+    dft['sid'] = dft['computer_sid']
+
+    # Final output column order
+    final_order = [
+        'timestamp', 'hostname', 'event',
+        'task_name', 'status', 'last_run', 'next_run', 'task_to_run',
+        'schedule', 'author', 'start_time',  'sid', 'computer_sid', 'ec2_instance_id'
+    ]
+    dft = dft[[col for col in final_order if col in dft.columns]]
+
+    # Format and write each row
+    for line in dft.apply(format_row_with_keys, axis=1):
+        logger.info(line)
 
     logfunc.clear_handlers(log_directory, ready_directory, logger)
 
+
 def run():
-    interval = attr.get_config_value('Windows', 'TaskInterval', 43200.0, 'float')
+    #interval = attr.get_config_value('Windows', 'TaskInterval', 43200.0, 'float')
+    interval = 43200
     log_directory = 'tmp-scheduled-tasks' if attr.get_config_value('Windows', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory = 'ready'
     debug_generator_directory = 'debuggeneratorlogs'
     os.makedirs(debug_generator_directory, exist_ok=True)
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)
+    print('tasklog running')
     while True:
-        log_scheduled_tasks(log_directory, ready_directory)
-        time.sleep(interval)  # Twice a day by default, can be increased or decreased
+        fetch_scheduled_tasks(log_directory, ready_directory)
+        time.sleep(interval)
 
 run()
