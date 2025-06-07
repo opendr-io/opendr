@@ -75,7 +75,7 @@ def fetch_drivers(log_directory, ready_directory):
     "timestamp", "hostname", 'event',
     "name", "desc", "signer","class_guid", "compat_id", "device_class", "device_id",  "device_name",
     "driver_provider", "driver_version", "friendly_name", "hardware_id", "inf_name",
-    "is_signed", "location", "manufacturer", "pdo",  "sid",
+    "is_signed", "location", "manufacturer", "pdo",
      "computer_sid", "ec2_instance_id",
     ]
     dfd = dfd[[col for col in final_order if col in dfd.columns]]
