@@ -33,7 +33,7 @@ def log_connection(logger, event, conn):
     logger.info(
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
         f"hostname: {hostname} |  username: {username}  | "
-        f"event: {event} | process: {process_name}   pid: {conn.pid} | "       
+        f"event: {event} | process: {process_name} | pid: {conn.pid} | "       
         f"sourceip: {conn.laddr[0]} | sourceport: {conn.laddr[1]} | "
         f"destip: {remote_ip} | destport: {remote_port} | "
         f"status: {conn.status} | uuid: {uuid}"
@@ -54,7 +54,7 @@ def log_initial_connections(log_directory, ready_directory):
   initial_connections = {}
 
   for conn in connections:
-    if conn.laddr and conn.laddr[0] in ("127.0.0.1", "::1", "::", "0.0.0.0"):
+    if conn.laddr and conn.laddr[0] in ("127.0.0.1", "::1", "::", "0.0.0.0", "::127.0.0.1"):
       continue
     if conn.raddr and ipaddress.ip_address(conn.raddr[0]).is_private:
       continue
