@@ -113,14 +113,14 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
     time.sleep(interval)
 
 def run():
-  log_directory = 'tmp-process' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+  log_directory = 'tmp-process' if attr.get_config_value('MacOS', 'RunDatabaseOperations', False, 'bool') else 'tmp'
   ready_directory = 'ready'
   debug_generator_directory = 'debuggeneratorlogs'
   os.makedirs(debug_generator_directory, exist_ok=True)
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
   # Run the monitor with a 0.1-second interval
-  interval = attr.get_config_value('Linux', 'ProcessInterval', 0.1, 'float')
+  interval = attr.get_config_value('MacOS', 'ProcessInterval', 0.1, 'float')
   monitor_process_events(log_directory, ready_directory, interval)
 
 run()

@@ -7,7 +7,7 @@ import common.logger as logfunc
 log_line_count = 0
 
 def log_data(log_directory, ready_directory):
-  interval = attr.get_config_value('Linux', 'EndpointInterval', 43200.0, 'float')
+  interval = attr.get_config_value('MacOS', 'EndpointInterval', 43200.0, 'float')
   while True:
     logger = logfunc.setup_logging(log_directory, ready_directory, "EndpointMonitor", "endpoint")
     global log_line_count
@@ -25,7 +25,7 @@ def log_data(log_directory, ready_directory):
     time.sleep(interval)  # Log every 60 minutes - or choose an interval
 
 def run():
-  log_directory = 'tmp-endpoint-info' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+  log_directory = 'tmp-endpoint-info' if attr.get_config_value('MacOS', 'RunDatabaseOperations', False, 'bool') else 'tmp'
   ready_directory = 'ready'
   debug_generator_directory = 'debuggeneratorlogs'
   os.makedirs(debug_generator_directory, exist_ok=True)

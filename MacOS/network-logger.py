@@ -104,11 +104,11 @@ def monitor_network_connections(log_directory, ready_directory, interval):
     time.sleep(interval)
 
 def run():
-  log_directory = 'tmp-network' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+  log_directory = 'tmp-network' if attr.get_config_value('MacOS', 'RunDatabaseOperations', False, 'bool') else 'tmp'
   ready_directory = 'ready'
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
-  interval = attr.get_config_value('Linux', 'NetworkInterval', 0.1, 'float')
+  interval = attr.get_config_value('MacOS', 'NetworkInterval', 0.1, 'float')
   monitor_network_connections(log_directory, ready_directory, interval)
 
 run()
