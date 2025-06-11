@@ -1,23 +1,10 @@
 import os
 import pwd
 import time
-import socket
 import subprocess
-import logging
 from datetime import datetime
-
-log_directory = 'logs'
-os.makedirs(log_directory, exist_ok=True)
-log_file = os.path.join(log_directory, 'cron-jobs.log')
-
-logging.basicConfig(
-    filename=log_file,
-    level=logging.INFO,
-    format='%(message)s'
-)
-
-def get_hostname():
-    return socket.gethostname()
+import common.attributes as attr
+import common.logger as logfunc
 
 def get_crontab_jobs(filepath):
     jobs = []
@@ -46,8 +33,9 @@ def get_user_crontabs():
             continue
     return jobs
 
-def log_cron_jobs():
-    hostname = get_hostname()
+def log_cron_jobs(log_directory: str, ready_directory: str):
+    logger = logfunc.setup_logging(log_directory, ready_directory, "CronJobMonitor", "cronjob")
+    hostname = attr.get_hostname()
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
     cron_files = ['/etc/crontab'] + [
@@ -59,17 +47,25 @@ def log_cron_jobs():
     for path in cron_files:
         for job in get_crontab_jobs(path):
             entry = f"timestamp: {timestamp} | hostname: {hostname} | file: {path} | job: {job}"
-            logging.info(entry)
+            logger.info(entry)
 
     for job in get_user_crontabs():
         entry = f"timestamp: {timestamp} | hostname: {hostname} | source: user_crontab | {job}"
-        logging.info(entry)
+        logger.info(entry)
+
+    logfunc.clear_handlers(log_directory, ready_directory, logger)
 
 def run():
-    interval = 43200  # 12 hours
+    interval = attr.get_config_value('Linux', 'CronLogInterval', 43200.0, 'float')
+    log_directory = 'tmp-cron-job' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+    ready_directory = 'ready'
+    debug_generator_directory = 'debuggeneratorlogs'
+    os.makedirs(debug_generator_directory, exist_ok=True)
+    os.makedirs(log_directory, exist_ok=True)
+    os.makedirs(ready_directory, exist_ok=True)
     print("cronlog running")
     while True:
-        log_cron_jobs()
+        log_cron_jobs(log_directory, ready_directory)
         time.sleep(interval)
 
 if __name__ == "__main__":

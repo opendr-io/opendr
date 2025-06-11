@@ -1,13 +1,9 @@
 import subprocess
 import os
-import logging
+import time
 from datetime import datetime
-
-# Setup logging
-log_dir = 'logs'
-os.makedirs(log_dir, exist_ok=True)
-log_file = os.path.join(log_dir, 'kernel_modules_detailed.log')
-logging.basicConfig(filename=log_file, level=logging.INFO, format='%(message)s')
+import common.attributes as attr
+import common.logger as logfunc
 
 # Kernel taint bits and their meaning
 TAINT_FLAGS = {
@@ -41,7 +37,7 @@ def get_module_list():
     with open('/proc/modules', 'r') as f:
         return [line.split()[0] for line in f]
 
-def get_module_info(module):
+def get_module_info(module: str):
     try:
         result = subprocess.run(['modinfo', module], capture_output=True, text=True, check=True)
         lines = result.stdout.strip().splitlines()
@@ -49,8 +45,10 @@ def get_module_info(module):
     except subprocess.CalledProcessError:
         return {}
 
-def log_modules():
+def log_modules(log_directory: str, ready_directory: str):
+    logger = logfunc.setup_logging(log_directory, ready_directory, "KernelMonitor", "kernel")
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
     taint_val, taint_flags = get_kernel_taint_status()
     taint_info = f"tainted: {taint_val} | " + " | ".join([f"{flag}=True" for flag in taint_flags]) if taint_flags else "tainted: 0 | clean_kernel=True"
 
@@ -59,6 +57,22 @@ def log_modules():
         log_line = f"timestamp: {timestamp} | module: {mod} | {taint_info}"
         for key, value in info.items():
             log_line += f" | {key.lower().replace(' ', '_')}: {value}"
-        logging.info(log_line)
+        logger.info(log_line)
 
-log_modules()
+    logfunc.clear_handlers(log_directory, ready_directory, logger)
+
+def run():
+    interval = attr.get_config_value('Linux', 'KernelInterval', 43200.0, 'float')
+    log_directory = 'tmp-kernel' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+    ready_directory = 'ready'
+    debug_generator_directory = 'debuggeneratorlogs'
+    os.makedirs(debug_generator_directory, exist_ok=True)
+    os.makedirs(log_directory, exist_ok=True)
+    os.makedirs(ready_directory, exist_ok=True)
+    print("kernel logging running")
+    while True:
+        log_modules(log_directory, ready_directory)
+        time.sleep(interval)
+
+if __name__ == "__main__":
+    run()
