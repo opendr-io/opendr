@@ -1,0 +1,7 @@
+datetime
+ipaddress
+ipwhois
+psutil
+psycopg[binary]
+requests
+schedule
