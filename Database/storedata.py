@@ -13,7 +13,7 @@ class StoreData:
     self.db = config.get('Database', 'DatabaseName', fallback='opendr')
     self.user = config.get('Database', 'AgentUserName', fallback='agent')
     self.password = config.get('Database', 'AgentPassword')
-    self.sslmode = 'prefer' # 'verify-ca'
+    self.sslmode = 'verify-ca'
     self.sslrootcert = config.get('Database', 'SSLRootCert')
     self.users_log_counter = 0
     self.endpoint_log_counter = 0
