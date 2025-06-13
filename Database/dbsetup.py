@@ -32,7 +32,8 @@ def setup_postgres_tables():
       print('Tables Created!')
 
 def setup_postgres_users():
-  with psycopg.connect() as connection:
+  with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'), dbname=config.get('Database', 'DatabaseName', fallback='opendr'),
+                      user=config.get('Database', 'RootDatabaseUserName', fallback='postgres'), password=config.get('Database', 'RootDatabasePassword')) as connection:
     with connection.cursor() as cursor:
       cursor.execute(f"CREATE USER {config.get('Database', 'AgentUserName', fallback='agent')} WITH PASSWORD '{config.get('Database', 'AgentPassword')}'")
       cursor.execute(f"CREATE USER {config.get('Database', 'AppUserName', fallback='app')} WITH PASSWORD '{config.get('Database', 'AppUserPassword')}'")
