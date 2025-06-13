@@ -1,7 +1,7 @@
 import socket
 import requests
 import psutil
-#import win32security
+import subprocess
 import os
 import configparser
 import pathlib
@@ -13,12 +13,26 @@ def get_hostname() -> str:
     return socket.gethostname()
 
 # Gets the Windows host SID
-def get_computer_sid() -> str:
-    return win32security.ConvertSidToStringSid(
-        win32security.GetFileSecurity(
-        os.environ['SYSTEMROOT'], win32security.OWNER_SECURITY_INFORMATION
-        ).GetSecurityDescriptorOwner()
-    )
+def get_mac_computer_uuid() -> str:
+    """
+    Retrieves the hardware UUID of a macOS machine.
+    """
+    try:
+        # Command to get the IOPlatformUUID
+        command = "ioreg -d2 -c IOPlatformExpertDevice | awk -F\\\" '/IOPlatformUUID/{print $(NF-1)}'"
+        
+        # Execute the command and capture the output
+        uuid_output = subprocess.check_output(command, shell=True, text=True).strip()
+        
+        return uuid_output
+    except subprocess.CalledProcessError:
+        # This handles cases where the command fails
+        print("Error: Failed to execute ioreg command.")
+        return None
+    except FileNotFoundError:
+        # This handles cases where ioreg might not be available
+        print("Error: 'ioreg' command not found. This script is intended for macOS.")
+        return None
 
 def get_ec2_instance_id() -> str:
     try:

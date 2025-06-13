@@ -12,7 +12,7 @@ log_line_count = 0
 
 # Retrieve system details once
 #sid = attr.get_computer_sid()
-uuid = attr.get_system_uuid()
+uuid = attr.get_mac_computer_uuid()
 hostname = attr.get_hostname()
 
 def log_connection(logger, event, conn):
