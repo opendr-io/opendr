@@ -70,8 +70,7 @@ def fetch_scheduled_tasks(log_directory, ready_directory):
 
 
 def run():
-    #interval = attr.get_config_value('Windows', 'TaskInterval', 43200.0, 'float')
-    interval = 43200
+    interval = attr.get_config_value('Windows', 'TaskInterval', 43200.0, 'float')
     log_directory = 'tmp-scheduled-tasks' if attr.get_config_value('Windows', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory = 'ready'
     debug_generator_directory = 'debuggeneratorlogs'
