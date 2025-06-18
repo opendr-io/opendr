@@ -16,7 +16,7 @@ Common Components: these components use psutil which makes them portable across 
 - The user component logs users that are present on the endpoint
 - The endpoint info component logs essential endpoint identification information including hostname, IP addresses (both private and public), EC2 instance ID (for cloud environments), and unique identifiers such as the endpoint SID (Windows) or endpoint UUID (Linux and MacOS)
 - The alert component can generate alerts on anything in our logs. Alert rules are defined in alertrules.csv.
-- The Jupyter notebooks in the Jupyter folder can ingest OpenDR data for threat hunting. One notebook performs some simple anomaly detection and one is an experimental AI-assisted huting notebook. That one needs a Groq API key which has a free tier, or you can use another model.
+- The Jupyter notebooks in the Jupyter folder can ingest OpenDR data for threat hunting. One notebook performs some simple anomaly detection and one is an experimental AI-assisted hunting notebook. That one needs a Groq API key which has a free tier, or you can use another model.
 
 These components have different implementation details, across operating systems, but collect the same data types. These run twice per day, by default, but can be scheduled to run at any interval. Our thinking was that the cost / benefit ratio of logging all of this data once per hour, across a fleet, is not that high, esp where we don't need to repeat all that data at scale in order to detect new software and services. This means that we can be more efficient by generating a fraction of the data that some other tools produce.
 
