@@ -2,9 +2,10 @@
 # OpenDR
 A FOSS Endpoint Detection and Response (EDR) alternative implemented in Python using psutil and some Windows modules. Quick start:
 
-0. Requires Python 3.9 - 3.13
+0. Install Python 3.9 - 3.13
 1. install the dependencies in the requirements file using pip install -r requirements (pref in a venv)
-2. run agent.py to start logging locally (please do this on a D: drive under Windows or something other than the C: drive)
+2. In the agentconfig.ini file, set the ```OperatingSystem=``` parameter to Windows, Linux or MacOS 
+3. run sensor.py to start logging locally
 
 If you are instrumenting an endpoint fleet, and need to ship logs to a database, see the database mode setup guide here. At present we started with Postgres but we can support other databases if you wish: https://github.com/cyberdyne-ventures/opendr/blob/main/setup.md
 
