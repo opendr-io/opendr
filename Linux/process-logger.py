@@ -9,7 +9,6 @@ from common.logger import check_logging_interval, enter_debug_logs
 log_line_count = 0
 
 # Retrieve system details once
-#sid = attr.get_computer_sid()
 uuid = attr.get_system_uuid()
 hostname = attr.get_hostname()
 
@@ -42,7 +41,7 @@ def log_existing_processes(logger):
       log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
           f"hostname: {hostname} | username: {user} | event: existing process | "
           f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
-          f"exe: {exe} | cmdline: {cmdline} | sid: {uuid}"
+          f"exe: {exe} | cmdline: {cmdline} | uuid: {uuid}"
         )
     except (psutil.NoSuchProcess, psutil.AccessDenied):
       continue  # Ignore processes that vanish before logging
@@ -84,7 +83,7 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
         log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
           f"hostname: {hostname} | username: {user} | event: process created | "
           f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
-          f"exe: {exe} | cmdline: {cmdline} | sid: {uuid}"
+          f"exe: {exe} | cmdline: {cmdline} | uuid: {uuid}"
         )
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue
@@ -110,7 +109,7 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
         log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
           f"hostname: {hostname} | username: {user} | event: process terminated | "
           f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
-          f"exe: {exe} | cmdline: {cmdline} | sid: {uuid}"
+          f"exe: {exe} | cmdline: {cmdline} | uuid: {uuid}"
         )
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue
