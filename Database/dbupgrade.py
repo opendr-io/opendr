@@ -13,7 +13,7 @@ def run_postgres_upgrade(queries):
             for query in queries:
                 print(query)
                 cursor.execute(query)
-            connection.commit()
+        connection.commit()
 
 def update_postgres_users():
     with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'), dbname=config.get('Database', 'DatabaseName', fallback='opendr'),
@@ -23,7 +23,7 @@ def update_postgres_users():
             cursor.execute(f"GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO {config.get('Database', 'AppUserName', fallback='app')}")
             cursor.execute(f"GRANT INSERT ON ALL TABLES IN SCHEMA public TO {config.get('Database', 'AgentUserName', fallback='agent')}")
             cursor.execute(f"GRANT SELECT ON ALL TABLES IN SCHEMA public TO {config.get('Database', 'AppUserName', fallback='app')}")
-            connection.commit()
+        connection.commit()
 
 def run():
     with open('upgrades.json', 'r') as file:
