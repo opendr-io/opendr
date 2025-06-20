@@ -1,31 +1,29 @@
 import os
 import psutil
 import time
-import logging
 from datetime import datetime
 import common.attributes as attr
 from common.logger import check_logging_interval, enter_debug_logs
-from typing import NoReturn
 
 # Global counter for log lines written
-log_line_count: int = 0
+log_line_count = 0
 
 # Retrieve system details once
-sid: str = attr.get_computer_sid()
-hostname: str = attr.get_hostname()
+uuid = attr.get_mac_computer_uuid()
+hostname = attr.get_hostname()
 
-def log_message(logger: logging.Logger, message: str) -> None:
+def log_message(logger, message):
   """Logs a message and updates the global line counter."""
   global log_line_count
   logger.info(message)
   log_line_count += 1  # Increment counter
 
-def log_existing_processes(logger: logging.Logger) -> None:
+def log_existing_processes(logger):
   """Logs all currently running processes at script startup."""
-  #log_message(logger, f"Logging all existing processes at startup on {hostname} with SID: {sid}")
+  #log_message(logger, f"Logging all existing processes at startup on {hostname} with uuid: {uuid}")
   for proc in psutil.process_iter(attrs=['pid', 'name', 'exe', 'username', 'cmdline']):
     try:
-      proc_info = proc.as_dict(attrs=['pid', 'name', 'username', 'cmdline', 'exe'])
+      proc_info = proc.as_dict(attrs=['pid', 'name', 'username', 'exe', 'cmdline'])
       pid = proc_info.get('pid', 'N/A')
       proc_name: str = proc_info.get('name', 'Unknown')
       user: str = proc_info.get('username', 'N/A')
@@ -41,17 +39,17 @@ def log_existing_processes(logger: logging.Logger) -> None:
           parent_name = parent.name()
 
       log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-          f"hostname: {hostname} | username: {user} | event: existing process | "
+        f"hostname: {hostname} | username: {user} | event: existing process | "
           f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
-          f"exe: {exe} | cmdline: {cmdline} | sid: {sid}"
+          f"exe: {exe} | cmdline: {cmdline} | uuid: {uuid}"
         )
     except (psutil.NoSuchProcess, psutil.AccessDenied):
       continue  # Ignore processes that vanish before logging
 
-def monitor_process_events(log_directory: str, ready_directory: str, interval: float=1.0) -> NoReturn:
+def monitor_process_events(log_directory, ready_directory, interval=1):
   """Monitors process creation and termination events while tracking log lines written."""
   logger, last_interval = check_logging_interval(log_directory, ready_directory, "ProcessMonitor", "process", None, None)
-  previous_processes: set[int] = set(psutil.pids())
+  previous_processes = set(psutil.pids())
 
   # Log all running processes at startup
   log_existing_processes(logger)
@@ -60,15 +58,15 @@ def monitor_process_events(log_directory: str, ready_directory: str, interval: f
     # # Check if the minute has changed to rotate the log file
     logger, last_interval = check_logging_interval(log_directory, ready_directory, "ProcessMonitor", "process", logger, last_interval)
 
-    current_processes: set[int] = set(psutil.pids()) 
+    current_processes = set(psutil.pids()) 
     created_processes = current_processes - previous_processes
     terminated_processes = previous_processes - current_processes
 
     # Log created processes
     for pid in created_processes:
       try:
-        proc: psutil.Process = psutil.Process(pid)
-        proc_info = proc.as_dict(attrs=['pid', 'name', 'username', 'cmdline', 'exe'])
+        proc = psutil.Process(pid)
+        proc_info = proc.as_dict(attrs=['pid', 'name', 'username', 'exe', 'cmdline'])
         proc_name: str = proc_info.get('name', 'Unknown')
         user: str = proc_info.get('username', 'N/A')
         cmdline = proc_info.get('cmdline', [])
@@ -85,7 +83,7 @@ def monitor_process_events(log_directory: str, ready_directory: str, interval: f
         log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
           f"hostname: {hostname} | username: {user} | event: process created | "
           f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
-          f"exe: {exe} | cmdline: {cmdline} | sid: {sid}"
+          f"exe: {exe} | cmdline: {cmdline} | uuid: {uuid}"
         )
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue
@@ -93,14 +91,15 @@ def monitor_process_events(log_directory: str, ready_directory: str, interval: f
     # Log terminated processes
     for pid in terminated_processes:
       try:
-        proc: psutil.Process = psutil.Process(pid)
-        proc_info = proc.as_dict(attrs=['pid', 'name', 'username', 'cmdline', 'exe'])
+        proc = psutil.Process(pid)
+        proc_info = proc.as_dict(attrs=['pid', 'name', 'username', 'exe', 'cmdline'])
+        pid = proc_info.get('pid', 'N/A')
         proc_name: str = proc_info.get('name', 'Unknown')
         user: str = proc_info.get('username', 'N/A')
         cmdline = proc_info.get('cmdline', [])
         cmdline: str = " ".join(cmdline) if cmdline else 'N/A'
         exe: str = proc_info.get('exe', 'N/A')
-
+      
         # Handle cases where the parent process is None
         parent_pid, parent_name = "N/A", "N/A"
         parent: psutil.Process|None = proc.parent()
@@ -111,10 +110,13 @@ def monitor_process_events(log_directory: str, ready_directory: str, interval: f
         log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
           f"hostname: {hostname} | username: {user} | event: process terminated | "
           f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
-          f"exe: {exe} | cmdline: {cmdline} | sid: {sid}"
+          f"exe: {exe} | cmdline: {cmdline} | uuid: {uuid}"
         )
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue
+        #log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+          #f"hostname: {hostname} | username: {user} | event: process terminated | "
+          #f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | uuid: {uuid}")
 
     # Print the current running total of log lines every 10 seconds
     if int(time.time()) % 10 == 0:
@@ -124,15 +126,15 @@ def monitor_process_events(log_directory: str, ready_directory: str, interval: f
     previous_processes = current_processes
     time.sleep(interval)
 
-def run() -> NoReturn:
-  log_directory: str = 'tmp-process' if attr.get_config_value('Windows', 'RunDatabaseOperations', False, 'bool') else 'tmp'
-  ready_directory: str = 'ready'
-  debug_generator_directory: str = 'debuggeneratorlogs'
+def run():
+  log_directory = 'tmp-process' if attr.get_config_value('MacOS', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+  ready_directory = 'ready'
+  debug_generator_directory = 'debuggeneratorlogs'
   os.makedirs(debug_generator_directory, exist_ok=True)
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
   # Run the monitor with a 0.1-second interval
-  interval = attr.get_config_value('Windows', 'ProcessInterval', 0.1, 'float')
+  interval = attr.get_config_value('MacOS', 'ProcessInterval', 0.1, 'float')
   monitor_process_events(log_directory, ready_directory, interval)
 
 run()

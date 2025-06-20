@@ -4,7 +4,7 @@ import configparser
 import pathlib
 
 config = configparser.ConfigParser()
-config.read(pathlib.Path(__file__).parent.absolute() / "../agentconfig.ini")
+config.read(pathlib.Path(__file__).parent.absolute() / "agentconfig.ini")
 
 def execute_scripts(script):
     print(script)
@@ -12,11 +12,14 @@ def execute_scripts(script):
     return script, result.stdout, result.stderr
 
 def run() -> None:
+  os_mode = config.get('General', 'OperatingSystem', fallback='Windows')
+  pathsep = '\\' if os_mode == 'Windows' else '/'
+  generators = [os_mode + pathsep + script for script in config.get(os_mode, 'Scripts', fallback='').split(', ')]
   # this section governs local vs database mode - default is local
-  generators = config.get('Windows', 'Scripts', fallback='').split(', ')
-  if config.getboolean('Windows', 'RunDatabaseOperations', fallback=False):
-    generators.append('dboperations.py')
-  print('Starting Generators')
+  if config.getboolean(os_mode, 'RunDatabaseOperations', fallback=False):
+    generators.append('Database' + pathsep + 'dboperations.py')
+
+  print('Starting Scripts')
   with concurrent.futures.ThreadPoolExecutor(len(generators)) as executor:
     results = executor.map(execute_scripts, generators)
     for script, stdout, stderr in results:

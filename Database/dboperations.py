@@ -34,21 +34,25 @@ def monitor_directory(dir, pat) -> NoReturn:
         time.sleep(db_interval)
         continue            
       for new_file in new_files:
-        fn: str = str(new_file)
-        if('process' in fn):
+        fn = str(new_file)
+        if ('process' in fn):
           dataStorage.store_process_events(fn)
-        elif('network' in fn):
+        elif ('network' in fn):
           dataStorage.store_network_events(fn)
-        elif('services' in fn):
+        elif ('services' in fn):
           dataStorage.store_installed_services(fn)
-        elif('software' in fn):
+        elif ('software' in fn):
           dataStorage.store_installed_applications(fn)
-        elif('endpoint' in fn):
+        elif ('endpoint' in fn):
           dataStorage.store_endpoint_info(fn)
-        elif('user' in fn):
+        elif ('user' in fn):
           dataStorage.store_user_info(fn)
-        elif('newservice' in fn):
+        elif ('newservice' in fn):
           dataStorage.store_new_service(fn)
+        elif ('hotfix' in fn):
+          dataStorage.store_hotfix_info(fn)
+        elif ('defender' in fn):
+          dataStorage.store_defender_info(fn)
         processed_files.add(new_file)
         schedule.run_pending()
         shutil.move(fn, 'done/' + fn)

@@ -20,16 +20,20 @@ def setup_postgres_tables() -> None:
   with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'), dbname=config.get('Database', 'DatabaseName', fallback='opendr'),
                       user=config.get('Database', 'RootDatabaseUserName', fallback='postgres'), password=config.get('Database', 'RootDatabasePassword')) as connection:
     with connection.cursor() as cursor:
-      cursor.execute("""CREATE TABLE applications (id serial PRIMARY KEY, timestmp text, hostname text, ec2instanceid text, program text, servicename text, displayname text, status text, start text, username text, pid TEXT, executable text, sid text)""")
+      cursor.execute("""CREATE TABLE applications (id serial PRIMARY KEY, timestmp text, hostname text, event text, ec2instanceid text, program text, servicename text, 
+                    displayname text, status text, start text, username text, pid TEXT, executable text, sid text)""")
       cursor.execute("""CREATE TABLE endpointinfo (id serial PRIMARY KEY, timestmp text, hostname text,  ec2instanceid text, privateips text, publicip text, event text, username text,
         onterminal text, fromhostname text, logintime text, sid text)""")
       cursor.execute("""CREATE TABLE systemevents (id serial PRIMARY KEY, timestmp text, event text, pid integer, name text, hostname text, ppid text,
-        parent text, username text, dnsname text, dnsdate text, sourceip text, sourceport text, destip text, destport text, asname text, status text, sid text)""")
+        parent text, username text, dnsname text, dnsdate text, sourceip text, sourceport text, destip text, destport text, asname text, status text, exe text, cmdline text, sid text)""")
+      cursor.execute("""CREATE TABLE systemalerts (id serial PRIMARY KEY, timestmp text, event text, username text, title text, severity text,
+        category text, executable text, filepath text, eventid integer, threatid integer, origin text, type text, source text, description text, reference text, sid text)""")
       connection.commit()
       print('Tables Created!')
 
 def setup_postgres_users() -> None:
-  with psycopg.connect() as connection:
+  with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'), dbname=config.get('Database', 'DatabaseName', fallback='opendr'),
+                      user=config.get('Database', 'RootDatabaseUserName', fallback='postgres'), password=config.get('Database', 'RootDatabasePassword')) as connection:
     with connection.cursor() as cursor:
       cursor.execute(f"CREATE USER {config.get('Database', 'AgentUserName', fallback='agent')} WITH PASSWORD '{config.get('Database', 'AgentPassword')}'")
       cursor.execute(f"CREATE USER {config.get('Database', 'AppUserName', fallback='app')} WITH PASSWORD '{config.get('Database', 'AppUserPassword')}'")
