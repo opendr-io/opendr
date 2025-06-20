@@ -25,7 +25,7 @@ def setup_postgres_tables():
       cursor.execute("""CREATE TABLE endpointinfo (id serial PRIMARY KEY, timestmp text, hostname text,  ec2instanceid text, privateips text, publicip text, event text, username text,
         onterminal text, fromhostname text, logintime text, sid text)""")
       cursor.execute("""CREATE TABLE systemevents (id serial PRIMARY KEY, timestmp text, event text, pid integer, name text, hostname text, ppid text,
-        parent text, username text, dnsname text, dnsdate text, sourceip text, sourceport text, destip text, destport text, asname text, status text, exe test, cmdline text, sid text)""")
+        parent text, username text, dnsname text, dnsdate text, sourceip text, sourceport text, destip text, destport text, asname text, status text, exe text, cmdline text, sid text)""")
       cursor.execute("""CREATE TABLE systemalerts (id serial PRIMARY KEY, timestmp text, event text, username text, title text, severity text,
         category text, executable text, filepath text, eventid integer, threatid integer, origin text, type text, source text, description text, reference text, sid text)""")
       connection.commit()
