@@ -8,12 +8,12 @@ from typing import NoReturn
 log_line_count: int = 0
 
 def log_data(log_directory: str, ready_directory: str) -> NoReturn:
-  interval = attr.get_config_value('Linux', 'EndpointInterval', 43200.0, 'float')
+  interval: float = attr.get_config_value('Linux', 'EndpointInterval', 43200.0, 'float')
   while True:
     logger = logfunc.setup_logging(log_directory, ready_directory, "EndpointMonitor", "endpoint")
     global log_line_count
     # Configure logging for the new file
-    data = (
+    data: str = (
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
         f"hostname: {attr.get_hostname()} | private_ips: {attr.get_private_ips()} | public_ip: {attr.get_public_ip()} | "
         f"ec2_instance_id: {attr.get_ec2_instance_id() or ''} | computer_uuid: {attr.get_system_uuid() or ''}"

@@ -71,7 +71,7 @@ def get_installed_packages():
 log_line_count: int = 0
 
 def log_data(log_directory: str, ready_directory: str) -> NoReturn:
-    interval = attr.get_config_value('Linux', 'SoftwareInterval', 43200.0, 'float')
+    interval: float = attr.get_config_value('Linux', 'SoftwareInterval', 43200.0, 'float')
     while True:
         logger = logfunc.setup_logging(log_directory, ready_directory, "SoftwareMonitor", "installed_software")
         global log_line_count

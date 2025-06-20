@@ -109,7 +109,7 @@ def run() -> NoReturn:
   ready_directory: str = 'ready'
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
-  interval = attr.get_config_value('Linux', 'NetworkInterval', 0.1, 'float')
+  interval: float = attr.get_config_value('Linux', 'NetworkInterval', 0.1, 'float')
   monitor_network_connections(log_directory, ready_directory, interval)
 
 run()

@@ -11,8 +11,8 @@ from storedata import StoreData
 config = configparser.ConfigParser()
 config.read(pathlib.Path(__file__).parent.absolute() / "../dbconfig.ini")
 
-db_interval = config.getint('Database', 'DatabaseInterval', fallback=30)
-cleanup_interval = config.getint('Database', 'CleanupInterval', fallback=30)
+db_interval: int = config.getint('Database', 'DatabaseInterval', fallback=30)
+cleanup_interval: int = config.getint('Database', 'CleanupInterval', fallback=30)
 
 def directory_cleanup() -> None:
   directory: str = 'done/ready'

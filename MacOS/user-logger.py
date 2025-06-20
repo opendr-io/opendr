@@ -2,13 +2,14 @@ import os
 import psutil
 import time
 from datetime import datetime
+from typing import NoReturn
 import common.attributes as attr
 from common.logger import check_logging_interval
 
-hostname = attr.get_hostname()
+hostname: str = attr.get_hostname()
 uuid = attr.get_system_uuid()
 
-def monitor_logged_in_users(log_directory, ready_directory, interval):
+def monitor_logged_in_users(log_directory: str, ready_directory: str, interval: float) -> NoReturn:
     """Monitor and log new user logins only."""
     logger, last_interval = check_logging_interval(log_directory, ready_directory, "UserMonitor", "user", None, None)
     seen_users = set()
@@ -32,11 +33,11 @@ def monitor_logged_in_users(log_directory, ready_directory, interval):
 
         time.sleep(interval)
 
-def run():
-    interval = attr.get_config_value('MacOS', 'UserInterval', 60.0, 'float')
-    log_directory = 'tmp-user-info' if attr.get_config_value('MacOS', 'RunDatabaseOperations', False, 'bool') else 'tmp'
-    ready_directory = 'ready'
-    debug_generator_directory = 'debuggeneratorlogs'
+def run() -> NoReturn:
+    interval: float = attr.get_config_value('MacOS', 'UserInterval', 60.0, 'float')
+    log_directory: str = 'tmp-user-info' if attr.get_config_value('MacOS', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+    ready_directory: str = 'ready'
+    debug_generator_directory: str = 'debuggeneratorlogs'
     os.makedirs(debug_generator_directory, exist_ok=True)
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)

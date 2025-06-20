@@ -134,7 +134,7 @@ def run() -> NoReturn:
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
   # Run the monitor with a 0.1-second interval
-  interval = attr.get_config_value('Linux', 'ProcessInterval', 0.1, 'float')
+  interval: float = attr.get_config_value('Linux', 'ProcessInterval', 0.1, 'float')
   monitor_process_events(log_directory, ready_directory, interval)
 
 run()
