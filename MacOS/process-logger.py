@@ -9,7 +9,6 @@ from common.logger import check_logging_interval, enter_debug_logs
 log_line_count = 0
 
 # Retrieve system details once
-#sid = attr.get_computer_sid()
 uuid = attr.get_mac_computer_uuid()
 hostname = attr.get_hostname()
 
@@ -24,10 +23,13 @@ def log_existing_processes(logger):
   #log_message(logger, f"Logging all existing processes at startup on {hostname} with uuid: {uuid}")
   for proc in psutil.process_iter(attrs=['pid', 'name', 'exe', 'username', 'cmdline']):
     try:
-      proc_info = proc.as_dict(attrs=['pid', 'name', 'username'])
+      proc_info = proc.as_dict(attrs=['pid', 'name', 'username', 'exe', 'cmdline'])
       pid = proc_info.get('pid', 'N/A')
       proc_name: str = proc_info.get('name', 'Unknown')
       user: str = proc_info.get('username', 'N/A')
+      cmdline = proc_info.get('cmdline', [])
+      cmdline: str = " ".join(cmdline) if cmdline else 'N/A'
+      exe: str = proc_info.get('exe', 'N/A')
 
       # Handle cases where the parent process is None
       parent_pid, parent_name = "N/A", "N/A"
@@ -38,7 +40,9 @@ def log_existing_processes(logger):
 
       log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
         f"hostname: {hostname} | username: {user} | event: existing process | "
-        f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | uuid: {uuid}")
+          f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
+          f"exe: {exe} | cmdline: {cmdline} | uuid: {uuid}"
+        )
     except (psutil.NoSuchProcess, psutil.AccessDenied):
       continue  # Ignore processes that vanish before logging
 
@@ -62,10 +66,12 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
     for pid in created_processes:
       try:
         proc = psutil.Process(pid)
-        proc_info = proc.as_dict(attrs=['pid', 'name', 'username'])
-        pid = proc_info.get('pid', 'N/A')
+        proc_info = proc.as_dict(attrs=['pid', 'name', 'username', 'exe', 'cmdline'])
         proc_name: str = proc_info.get('name', 'Unknown')
         user: str = proc_info.get('username', 'N/A')
+        cmdline = proc_info.get('cmdline', [])
+        cmdline: str = " ".join(cmdline) if cmdline else 'N/A'
+        exe: str = proc_info.get('exe', 'N/A')
 
         # Handle cases where the parent process is None
         parent_pid, parent_name = "N/A", "N/A"
@@ -76,7 +82,8 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
 
         log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
           f"hostname: {hostname} | username: {user} | event: process created | "
-          f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | uuid: {uuid}"
+          f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
+          f"exe: {exe} | cmdline: {cmdline} | uuid: {uuid}"
         )
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue
@@ -85,10 +92,14 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
     for pid in terminated_processes:
       try:
         proc = psutil.Process(pid)
-        proc_info = proc.as_dict(attrs=['pid', 'name', 'username'])
+        proc_info = proc.as_dict(attrs=['pid', 'name', 'username', 'exe', 'cmdline'])
         pid = proc_info.get('pid', 'N/A')
         proc_name: str = proc_info.get('name', 'Unknown')
         user: str = proc_info.get('username', 'N/A')
+        cmdline = proc_info.get('cmdline', [])
+        cmdline: str = " ".join(cmdline) if cmdline else 'N/A'
+        exe: str = proc_info.get('exe', 'N/A')
+      
         # Handle cases where the parent process is None
         parent_pid, parent_name = "N/A", "N/A"
         parent: psutil.Process|None = proc.parent()
@@ -97,7 +108,10 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
             parent_name: str = parent.name()
 
         log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-            f"pid: {pid} | name: {proc_name} | hostname: {hostname} | ppid: {parent_pid} | parent: {parent_name} | username: {user} | uuid: {uuid}")
+          f"hostname: {hostname} | username: {user} | event: process terminated | "
+          f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
+          f"exe: {exe} | cmdline: {cmdline} | uuid: {uuid}"
+        )
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue
         #log_message(logger, f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
