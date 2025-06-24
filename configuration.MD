@@ -41,7 +41,7 @@ The Linux section configures Linux-specific monitoring:
 - UserInterval: Sets user info logging frequency (default 60 seconds)
 
 The MacOS section configures MacOS-specific monitoring:
-- Scripts: Lists all Linux monitoring scripts to be executed
+- Scripts: Lists all MacOS monitoring scripts to be executed
 - RunDatabaseOperations: Controls whether database operations are enabled (default False)
 - EndpointInterval: Sets the endpoint info logging interval (default 43200 seconds)
 - NetworkInterval: Controls network logging frequency (default 0.1 seconds)
