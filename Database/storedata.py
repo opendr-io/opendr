@@ -9,8 +9,8 @@ config.read(pathlib.Path(__file__).parent.absolute() / "../dbconfig.ini")
 class StoreData:
   def __init__(self):
     self.host = config.get('Database', 'HostName')
-    self.port = config.get('Database', 'PortNumber', fallback='4000')
-    self.db = config.get('Database', 'DatabaseName', fallback='opendr')
+    self.port = "config.get('Database', 'PortNumber', fallback='4000')"
+    self.db = "config.get('Database', 'DatabaseName', fallback='opendr')"
     self.user = config.get('Database', 'AgentUserName', fallback='agent')
     self.password = config.get('Database', 'AgentPassword')
     self.sslmode = 'verify-ca'
@@ -30,6 +30,7 @@ class StoreData:
     return data
 
   def store_process_events(self, filename):
+    print('hello')
     table = 'systemevents(timestmp, event, pid, name, hostname, ppid, parent, username, dnsname, dnsdate, sourceip, sourceport, destip, destport, asname, status, exe, cmdline, sid)'
     try:
       with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
@@ -44,9 +45,13 @@ class StoreData:
             final_params.extend([ data.get('exe'),  data.get('cmdline'), data.get('sid') or data.get('uuid')])
             fillers = ("%s," * 19)[:-1]
             sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
-            connection.execute(sqlInsertStatement, final_params)
-            connection.commit()
+            try:
+              connection.execute(sqlInsertStatement, final_params)
+              connection.commit()
+            except Exception as e:
+              print(e)
     except Exception as e:
+      print('error')
       print(e)
 
   def store_network_events(self, filename):
@@ -63,8 +68,11 @@ class StoreData:
             data.get('sourceip'), data.get('sourceport'), data.get('destip'), data.get('destport'), '', data.get('status'), '', '', data.get('sid') or data.get('uuid')]
             fillers = ("%s," * 19)[:-1]
             sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
-            connection.execute(sqlInsertStatement, final_params)
-            connection.commit()
+            try:
+              connection.execute(sqlInsertStatement, final_params)
+              connection.commit()
+            except Exception as e:
+              print(e)
     except Exception as e:
       print(e)
 
@@ -82,8 +90,11 @@ class StoreData:
                             data.get('username'),  data.get('executable'), data.get('sid') or data.get('uuid')]
             fillers = ("%s," * 12)[:-1]
             sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
-            connection.execute(sqlInsertStatement, final_params)
-            connection.commit()
+            try:
+              connection.execute(sqlInsertStatement, final_params)
+              connection.commit()
+            except Exception as e:
+              print(e)
     except Exception as e:
       print(e)
 
@@ -100,8 +111,11 @@ class StoreData:
             final_params = [data.get('timestamp'),  data.get('hostname'), '', data.get('instanceid'), data.get('program'), '', '', '', '', '', '', data.get('sid') or data.get('uuid')]
             fillers = ("%s," * 12)[:-1]
             sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
-            connection.execute(sqlInsertStatement, final_params)
-            connection.commit()
+            try:
+              connection.execute(sqlInsertStatement, final_params)
+              connection.commit()
+            except Exception as e:
+              print(e)
     except Exception as e:
       print(e)
 
@@ -118,8 +132,11 @@ class StoreData:
             final_params = [data.get('timestamp'), '', data.get('hostname'), data.get('ec2_instance_id'), data.get('private_ips'), data.get('public_ip'), '', '', '', '', data.get('sid') or data.get('uuid')]
             fillers = ("%s," * 11)[:-1]
             sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
-            connection.execute(sqlInsertStatement, final_params)
-            connection.commit()
+            try:
+              connection.execute(sqlInsertStatement, final_params)
+              connection.commit()
+            except Exception as e:
+              print(e)
     except Exception as e:
       print(e)
 
@@ -137,8 +154,11 @@ class StoreData:
                             data.get('username'), '', '', data.get('sourceip'), '', '', '', '', '', '', '', data.get('sid') or data.get('uuid')]
             fillers = ("%s," * 19)[:-1]
             sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
-            connection.execute(sqlInsertStatement, final_params)
-            connection.commit()
+            try:
+              connection.execute(sqlInsertStatement, final_params)
+              connection.commit()
+            except Exception as e:
+              print(e)
     except Exception as e:
       print(e)
 
@@ -156,8 +176,11 @@ class StoreData:
                             data.get('start'), data.get('username'),  data.get('executable'), data.get('sid') or data.get('uuid')]
             fillers = ("%s," * 12)[:-1]
             sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
-            connection.execute(sqlInsertStatement, final_params)
-            connection.commit()
+            try:
+              connection.execute(sqlInsertStatement, final_params)
+              connection.commit()
+            except Exception as e:
+              print(e)
     except Exception as e:
       print(e)
 
@@ -193,7 +216,10 @@ class StoreData:
                             data.get('filepath'), data.get('eventid'), data.get('threatid'), data.get('origin'), data.get('type'), data.get('source'), data.get('description'), data.get('references'), data.get('sid') or data.get('uuid')]
             fillers = ("%s," * 16)[:-1]
             sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
-            connection.execute(sqlInsertStatement, final_params)
-            connection.commit()
+            try:
+              connection.execute(sqlInsertStatement, final_params)
+              connection.commit()
+            except Exception as e:
+              print(e)
     except Exception as e:
       print(e)

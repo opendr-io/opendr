@@ -10,6 +10,7 @@
 # OpenDR logs
 *logs/
 *ready/
+*done/
 *tmp-endpoint-info/
 *tmp-network/
 *tmp-process/
