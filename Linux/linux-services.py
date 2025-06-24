@@ -1,4 +1,3 @@
-import subprocess
 import os
 import time
 import common.attributes as attr
@@ -8,36 +7,6 @@ from datetime import datetime
 hostname = attr.get_hostname()
 uuid = attr.get_system_uuid()
 
-# List all services and their statuses on a linux machine
-def get_all_service_statuses():
-    try:
-        output = subprocess.check_output(
-            ['systemctl', 'list-units', '--type=service', '--no-pager', '--no-legend'],
-            stderr=subprocess.DEVNULL
-        ).decode('utf-8')
-
-        services = []
-        for line in output.strip().split('\n'):
-            if line:
-                parts = line.split(None, 4)
-                service_name = parts[0]
-                load_state = parts[1]
-                active_state = parts[2]
-                sub_state = parts[3]
-                description = parts[4] if len(parts) > 4 else ''
-                services.append({
-                    'name': service_name,
-                    'load_state': load_state,
-                    'active_state': active_state,
-                    'sub_state': sub_state,
-                    'description': description
-                })
-
-        return services
-
-    except subprocess.CalledProcessError:
-        return []
-
 log_line_count = 0
 
 def log_data(log_directory, ready_directory):
@@ -45,7 +14,7 @@ def log_data(log_directory, ready_directory):
     while True:
         logger = logfunc.setup_logging(log_directory, ready_directory, "ServiceMonitor", "services")
         global log_line_count
-        services = get_all_service_statuses()
+        services = attr.get_all_service_statuses()
         for service in services:
             logger.info((
                 f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | hostname: {hostname} | "
