@@ -2,8 +2,6 @@ import configparser
 import pathlib
 import subprocess
 import concurrent.futures
-import os
-import threading
 
 config = configparser.ConfigParser()
 config.read(pathlib.Path(__file__).parent.absolute() / "agentconfig.ini")
@@ -14,20 +12,20 @@ def execute_scripts_realtime(script):
     process = subprocess.Popen(
       ['python', script],
       stdout=subprocess.PIPE,
-      stderr=subprocess.STDOUT,  # Combine stderr with stdout
+      stderr=subprocess.STDOUT,
       text=True,
       bufsize=1,
       universal_newlines=True
     )
-      
+
     output_lines = []
-    # Read output line by line in real-time
+
     for line in iter(process.stdout.readline, ''):
       line = line.rstrip()
       print(f"[{script}] {line}")
       output_lines.append(line)
     
-    process.wait()  # Wait for process to complete
+    process.wait()
     return script, '\n'.join(output_lines), "", process.returncode
   except Exception as e:
     print(f"Error executing {script}: {e}")
