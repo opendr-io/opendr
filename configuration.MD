@@ -7,7 +7,7 @@ The OpenDR endpoint monitoring system utilizes two primary configuration files t
 The agentconfig.ini file serves as the central configuration point for all monitoring activities. It is organized into three main sections:
 
 The General section controls system-wide parameters:
-- OperatingSystem: Set the operating system mode
+- OperatingSystem: Set the operating system mode (Windows, Linux, or MacOS)
 - LoggingInterval: Determines the frequency of log file rotation (minute, hour, or day)
 - DatabaseInterval: Sets the interval for database operations (default 30 seconds)
 - CleanupInterval: Specifies the cleanup interval for processed log files (default 30 minutes)
