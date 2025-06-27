@@ -8,10 +8,26 @@ from common.logger import check_logging_interval, enter_debug_logs
 hostname = attr.get_hostname()
 sid = attr.get_computer_sid()
 
+def log_existing_users(logger):
+    previous_users = set()
+    users = psutil.users() 
+    for user in users:
+        login_time = datetime.fromtimestamp(user.started).strftime("%Y-%m-%d %H:%M:%S")
+        user_entry = (user.name, user.terminal or "N/A", user.host or "N/A", login_time)
+        logger.info(
+            f"timestamp: {login_time} | "
+            f"hostname: {hostname} | "
+            f"event: existing user | username: {user.name} | "
+            f"sourceip: {user.host or 'n/a'} | "
+            f"sid: {sid}"
+        )
+        previous_users.add(user_entry)
+    return previous_users
+
 def monitor_logged_in_users(log_directory, ready_directory, interval):
     """Monitor and log new user logins only."""
     logger, last_interval = check_logging_interval(log_directory, ready_directory, "UserMonitor", "user", None, None)
-    seen_users = set()
+    seen_users = log_existing_users(logger)
     
     while True:
         logger, last_interval = check_logging_interval(log_directory, ready_directory, "UserMonitor", "user", logger, last_interval)
@@ -24,12 +40,11 @@ def monitor_logged_in_users(log_directory, ready_directory, interval):
                 logger.info(
                     f"timestamp: {login_time} | "
                     f"hostname: {hostname} | "
-                    f"event: user detected | username: {user.name} | "
+                    f"event: new user detected | username: {user.name} | "
                     f"sourceip: {user.host or 'n/a'} | "
-                    f"sid: {sid} "
+                    f"sid: {sid}"
                 )
                 seen_users.add(user_entry)  
-
         time.sleep(interval)
 
 def run():
