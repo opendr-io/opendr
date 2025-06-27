@@ -4,15 +4,16 @@ import psutil
 import time
 import logging
 import ipaddress
+from typing import NoReturn
 import common.attributes as attr
 from common.logger import check_logging_interval, enter_debug_logs
 
 # Global counter for log lines written
-log_line_count = 0
+log_line_count: int = 0
 
 # Retrieve system details once
 uuid = attr.get_mac_computer_uuid()
-hostname = attr.get_hostname()
+hostname: str = attr.get_hostname()
 
 def log_connection(logger, event, conn):
     """Logs a network connection event (created/terminated/existing)."""
@@ -40,7 +41,7 @@ def log_connection(logger, event, conn):
 
     log_line_count += 1
 
-def log_initial_connections(log_directory, ready_directory):
+def log_initial_connections(log_directory: str, ready_directory: str):
   """Log all currently active connections before starting real-time monitoring."""
   logger, last_interval = check_logging_interval(log_directory, ready_directory, "NetworkMonitor", "network", None, None)
 
@@ -64,7 +65,7 @@ def log_initial_connections(log_directory, ready_directory):
     log_connection(logger, "existing connection", conn)
   return initial_connections, logger, last_interval  # Return initial snapshot for comparison in monitoring
 
-def monitor_network_connections(log_directory, ready_directory, interval):
+def monitor_network_connections(log_directory: str, ready_directory: str, interval: float) -> NoReturn:
   """Continuously monitor new and terminated connections, rotating logs every minute."""
   previous_connections, logger, last_interval = log_initial_connections(log_directory, ready_directory)  # Log all existing connections first
   
@@ -102,12 +103,12 @@ def monitor_network_connections(log_directory, ready_directory, interval):
     
     time.sleep(interval)
 
-def run():
-  log_directory = 'tmp-network' if attr.get_config_value('MacOS', 'RunDatabaseOperations', False, 'bool') else 'tmp'
-  ready_directory = 'ready'
+def run() -> NoReturn:
+  log_directory: str = 'tmp-network' if attr.get_config_value('MacOS', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+  ready_directory: str = 'ready'
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
-  interval = attr.get_config_value('MacOS', 'NetworkInterval', 0.1, 'float')
+  interval: float = attr.get_config_value('MacOS', 'NetworkInterval', 0.1, 'float')
   monitor_network_connections(log_directory, ready_directory, interval)
 
 run()

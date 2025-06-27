@@ -2,15 +2,16 @@ import os
 import psutil
 import time
 from datetime import datetime
+from typing import NoReturn
 import common.attributes as attr
 from common.logger import check_logging_interval, enter_debug_logs
 
 # Global counter for log lines written
-log_line_count = 0
+log_line_count: int = 0
 
 # Retrieve system details once
 uuid = attr.get_mac_computer_uuid()
-hostname = attr.get_hostname()
+hostname: str = attr.get_hostname()
 
 def log_message(logger, message):
   """Logs a message and updates the global line counter."""
@@ -46,7 +47,7 @@ def log_existing_processes(logger):
     except (psutil.NoSuchProcess, psutil.AccessDenied):
       continue  # Ignore processes that vanish before logging
 
-def monitor_process_events(log_directory, ready_directory, interval=1):
+def monitor_process_events(log_directory: str, ready_directory: str, interval: float) -> NoReturn:
   """Monitors process creation and termination events while tracking log lines written."""
   logger, last_interval = check_logging_interval(log_directory, ready_directory, "ProcessMonitor", "process", None, None)
   previous_processes = set(psutil.pids())
@@ -126,15 +127,15 @@ def monitor_process_events(log_directory, ready_directory, interval=1):
     previous_processes = current_processes
     time.sleep(interval)
 
-def run():
-  log_directory = 'tmp-process' if attr.get_config_value('MacOS', 'RunDatabaseOperations', False, 'bool') else 'tmp'
-  ready_directory = 'ready'
-  debug_generator_directory = 'debuggeneratorlogs'
+def run() -> NoReturn:
+  log_directory: str = 'tmp-process' if attr.get_config_value('MacOS', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+  ready_directory: str = 'ready'
+  debug_generator_directory: str = 'debuggeneratorlogs'
   os.makedirs(debug_generator_directory, exist_ok=True)
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
   # Run the monitor with a 0.1-second interval
-  interval = attr.get_config_value('MacOS', 'ProcessInterval', 0.1, 'float')
+  interval: float = attr.get_config_value('MacOS', 'ProcessInterval', 0.1, 'float')
   monitor_process_events(log_directory, ready_directory, interval)
 
 run()

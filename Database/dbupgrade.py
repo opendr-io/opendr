@@ -6,7 +6,7 @@ import json
 config = configparser.ConfigParser()
 config.read(pathlib.Path(__file__).parent.absolute() / "../dbconfig.ini")
 
-def run_postgres_upgrade(queries):
+def run_postgres_upgrade(queries: list[str]) -> None:
     with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'), dbname=config.get('Database', 'DatabaseName', fallback='opendr'),
                     user=config.get('Database', 'RootDatabaseUserName', fallback='postgres'), password=config.get('Database', 'RootDatabasePassword')) as connection:
         with connection.cursor() as cursor:
@@ -15,7 +15,7 @@ def run_postgres_upgrade(queries):
                 cursor.execute(query)
         connection.commit()
 
-def update_postgres_users():
+def update_postgres_users() -> None:
     with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'), dbname=config.get('Database', 'DatabaseName', fallback='opendr'),
                     user=config.get('Database', 'RootDatabaseUserName', fallback='postgres'), password=config.get('Database', 'RootDatabasePassword')) as connection:
         with connection.cursor() as cursor:
@@ -29,7 +29,7 @@ def run():
     with open('upgrades.json', 'r') as file:
         d = json.load(file)
 
-    patches = config.get('Upgrade', 'Patches', fallback='').split(', ')
+    patches: list[str] = config.get('Upgrade', 'Patches', fallback='').split(', ')
     for patch in patches:
         if patch not in d:
             continue

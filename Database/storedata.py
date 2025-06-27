@@ -8,19 +8,19 @@ config.read(pathlib.Path(__file__).parent.absolute() / "../dbconfig.ini")
 
 class StoreData:
   def __init__(self):
-    self.host = config.get('Database', 'HostName')
-    self.port = config.get('Database', 'PortNumber', fallback='4000')
-    self.db = config.get('Database', 'DatabaseName', fallback='opendr')
-    self.user = config.get('Database', 'AgentUserName', fallback='agent')
-    self.password = config.get('Database', 'AgentPassword')
+    self.host: str = config.get('Database', 'HostName')
+    self.port: str = config.get('Database', 'PortNumber', fallback='4000')
+    self.db: str = config.get('Database', 'DatabaseName', fallback='opendr')
+    self.user: str = config.get('Database', 'AgentUserName', fallback='agent')
+    self.password: str = config.get('Database', 'AgentPassword')
     self.sslmode = 'verify-ca'
-    self.sslrootcert = config.get('Database', 'SSLRootCert')
-    self.users_log_counter = 0
-    self.endpoint_log_counter = 0
-    self.network_log_counter = 0
-    self.process_log_counter = 0
-    self.services_log_counter = 0
-    self.applications_installed_log_counter = 0
+    self.sslrootcert: str = config.get('Database', 'SSLRootCert')
+    self.users_log_counter: int = 0
+    self.endpoint_log_counter: int = 0
+    self.network_log_counter: int = 0
+    self.process_log_counter: int = 0
+    self.services_log_counter: int = 0
+    self.applications_installed_log_counter: int = 0
 
   @staticmethod
   def find_pattern(line):
@@ -29,11 +29,11 @@ class StoreData:
     data = {key.strip(): value.strip() for key, value in matches}
     return data
 
-  def store_process_events(self, filename):
+  def store_process_events(self, filename: str) -> None:
     table = 'systemevents(timestmp, event, pid, name, hostname, ppid, parent, username, dnsname, dnsdate, sourceip, sourceport, destip, destport, asname, status, exe, cmdline, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
-        lines = file.readlines()
+        lines: list[str] = file.readlines()
         for line in lines:
           if(not line):
             continue
@@ -46,11 +46,11 @@ class StoreData:
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
 
-  def store_network_events(self, filename):
+  def store_network_events(self, filename: str) -> None:
     table = 'systemevents(timestmp, event, pid, name, hostname, ppid, parent, username, dnsname, dnsdate, sourceip, sourceport, destip, destport, asname, status, exe, cmdline, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
-        lines = file.readlines()
+        lines: list[str] = file.readlines()
         for line in lines:
           if(not line):
             continue
@@ -62,11 +62,11 @@ class StoreData:
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
 
-  def store_installed_services(self, filename):
-    table = 'applications(timestmp, hostname, pid, ec2instanceid, program, servicename, displayname, status, start, username, executable, sid)'
+  def store_installed_services(self, filename: str) -> None:
+    table: str = 'applications(timestmp, hostname, pid, ec2instanceid, program, servicename, displayname, status, start, username, executable, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
-        lines = file.readlines()
+        lines: list[str] = file.readlines()
         for line in lines:
           if(not line):
             continue
@@ -78,11 +78,11 @@ class StoreData:
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
 
-  def store_installed_applications(self, filename):
-    table = 'applications(timestmp, hostname, pid, ec2instanceid, program, servicename, displayname, status, start, username, executable, sid)'
+  def store_installed_applications(self, filename: str) -> None:
+    table: str = 'applications(timestmp, hostname, pid, ec2instanceid, program, servicename, displayname, status, start, username, executable, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
-        lines = file.readlines()
+        lines: list[str] = file.readlines()
         for line in lines:
           if(not line):
             continue
@@ -93,11 +93,11 @@ class StoreData:
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
 
-  def store_endpoint_info(self, filename):
-    table = 'endpointinfo(timestmp, event, hostname, ec2instanceid, privateips, publicip, username, onterminal, fromhostname, logintime, sid)'
+  def store_endpoint_info(self, filename: str) -> None:
+    table: str = 'endpointinfo(timestmp, event, hostname, ec2instanceid, privateips, publicip, username, onterminal, fromhostname, logintime, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
-        lines = file.readlines()
+        lines: list[str] = file.readlines()
         for line in lines:
           if(not line):
             continue
@@ -107,12 +107,12 @@ class StoreData:
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
-
-  def store_user_info(self, filename):
+  
+  def store_user_info(self, filename: str) -> None:
     table = 'systemevents(timestmp, event, pid, name, hostname, ppid, parent, username, dnsname, dnsdate, sourceip, sourceport, destip, destport, asname, status, exe, cmdline, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
-        lines = file.readlines()
+        lines: list[str] = file.readlines()
         for line in lines:
           if(not line):
             continue
@@ -124,7 +124,7 @@ class StoreData:
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
 
-  def store_new_service(self, filename):
+  def store_new_service(self, filename: str) -> None:
     table = 'applications(timestmp, hostname, pid, ec2instanceid, program, servicename, displayname, status, start, username, executable, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
@@ -140,7 +140,7 @@ class StoreData:
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
 
-  def store_hotfix_info(self, filename):
+  def store_hotfix_info(self, filename: str) -> None:
     table = 'applications(timestmp, hostname, pid, ec2instanceid, program, servicename, displayname, status, start, username, executable, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
@@ -155,7 +155,7 @@ class StoreData:
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
 
-  def store_defender_info(self, filename):
+  def store_defender_info(self, filename: str) -> None:
     table = 'systemalerts(timestmp, event, username, title, severity, category, executable, filepath, eventid, threatid, origin, type, source, description, reference, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:

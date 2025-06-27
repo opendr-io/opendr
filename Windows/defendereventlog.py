@@ -6,12 +6,13 @@ import time
 import common.attributes as attr
 import common.logger as logfunc
 
+prev_records = {}
+
 # output formatted lines
 def format_row_with_keys(row):
     return " | ".join(f"{col}: {row[col]}" for col in row.index if pd.notna(row[col]))
 
 def fetch_defender_events(log_directory, ready_directory):
-    logger = logfunc.setup_logging(log_directory, ready_directory, "DefenderMonitor", "defender")
     # PowerShell command to fetch Event ID 1116
     command = [
         "powershell.exe",
@@ -47,8 +48,16 @@ def fetch_defender_events(log_directory, ready_directory):
                 if record:
                     last_key = list(record.keys())[-1]
                     record[last_key] += ' ' + line.strip()
-        records.append(record)
 
+        key = (record.get('TimeCreated', ''), record.get('Id', ''), record.get('Name', ''))
+        if key not in prev_records:
+            records.append(record)
+            prev_records[key] = record
+
+    if not records:
+        return
+
+    logger = logfunc.setup_logging(log_directory, ready_directory, "DefenderMonitor", "defender")
     dfwdf = pd.DataFrame(records)
     dfwdf = dfwdf.rename(columns={
         "TimeCreated": "timestamp",

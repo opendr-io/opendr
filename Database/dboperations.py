@@ -3,32 +3,33 @@ import time
 import shutil
 import schedule
 from pathlib import Path
-from storedata import StoreData
+from typing import NoReturn
 import configparser
 import pathlib
+from storedata import StoreData
 
 config = configparser.ConfigParser()
 config.read(pathlib.Path(__file__).parent.absolute() / "../dbconfig.ini")
 
-db_interval = config.getint('Database', 'DatabaseInterval', fallback=30)
-cleanup_interval = config.getint('Database', 'CleanupInterval', fallback=30)
+db_interval: int = config.getint('Database', 'DatabaseInterval', fallback=30)
+cleanup_interval: int = config.getint('Database', 'CleanupInterval', fallback=30)
 
-def directory_cleanup():
-  directory = 'done/ready'
+def directory_cleanup() -> None:
+  directory: str = 'done/ready'
   with os.scandir(directory) as files:
     for file in files:
       if(file.is_file()):
         os.unlink(file.path)
 
-def monitor_directory(dir, pat):
+def monitor_directory(dir, pat) -> NoReturn:
   dataStorage = StoreData()
   path = Path(dir)
-  processed_files = set()
+  processed_files: set[Path] = set()
   schedule.every(cleanup_interval).minutes.do(directory_cleanup)
   while True:
     try:
-      current_files = set(path.glob(pat))
-      new_files = current_files - processed_files
+      current_files: set[Path] = set(path.glob(pat))
+      new_files: set[Path] = current_files - processed_files
       if not new_files:
         time.sleep(db_interval)
         continue            
@@ -59,10 +60,10 @@ def monitor_directory(dir, pat):
       print(f"Error: {e}")
       time.sleep(db_interval)
       
-def run():
+def run() -> NoReturn:
   os.makedirs('done/ready', exist_ok=True)
-  directory = 'ready'
-  pat = '*.log'
+  directory: str = 'ready'
+  pat: str = '*.log'
   monitor_directory(directory, pat)
 
 run()

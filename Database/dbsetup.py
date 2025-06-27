@@ -5,7 +5,7 @@ import pathlib
 config = configparser.ConfigParser()
 config.read(pathlib.Path(__file__).parent.absolute() / "../dbconfig.ini")
 
-def setup_postgres_database():
+def setup_postgres_database() -> None:
   print('Initiating Database Connection')
   with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'), user=config.get('Database', 'RootDatabaseUserName', fallback='postgres'), 
                         password=config.get('Database', 'RootDatabasePassword'), autocommit=True) as connection:
@@ -16,7 +16,7 @@ def setup_postgres_database():
       print('Database Created!')
     connection.commit()
 
-def setup_postgres_tables():
+def setup_postgres_tables() -> None:
   with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'), dbname=config.get('Database', 'DatabaseName', fallback='opendr'),
                       user=config.get('Database', 'RootDatabaseUserName', fallback='postgres'), password=config.get('Database', 'RootDatabasePassword')) as connection:
     with connection.cursor() as cursor:
@@ -31,7 +31,7 @@ def setup_postgres_tables():
       connection.commit()
       print('Tables Created!')
 
-def setup_postgres_users():
+def setup_postgres_users() -> None:
   with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'), dbname=config.get('Database', 'DatabaseName', fallback='opendr'),
                       user=config.get('Database', 'RootDatabaseUserName', fallback='postgres'), password=config.get('Database', 'RootDatabasePassword')) as connection:
     with connection.cursor() as cursor:
