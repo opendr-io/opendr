@@ -6,6 +6,7 @@ import time
 from datetime import datetime
 import common.attributes as attr
 import common.logger as logfunc
+from typing import NoReturn
 
 timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 hostname = attr.get_hostname()
@@ -13,12 +14,12 @@ computer_sid = attr.get_computer_sid() or ''
 ec2_instance_id = attr.get_ec2_instance_id() or ''
 
 # format output
-def format_row_with_keys(row):
+def format_row_with_keys(row) -> str:
     return " | ".join(f"{col}: {row[col]}" for col in row.index if pd.notna(row[col]))
 
-def fetch_defender_events():
+def fetch_defender_events() -> pd.DataFrame:
     # PowerShell command to get drivers and convert to JSON
-    command = [
+    command: list[str] = [
         "powershell",
         "-NoProfile",
         "-Command",
@@ -29,13 +30,13 @@ def fetch_defender_events():
     # JSON  to DataFrame
     try:
         driver_data = json.loads(result.stdout)
-        dfd = pd.DataFrame(driver_data)
+        dfd: pd.DataFrame = pd.DataFrame(driver_data)
     except json.JSONDecodeError as e:
         print("JSON parse error:", e)
         print(result.stdout)
         return pd.DataFrame()
     # Fields to retain and optional renaming
-    keep = [
+    keep: list[str] = [
         'Description','ClassGuid','CompatID','DeviceClass','DeviceID','DeviceName',
         'DriverDate','DriverName','DriverProviderName','DriverVersion','FriendlyName',
         'HardWareID','InfName','IsSigned','Location','Manufacturer','PDO','Signer'
@@ -69,7 +70,7 @@ def fetch_defender_events():
     dfd["hostname"] = hostname
     dfd["ec2_instance_id"] = ec2_instance_id
 
-    final_order = [
+    final_order: list[str] = [
         "timestamp", "hostname", "event",
         "name", "desc", "signer","class_guid", "compat_id", "device_class", "device_id",  "device_name",
         "driver_provider", "driver_version", "friendly_name", "hardware_id", "inf_name",
@@ -79,7 +80,7 @@ def fetch_defender_events():
     dfd = dfd[[col for col in final_order if col in dfd.columns]]
     return dfd
 
-def log_drivers(log_directory, ready_directory):
+def log_drivers(log_directory: str, ready_directory: str) -> NoReturn:
     interval: float = attr.get_config_value('Windows', 'DriverInterval', 60.0, 'float')
     logger, last_interval  = logfunc.check_logging_interval(log_directory, ready_directory, "DriverMonitor", "driver", None, None)
     prev_dfd: pd.DataFrame = fetch_defender_events()
@@ -96,7 +97,7 @@ def log_drivers(log_directory, ready_directory):
             logger.info(line)
         time.sleep(interval)
 
-def run():
+def run() -> NoReturn:
     log_directory = 'tmp-windows-drivers' if attr.get_config_value('Windows', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory = 'ready'
     debug_generator_directory = 'debuggeneratorlogs'
