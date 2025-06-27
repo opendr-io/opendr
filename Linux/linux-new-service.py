@@ -12,9 +12,9 @@ log_line_count = 0
 def log_data(log_directory, ready_directory):
     interval = attr.get_config_value('Linux', 'NewServiceInterval', 60.0, 'float')
     previous_services = [str((service['name'], service['description'])) for service in attr.get_all_service_statuses()]
+    logger, last_interval = logfunc.check_logging_interval(log_directory, ready_directory, "NewServiceMonitor", "newservice", None, None)
+    global log_line_count
     while True:
-        logger = logfunc.setup_logging(log_directory, ready_directory, "NewServiceMonitor", "newservice")
-        global log_line_count
         services = attr.get_all_service_statuses()
         for service in services:
             if str((service['name'], service['description'])) not in previous_services:
@@ -27,8 +27,8 @@ def log_data(log_directory, ready_directory):
                 log_line_count += 1
 
         logfunc.enter_debug_logs('linux-newservice', f"Running total log lines written: {log_line_count}  \n")
-        logfunc.clear_handlers(log_directory, ready_directory, logger)
-        time.sleep(interval)  # Log every 60 minutes - or choose an interval
+        logger, last_interval = logfunc.check_logging_interval(log_directory, ready_directory, "NewServiceMonitor", "newservice", logger, last_interval)
+        time.sleep(interval)
 
 def run():
     log_directory = 'tmp-linux-new-service' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
