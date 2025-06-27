@@ -11,7 +11,7 @@ def execute_scripts(script):
     result = subprocess.run(['python', script], capture_output=True, text=True)
     return script, result.stdout, result.stderr
 
-def run():
+def run() -> None:
   os_mode = config.get('General', 'OperatingSystem', fallback='Windows')
   pathsep = '\\' if os_mode == 'Windows' else '/'
   generators = [os_mode + pathsep + script for script in config.get(os_mode, 'Scripts', fallback='').split(', ')]

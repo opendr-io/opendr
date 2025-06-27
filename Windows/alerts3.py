@@ -13,10 +13,10 @@ search_interval = now - timedelta(hours=10)
 
 # Format timestamps for comparison
 time_format = "%Y-%m-%d %H:%M:%S"
-date_prefix = now.strftime("%Y-%m-%d")  # Ensure we only check today’s logs
+date_prefix: str = now.strftime("%Y-%m-%d")  # Ensure we only check today’s logs
 
 # search log files with a time filter
-def search_log(directory_path, pattern):
+def search_log(directory_path, pattern) -> list[str]:
     matches = []
 
     directory = Path(directory_path)
@@ -38,12 +38,12 @@ def search_log(directory_path, pattern):
     return matches
 
 # create toaster
-def send_notification(title, message):
+def send_notification(title, message) -> None:
     toaster.show_toast(title, message, duration=5)  # toast for 5 seconds
 
 
-def run():
-    alerts_generated = 0
+def run() -> None:
+    alerts_generated: int = 0
     with open(Path(__file__).parent.absolute() / 'alertrules.csv', encoding="utf8") as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:

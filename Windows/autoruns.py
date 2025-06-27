@@ -78,13 +78,13 @@ def fetch_autoruns(log_directory, ready_directory):
     # Add metadata
     df["timestamp"] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     df["hostname"] = attr.get_hostname()
-    df["computer_sid"] = attr.get_computer_sid() or ''
+    df["sid"] = attr.get_computer_sid() or ''
     df["ec2_instance_id"] = attr.get_ec2_instance_id() or ''
     df["event"] = "autorun"
     # Column order
     final_order = [
         "timestamp", "hostname", 'event',
-        "source", "entry", "path", "computer_sid", "ec2_instance_id"
+        "source", "entry", "path", "sid", "ec2_instance_id"
     ]
     df = df[[col for col in final_order if col in df.columns]]
 

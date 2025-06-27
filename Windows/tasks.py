@@ -49,16 +49,15 @@ def fetch_scheduled_tasks(log_directory, ready_directory):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     dft['timestamp'] = timestamp
     dft['hostname'] = attr.get_hostname()
-    dft['computer_sid'] = attr.get_computer_sid() or ''
+    dft['sid'] = attr.get_computer_sid() or ''
     dft['ec2_instance_id'] = attr.get_ec2_instance_id() or ''
     dft['event'] = 'scheduled_task'
-    dft['sid'] = dft['computer_sid']
 
     # Final output column order
     final_order = [
         'timestamp', 'hostname', 'event',
         'task_name', 'status', 'last_run', 'next_run', 'task_to_run',
-        'schedule', 'author', 'start_time',  'sid', 'computer_sid', 'ec2_instance_id'
+        'schedule', 'author', 'start_time',  'sid', 'ec2_instance_id'
     ]
     dft = dft[[col for col in final_order if col in dft.columns]]
 

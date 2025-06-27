@@ -2,6 +2,7 @@ import subprocess
 import os
 import time
 from datetime import datetime
+from typing import NoReturn
 import common.attributes as attr
 import common.logger as logfunc
 
@@ -45,7 +46,7 @@ def get_module_info(module: str):
     except subprocess.CalledProcessError:
         return {}
 
-def log_modules(log_directory: str, ready_directory: str):
+def log_modules(log_directory: str, ready_directory: str) -> None:
     logger = logfunc.setup_logging(log_directory, ready_directory, "KernelMonitor", "kernel")
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -61,11 +62,11 @@ def log_modules(log_directory: str, ready_directory: str):
 
     logfunc.clear_handlers(log_directory, ready_directory, logger)
 
-def run():
-    interval = attr.get_config_value('Linux', 'KernelInterval', 43200.0, 'float')
-    log_directory = 'tmp-kernel' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
-    ready_directory = 'ready'
-    debug_generator_directory = 'debuggeneratorlogs'
+def run() -> NoReturn:
+    interval: float = attr.get_config_value('Linux', 'KernelInterval', 43200.0, 'float')
+    log_directory: str = 'tmp-kernel' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+    ready_directory: str = 'ready'
+    debug_generator_directory: str = 'debuggeneratorlogs'
     os.makedirs(debug_generator_directory, exist_ok=True)
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)
