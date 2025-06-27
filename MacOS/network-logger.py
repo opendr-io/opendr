@@ -48,7 +48,7 @@ def log_initial_connections(log_directory, ready_directory):
     connections = psutil.net_connections(kind='inet')
   except Exception as e:
     logging.error(f"Error retrieving existing network connections: {e}")
-    return {}
+    return {}, logger, last_interval
 
   initial_connections = {}
 
