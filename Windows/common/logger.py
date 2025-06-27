@@ -9,7 +9,7 @@ from common.attributes import get_config_value
 def setup_logging(log_directory: str, ready_directory: str, logger_name: str, file_name: str) -> logging.Logger:
     """Configures logging to write to a new file every minute."""
     current_time: str = datetime.now().strftime('%Y-%m-%d_%H-%M')
-    random_int = random.randint(1, 1000)
+    random_int: int = random.randint(1, 1000)
     log_filename: str = os.path.join(log_directory, f'{file_name}_{random_int}_{current_time}.log')
     logger: logging.Logger = logging.getLogger(logger_name)
     logger.setLevel(logging.INFO)
@@ -62,7 +62,7 @@ def check_logging_interval(*args) -> tuple[logging.Logger, int]:
     logger: Optional[logging.Logger]
     last_interval: Optional[int]
     log_directory, ready_directory, logger_name, file_name, logger, last_interval = args
-    current_interval: int = fetch_interval() # Defaults to daily logs for running locally; change to minute for database shippping
+    current_interval: int = fetch_interval()
     if current_interval != last_interval:  # Rotate log file at the start of a new minute
         logger = setup_logging(log_directory, ready_directory, logger_name, file_name)
         last_interval = current_interval

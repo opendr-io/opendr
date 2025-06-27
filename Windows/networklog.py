@@ -6,17 +6,18 @@ import logging
 import ipaddress
 import common.attributes as attr
 from common.logger import check_logging_interval, enter_debug_logs
+from typing import NoReturn
 
 # Global counter for log lines written
-log_line_count = 0
+log_line_count: int = 0
 
 # Retrieve system details once
-sid = attr.get_computer_sid()
-hostname = attr.get_hostname()
+sid: str = attr.get_computer_sid()
+hostname: str = attr.get_hostname()
 
-def log_connection(logger, event, conn):
+def log_connection(logger: logging.Logger, event: str, conn) -> None:
     """Logs a network connection event (created/terminated/existing)."""
-    process_name = attr.get_process_name(conn.pid)
+    process_name: str = attr.get_process_name(conn.pid)
     global log_line_count
 
     # Get remote address
@@ -24,6 +25,7 @@ def log_connection(logger, event, conn):
     remote_port = conn.raddr[1] if conn.raddr else "N/A"
 
     # Get username if possible
+    username: str
     try:
         username = psutil.Process(conn.pid).username()
     except (psutil.NoSuchProcess, psutil.AccessDenied):
@@ -40,7 +42,7 @@ def log_connection(logger, event, conn):
 
     log_line_count += 1
 
-def log_initial_connections(log_directory, ready_directory):
+def log_initial_connections(log_directory: str, ready_directory: str) -> tuple[dict, logging.Logger, int]:
   """Log all currently active connections before starting real-time monitoring."""
   logger, last_interval  = check_logging_interval(log_directory, ready_directory, "NetworkMonitor", "network", None, None)
 
@@ -64,7 +66,7 @@ def log_initial_connections(log_directory, ready_directory):
     log_connection(logger, "existing connection", conn)
   return initial_connections, logger, last_interval   # Return initial snapshot for comparison in monitoring
 
-def monitor_network_connections(log_directory, ready_directory, interval):
+def monitor_network_connections(log_directory: str, ready_directory: str, interval: float) -> NoReturn:
   """Continuously monitor new and terminated connections, rotating logs every minute."""
   previous_connections, logger, last_interval  = log_initial_connections(log_directory, ready_directory)  # Log all existing connections first
   
@@ -102,9 +104,9 @@ def monitor_network_connections(log_directory, ready_directory, interval):
     
     time.sleep(interval)
 
-def run():
-  log_directory = 'tmp-network' if attr.get_config_value('Windows', 'RunDatabaseOperations', False, 'bool') else 'tmp'
-  ready_directory = 'ready'
+def run() -> NoReturn:
+  log_directory: str = 'tmp-network' if attr.get_config_value('Windows', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+  ready_directory: str = 'ready'
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
 
