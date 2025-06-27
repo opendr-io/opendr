@@ -48,7 +48,7 @@ def monitor_logged_in_users(log_directory, ready_directory, interval):
         time.sleep(interval)
 
 def run():
-    interval = attr.get_config_value('Linux', 'UserInterval', 60.0, 'float')
+    interval = attr.get_config_value('Linux', 'UserInterval', 1.0, 'float')
     log_directory = 'tmp-user-info' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory = 'ready'
     debug_generator_directory = 'debuggeneratorlogs'
