@@ -16,9 +16,7 @@ ec2_instance_id = attr.get_ec2_instance_id() or ''
 def format_row_with_keys(row):
     return " | ".join(f"{col}: {row[col]}" for col in row.index if pd.notna(row[col]))
 
-def fetch_drivers(log_directory, ready_directory):
-    logger = logfunc.setup_logging(log_directory, ready_directory, "DriverMonitor", "driver")
-
+def fetch_defender_events():
     # PowerShell command to get drivers and convert to JSON
     command = [
         "powershell",
@@ -35,6 +33,7 @@ def fetch_drivers(log_directory, ready_directory):
     except json.JSONDecodeError as e:
         print("JSON parse error:", e)
         print(result.stdout)
+        return pd.DataFrame()
     # Fields to retain and optional renaming
     keep = [
         'Description','ClassGuid','CompatID','DeviceClass','DeviceID','DeviceName',
@@ -64,27 +63,40 @@ def fetch_drivers(log_directory, ready_directory):
     })
 
     dfd['timestamp'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    dfd["event"] = "driver"
+    dfd["event"] = "existing driver"
     dfd["sid"] = computer_sid
     dfd["timestamp"] = timestamp
     dfd["hostname"] = hostname
     dfd["ec2_instance_id"] = ec2_instance_id
 
     final_order = [
-        "timestamp", "hostname", 'event',
+        "timestamp", "hostname", "event",
         "name", "desc", "signer","class_guid", "compat_id", "device_class", "device_id",  "device_name",
         "driver_provider", "driver_version", "friendly_name", "hardware_id", "inf_name",
         "is_signed", "location", "manufacturer", "pdo",
         "sid", "ec2_instance_id",
     ]
     dfd = dfd[[col for col in final_order if col in dfd.columns]]
-    lines = dfd.apply(format_row_with_keys, axis=1)
+    return dfd
+
+def log_drivers(log_directory, ready_directory):
+    interval: float = attr.get_config_value('Windows', 'DriverInterval', 60.0, 'float')
+    logger, last_interval  = logfunc.check_logging_interval(log_directory, ready_directory, "DriverMonitor", "driver", None, None)
+    prev_dfd: pd.DataFrame = fetch_defender_events()
+    lines = prev_dfd.apply(format_row_with_keys, axis=1)
     for line in lines:
         logger.info(line)
-    logfunc.clear_handlers(log_directory, ready_directory, logger)
+    while True:
+        logger, last_interval  = logfunc.check_logging_interval(log_directory, ready_directory, "DriverMonitor", "driver", logger, last_interval)
+        cur_dfd: pd.DataFrame = fetch_defender_events()
+        df_new: pd.DataFrame = pd.concat([cur_dfd, prev_dfd, prev_dfd]).drop_duplicates(keep=False)
+        df_new["event"] = "new driver found"
+        lines = df_new.apply(format_row_with_keys, axis=1)
+        for line in lines:
+            logger.info(line)
+        time.sleep(interval)
 
 def run():
-    interval = attr.get_config_value('Windows', 'DriverInterval', 43200.0, 'float')
     log_directory = 'tmp-windows-drivers' if attr.get_config_value('Windows', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory = 'ready'
     debug_generator_directory = 'debuggeneratorlogs'
@@ -92,8 +104,6 @@ def run():
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)
     print('driverlog running')
-    while True:
-        fetch_drivers(log_directory, ready_directory)
-        time.sleep(interval)  # Twice a day by default, can be increased or decreased
+    log_drivers(log_directory, ready_directory)
 
 run()
