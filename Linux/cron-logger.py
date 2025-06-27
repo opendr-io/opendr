@@ -6,8 +6,8 @@ from datetime import datetime
 import common.attributes as attr
 import common.logger as logfunc
 
-def get_crontab_jobs(filepath):
-    jobs = []
+def get_crontab_jobs(filepath) -> list:
+    jobs: list = []
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
             for line in f:
@@ -18,8 +18,8 @@ def get_crontab_jobs(filepath):
         jobs.append(f"ERROR reading {filepath}: {e}")
     return jobs
 
-def get_user_crontabs():
-    jobs = []
+def get_user_crontabs() -> list:
+    jobs: list = []
     for user in pwd.getpwall():
         username = user.pw_name
         try:
@@ -33,12 +33,12 @@ def get_user_crontabs():
             continue
     return jobs
 
-def log_cron_jobs(log_directory: str, ready_directory: str):
+def log_cron_jobs(log_directory: str, ready_directory: str) -> None:
     logger = logfunc.setup_logging(log_directory, ready_directory, "CronJobMonitor", "cronjob")
-    hostname = attr.get_hostname()
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    
-    cron_files = ['/etc/crontab'] + [
+    hostname: str = attr.get_hostname()
+    timestamp: str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    cron_files: list[str] = ['/etc/crontab'] + [
         os.path.join('/etc/cron.d', f)
         for f in os.listdir('/etc/cron.d')
         if os.path.isfile(os.path.join('/etc/cron.d', f))
@@ -46,20 +46,20 @@ def log_cron_jobs(log_directory: str, ready_directory: str):
 
     for path in cron_files:
         for job in get_crontab_jobs(path):
-            entry = f"timestamp: {timestamp} | hostname: {hostname} | file: {path} | job: {job}"
+            entry: str = f"timestamp: {timestamp} | hostname: {hostname} | file: {path} | job: {job}"
             logger.info(entry)
 
     for job in get_user_crontabs():
-        entry = f"timestamp: {timestamp} | hostname: {hostname} | source: user_crontab | {job}"
+        entry: str = f"timestamp: {timestamp} | hostname: {hostname} | source: user_crontab | {job}"
         logger.info(entry)
 
     logfunc.clear_handlers(log_directory, ready_directory, logger)
 
 def run():
-    interval = attr.get_config_value('Linux', 'CronLogInterval', 43200.0, 'float')
-    log_directory = 'tmp-cron-job' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
-    ready_directory = 'ready'
-    debug_generator_directory = 'debuggeneratorlogs'
+    interval: float = attr.get_config_value('Linux', 'CronLogInterval', 43200.0, 'float')
+    log_directory: str = 'tmp-cron-job' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+    ready_directory: str = 'ready'
+    debug_generator_directory: str = 'debuggeneratorlogs'
     os.makedirs(debug_generator_directory, exist_ok=True)
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)
