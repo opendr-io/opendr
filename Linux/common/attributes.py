@@ -14,12 +14,12 @@ def get_hostname() -> str:
     return socket.gethostname()
 
 # Gets the Windows host SID
-def get_computer_sid() -> str:
-    return win32security.ConvertSidToStringSid(
-        win32security.GetFileSecurity(
-        os.environ['SYSTEMROOT'], win32security.OWNER_SECURITY_INFORMATION
-        ).GetSecurityDescriptorOwner()
-    )
+# def get_computer_sid() -> str:
+#     return win32security.ConvertSidToStringSid(
+#         win32security.GetFileSecurity(
+#         os.environ['SYSTEMROOT'], win32security.OWNER_SECURITY_INFORMATION
+#         ).GetSecurityDescriptorOwner()
+#     )
 
 def get_ec2_instance_id() -> str:
     try:
@@ -49,7 +49,7 @@ def get_process_name(pid: int) -> str:
         return "Unknown"
 
 # Gets the Linux system UUID from the DMI product_uuid or systemd machine-id
-def get_system_uuid():
+def get_system_uuid() -> dict[str, str]:
     primary_path = "/sys/class/dmi/id/product_uuid"
     fallback_path = "/etc/machine-id"
     try:
