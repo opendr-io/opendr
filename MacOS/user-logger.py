@@ -9,7 +9,7 @@ from common.logger import check_logging_interval
 hostname: str = attr.get_hostname()
 uuid = attr.get_system_uuid()
 
-def log_existing_users(logger):
+def log_existing_users(logger) -> set:
     previous_users = set()
     users = psutil.users()
     for user in users:

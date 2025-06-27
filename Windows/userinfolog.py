@@ -3,12 +3,12 @@ import psutil
 import time
 from datetime import datetime
 import common.attributes as attr
-from common.logger import check_logging_interval, enter_debug_logs
+from common.logger import check_logging_interval
 
 hostname = attr.get_hostname()
 sid = attr.get_computer_sid()
 
-def log_existing_users(logger):
+def log_existing_users(logger) -> set:
     previous_users = set()
     users = psutil.users() 
     for user in users:
