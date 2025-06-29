@@ -75,7 +75,7 @@ def get_system_uuid() -> dict[str, str]:
         }
 
 # List all services and their statuses on a linux machine
-def get_all_service_statuses():
+def get_all_service_statuses() -> list:
     try:
         output = subprocess.check_output(
             ['systemctl', 'list-units', '--type=service', '--no-pager', '--no-legend'],
