@@ -35,6 +35,8 @@ def run():
     while True:
         ips = fetch_unique_ips(interval)
         for ip in ips:
+            if not ip or ip == 'n/a':
+                continue
             dns_name, as_name = get_resolved_name(ip)
             enrich_network(ip, dns_name, as_name, interval)
         time.sleep(interval)
