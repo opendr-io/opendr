@@ -117,7 +117,7 @@ class StoreData:
           if(not line):
             continue
           data = self.find_pattern(line)
-          final_params = [data.get('timestamp'), data.get('event'), '', '', data.get('hostname'), '', '',
+          final_params = [data.get('timestamp'), data.get('event'), 0, '', data.get('hostname'), '', '',
                           data.get('username'), '', '', data.get('sourceip'), '', '', '', '', '', '', '', data.get('sid') or data.get('uuid')]
           fillers = ("%s," * 19)[:-1]
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
