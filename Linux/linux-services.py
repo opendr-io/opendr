@@ -19,7 +19,7 @@ def log_initial_inventory(log_directory: str, ready_directory: str):
         logger.info((
             f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | hostname: {hostname} | "
             f"name: {service['name']} | active: {service['active_state']} | sub: ({service['sub_state']}) | "
-            f"description: {service['description']} | uuid: {uuid}"
+            f"description: {service['description']} | event: existing service | uuid: {uuid}"
             ))
         seen_services.append((service['name'], service['active_state'], service['description']))
         log_line_count += 1
@@ -37,7 +37,7 @@ def log_data(log_directory: str, ready_directory: str) -> NoReturn:
                 logger.info((
                     f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | hostname: {hostname} | "
                     f"name: {service['name']} | active: {service['active_state']} | sub: ({service['sub_state']}) | "
-                    f"description: {service['description']} | uuid: {uuid}"
+                    f"description: {service['description']} | event: new service | uuid: {uuid}"
                     ))
                 seen_services.append((service['name'], service['active_state'], service['description']))
                 log_line_count += 1
