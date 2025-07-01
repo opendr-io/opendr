@@ -1,3 +1,0 @@
-identifier,type,pattern,title,message
-PYTHON_NET,network,"connection created.*process: python\.exe","🚨 Python Internet Activity","python.exe created a connection. Check logs."
-PYTHON_CMD,process,"name:\s*cmd\.exe.*parent:\s*python\.exe","⚠️ Python Shelled Out","python.exe ran cmd.exe. Check logs."
