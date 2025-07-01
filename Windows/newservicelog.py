@@ -43,7 +43,7 @@ def log_services(log_directory, ready_directory, interval):
 
 def run():
     interval = attr.get_config_value('Windows', 'NewServiceInterval', 60.0, 'float')
-    log_directory = 'tmp-windows-new-service'
+    log_directory = 'tmp-windows-new-service' if attr.get_config_value('Windows', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory = 'ready'
     debug_generator_directory = 'debuggeneratorlogs'
     os.makedirs(debug_generator_directory, exist_ok=True)
