@@ -95,6 +95,7 @@ def log_drivers(log_directory: str, ready_directory: str) -> NoReturn:
         lines = df_new.apply(format_row_with_keys, axis=1)
         for line in lines:
             logger.info(line)
+        prev_dfd = cur_dfd
         time.sleep(interval)
 
 def run() -> NoReturn:
