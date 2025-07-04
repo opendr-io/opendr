@@ -8,6 +8,11 @@ import common.attributes as attr
 import common.logger as logfunc
 from typing import NoReturn
 
+# Enumerates Windows Plug and Play drivers
+# Not all Windows drivers will be output here, but 
+# most hardware device activations on a Windows PC
+# should be detected by this component.
+
 timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 hostname = attr.get_hostname()
 computer_sid = attr.get_computer_sid() or ''
