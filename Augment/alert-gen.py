@@ -14,6 +14,7 @@ process_log = Path("tmp-process")
 service_log = Path("tmp-software-inventory")
 endpoint_log = Path("tmp-endpoint-info")
 user_log = Path("tmp-user-info")
+driver_log = Path("tmp-windows-drivers")
 
 toaster = ToastNotifier()
 now = datetime.now()
@@ -52,25 +53,28 @@ def search_log(directory_path: str, pattern: str, type: str ='') -> list[str]:
 # create toaster
 def send_notification(title, message) -> None:
     if os_mode == 'Windows':
-        toaster.show_toast(title, message, duration=5)  # toast for 5 seconds
+        toaster.show_toast(title, message, duration=15)  # toast for 15 seconds
 
 def run() -> None:
     alerts_generated: int = 0
     with open(Path(__file__).parent.absolute() / 'alertrules.csv', encoding="utf8") as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            if row['type'] == 'network':
-                matches = search_log(network_log, row['pattern'], row['type'])
-            elif row['type'] == 'process':
-                matches = search_log(process_log, row['pattern'], row['type'])
-            elif row['type'] == 'user':
-                matches = search_log(user_log, row['pattern'], row['type'])
-            elif row['type'] == 'endpoint':
-                matches = search_log(endpoint_log, row['pattern'], row['type'])
-            elif row['type'] == 'service':
-                matches = search_log(service_log, row['pattern'], row['type'])
-            else:
-                continue
+            match row['type']:
+                case 'network':
+                    matches = search_log(network_log, row['pattern'], row['type'])
+                case 'process':
+                    matches = search_log(process_log, row['pattern'], row['type'])
+                case 'user':
+                    matches = search_log(user_log, row['pattern'], row['type'])
+                case 'endpoint':
+                    matches = search_log(endpoint_log, row['pattern'], row['type'])
+                case 'service':
+                    matches = search_log(service_log, row['pattern'], row['type'])
+                case 'driver':
+                    matches = search_log(driver_log, row['pattern'], row['type'])
+                case _:
+                    continue
 
             if not matches:
                 continue
