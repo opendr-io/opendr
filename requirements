@@ -1,6 +1,7 @@
 datetime
 ipaddress
 ipwhois
+pandas
 psutil
 pywin32
 psycopg[binary]
