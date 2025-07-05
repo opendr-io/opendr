@@ -8,13 +8,14 @@ The agentconfig.ini file serves as the central configuration point for all monit
 
 The General section controls system-wide parameters:
 - OperatingSystem: Set the operating system mode (Windows, Linux, or MacOS)
+- LogProfile: Set the logging scripts to be executed by assigning one of three pre-baked profiles (basic, advanced or complete) or 'custom' which will allow you to run your preference based on the Scripts parameter of the OS mode
+- RunDatabaseOperations: Controls whether database operations are enabled (default False)
 - LoggingInterval: Determines the frequency of log file rotation (minute, hour, or day)
 - DatabaseInterval: Sets the interval for database operations (default 30 seconds)
 - CleanupInterval: Specifies the cleanup interval for processed log files (default 30 minutes)
 
 The Windows section configures Windows-specific monitoring:
-- Scripts: Lists all Windows monitoring scripts to be executed
-- RunDatabaseOperations: Controls whether database operations are enabled (default False)
+- Scripts: Lists all Windows monitoring scripts to be executed by the custom log profile
 - EndpointInterval: Sets the endpoint info logging interval (default 43200 seconds)
 - NetworkInterval: Controls network logging frequency (default 0.1 seconds)
 - ProcessInterval: Sets process logging frequency (default 0.1 seconds)
@@ -29,8 +30,7 @@ The Windows section configures Windows-specific monitoring:
 - TaskInterval: Sets windows task logging frequency (default 43200 seconds)
 
 The Linux section configures Linux-specific monitoring:
-- Scripts: Lists all Linux monitoring scripts to be executed
-- RunDatabaseOperations: Controls whether database operations are enabled (default False)
+- Scripts: Lists all Linux monitoring scripts to be executed by the custom log profile
 - EndpointInterval: Sets the endpoint info logging interval (default 43200 seconds)
 - NetworkInterval: Controls network logging frequency (default 0.1 seconds)
 - ProcessInterval: Sets process logging frequency (default 0.1 seconds)
@@ -41,8 +41,7 @@ The Linux section configures Linux-specific monitoring:
 - UserInterval: Sets user info logging frequency (default 1 second)
 
 The MacOS section configures MacOS-specific monitoring:
-- Scripts: Lists all MacOS monitoring scripts to be executed
-- RunDatabaseOperations: Controls whether database operations are enabled (default False)
+- Scripts: Lists all MacOS monitoring scripts to be executed by the custom log profile
 - EndpointInterval: Sets the endpoint info logging interval (default 43200 seconds)
 - NetworkInterval: Controls network logging frequency (default 0.1 seconds)
 - ProcessInterval: Sets process logging frequency (default 0.1 seconds)

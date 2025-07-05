@@ -11,14 +11,16 @@ config.read(pathlib.Path(__file__).parent.absolute() / "agentconfig.ini")
 config.read(pathlib.Path(__file__).parent.absolute() / "dbconfig.ini")
 os_mode = config.get('General', 'OperatingSystem', fallback='Windows')
 
-logProfiles = {
-  "basic": ['process', 'network', 'software'],
-  "advanced": ['process', 'network', 'software', 'user', 'service', 'endpoint'],
-  "complete": {
-    "Windows": ['process', 'network', 'software', 'hotfix', 'driver', 'user', 'defender', 'autorun', 'service', 'endpoint', 'tasks'],
-    "Linux": ['process', 'network', 'software', 'user', 'service', 'endpoint', 'cronjob', 'kernel'],
-    "MacOS": ['process', 'network', 'user', 'endpoint']
-  },
+os_log = {
+  "Windows": ['process', 'network', 'software', 'user', 'endpoint', 'hotfix', 'driver',  'defender', 'autorun', 'service', 'tasks'],
+  "Linux": ['process', 'network', 'software', 'user', 'service', 'endpoint', 'cronjob', 'kernel'],
+  "MacOS": ['process', 'network', 'user', 'endpoint']
+}
+
+log_profiles = {
+  "basic": os_log[os_mode][:3],
+  "advanced": os_log[os_mode][:6],
+  "complete": os_log[os_mode],
   "custom": config.get(os_mode, 'Scripts', fallback='').split(', ')
 }
 
@@ -40,14 +42,13 @@ def execute_scripts(script):
     return script, result.stdout, result.stderr
 
 def run() -> None:
-  pathsep = '\\' if os_mode == 'Windows' else '/'
-  file_path = os_mode + pathsep + os_mode.lower() + '-'
-  logging_mode = config.get('General', 'LogProfile', fallback='basic')
-  logging_scripts = logProfiles[logging_mode] if logging_mode != 'complete' else logProfiles[logging_mode][os_mode]
+  path_sep = '\\' if os_mode == 'Windows' else '/'
+  file_path = os_mode + path_sep + os_mode.lower() + '-'
+  logging_scripts = log_profiles[config.get('General', 'LogProfile', fallback='basic')]
   generators = [file_path + script + '-log.py' for script in logging_scripts]
   # this section governs local vs database mode - default is local
-  if config.getboolean(os_mode, 'RunDatabaseOperations', fallback=False):
-    generators.append('Database' + pathsep + 'dboperations.py')
+  if config.getboolean('General', 'RunDatabaseOperations', fallback=False):
+    generators.append('Database' + path_sep + 'dboperations.py')
     test_connection()
 
   print('Starting Scripts')
