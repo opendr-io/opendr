@@ -2,12 +2,25 @@ import subprocess
 import concurrent.futures
 import psycopg
 import sys
+from enum import Enum
 import configparser
 import pathlib
 
 config = configparser.ConfigParser()
 config.read(pathlib.Path(__file__).parent.absolute() / "agentconfig.ini")
 config.read(pathlib.Path(__file__).parent.absolute() / "dbconfig.ini")
+os_mode = config.get('General', 'OperatingSystem', fallback='Windows')
+
+logProfiles = {
+  "basic": ['process', 'network', 'software'],
+  "advanced": ['process', 'network', 'software', 'user', 'service', 'endpoint'],
+  "complete": {
+    "Windows": ['process', 'network', 'software', 'hotfix', 'driver', 'user', 'defender', 'autorun', 'service', 'endpoint', 'tasks'],
+    "Linux": ['process', 'network', 'software', 'user', 'service', 'endpoint', 'cronjob', 'kernel'],
+    "MacOS": ['process', 'network', 'user', 'endpoint']
+  },
+  "custom": config.get(os_mode, 'Scripts', fallback='').split(', ')
+}
 
 def test_connection():
   try:
@@ -27,9 +40,11 @@ def execute_scripts(script):
     return script, result.stdout, result.stderr
 
 def run() -> None:
-  os_mode = config.get('General', 'OperatingSystem', fallback='Windows')
   pathsep = '\\' if os_mode == 'Windows' else '/'
-  generators = [os_mode + pathsep + script for script in config.get(os_mode, 'Scripts', fallback='').split(', ')]
+  file_path = os_mode + pathsep + os_mode.lower() + '-'
+  logging_mode = config.get('General', 'LogProfile', fallback='basic')
+  logging_scripts = logProfiles[logging_mode] if logging_mode != 'complete' else logProfiles[logging_mode][os_mode]
+  generators = [file_path + script + '-log.py' for script in logging_scripts]
   # this section governs local vs database mode - default is local
   if config.getboolean(os_mode, 'RunDatabaseOperations', fallback=False):
     generators.append('Database' + pathsep + 'dboperations.py')
