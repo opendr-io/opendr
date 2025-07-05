@@ -1,0 +1,5 @@
+identifier,type,pattern,title,message
+PYTHON_NET,network,"connection created.*process: python\.exe","🚨 Python Internet Activity","python.exe created a connection. Check logs."
+PYTHON_CMD,process,"name:\s*cmd\.exe.*parent:\s*python\.exe","⚠️ Python Shelled Out","python.exe ran cmd.exe. Check logs."
+NEW_USER,user,"event: new user detected","⚠️ New User","A new user was created recently. Check logs"
+NEW_DRIVER,driver,"new driver found","⚠️ New Driver","A new driver was created recently. Check logs"
