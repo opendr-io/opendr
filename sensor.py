@@ -2,29 +2,27 @@ import subprocess
 import concurrent.futures
 import psycopg
 import sys
-from enum import Enum
 import configparser
 import pathlib
 
 config = configparser.ConfigParser()
 config.read(pathlib.Path(__file__).parent.absolute() / "agentconfig.ini")
 config.read(pathlib.Path(__file__).parent.absolute() / "dbconfig.ini")
-os_mode = config.get('General', 'OperatingSystem', fallback='Windows')
 
-os_log = {
-  "Windows": ['process', 'network', 'software', 'user', 'endpoint', 'hotfix', 'driver',  'defender', 'autorun', 'service', 'tasks'],
-  "Linux": ['process', 'network', 'software', 'user', 'service', 'endpoint', 'cronjob', 'kernel'],
+os_mode: str = config.get('General', 'OperatingSystem', fallback='Windows')
+os_log: dict[str, list[str]] = {
+  "Windows": ['process', 'network', 'software', 'user', 'endpoint', 'service', 'hotfix', 'driver',  'defender', 'autorun', 'tasks'],
+  "Linux": ['process', 'network', 'software', 'user', 'endpoint', 'service', 'cronjob', 'kernel'],
   "MacOS": ['process', 'network', 'user', 'endpoint']
 }
-
-log_profiles = {
+log_profiles: dict[str, list[str]] = {
   "basic": os_log[os_mode][:3],
   "advanced": os_log[os_mode][:6],
   "complete": os_log[os_mode],
   "custom": config.get(os_mode, 'Scripts', fallback='').split(', ')
 }
 
-def test_connection():
+def test_connection() -> None:
   try:
     with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'),
                         dbname=config.get('Database', 'DatabaseName', fallback='opendr'),
@@ -46,6 +44,7 @@ def run() -> None:
   file_path = os_mode + path_sep + os_mode.lower() + '-'
   logging_scripts = log_profiles[config.get('General', 'LogProfile', fallback='basic')]
   generators = [file_path + script + '-log.py' for script in logging_scripts]
+
   # this section governs local vs database mode - default is local
   if config.getboolean('General', 'RunDatabaseOperations', fallback=False):
     generators.append('Database' + path_sep + 'dboperations.py')

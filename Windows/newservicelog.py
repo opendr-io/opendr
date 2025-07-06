@@ -9,16 +9,35 @@ import common.logger as logfunc
 if os.name != 'nt':
     sys.exit("platform not supported (Windows only)")
 
-# Create log directory
 log_line_count = 0
+hostname = attr.get_hostname()
+computer_sid = attr.get_computer_sid()
+
+def log_existing_services(logger):
+    previous_services = []
+    for service in psutil.win_service_iter():
+        try:
+            info = service.as_dict()
+            if str((info['pid'], info['name'])) not in previous_services:
+                service_info = (
+                    f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                    f"hostname: {hostname} | username: {info['username']} | event: existing service | "
+                    f"pid: {info['pid']} | servicename: {info['name']!r} | displayname: {info['display_name']!r} | "
+                    f"status: {info['status']} | start: {info['start_type']} | "
+                    f"executable: {info['binpath']} | sid: {computer_sid}"
+                )
+                logger.info(service_info)
+                log_line_count += 1
+                previous_services.append(str((info['pid'], info['name'])))
+        except Exception as e:
+            print(e)
+
+    return previous_services
 
 def log_services(log_directory, ready_directory, interval):
     """Logs running Windows services, formatted in a single line per service."""
     logger, last_interval  = logfunc.check_logging_interval(log_directory, ready_directory, "NewServiceMonitor", "newservice", None, None)
-    hostname = attr.get_hostname()
-    computer_sid = attr.get_computer_sid()
-    global log_line_count
-    previous_services = [str((service.pid(), service.name())) for service in psutil.win_service_iter()]
+    previous_services = log_existing_services(logger)
     while True:
         logger, last_interval = logfunc.check_logging_interval(log_directory, ready_directory, "NewServiceMonitor", "newservice", logger, last_interval)
 
@@ -28,11 +47,10 @@ def log_services(log_directory, ready_directory, interval):
                 if str((info['pid'], info['name'])) not in previous_services:
                     service_info = (
                         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-                        f"hostname: {hostname} | username: {info['username']} | "
+                        f"hostname: {hostname} | username: {info['username']} | event: new service | "
                         f"pid: {info['pid']} | servicename: {info['name']!r} | displayname: {info['display_name']!r} | "
                         f"status: {info['status']} | start: {info['start_type']} | "
-                        f"executable: {info['binpath']} | "
-                        f"sid: {computer_sid} | "
+                        f"executable: {info['binpath']} | sid: {computer_sid}"
                     )
                     logger.info(service_info)
                     log_line_count += 1
