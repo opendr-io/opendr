@@ -64,7 +64,7 @@ def log_modules(log_directory: str, ready_directory: str) -> None:
 
 def run() -> NoReturn:
     interval: float = attr.get_config_value('Linux', 'KernelInterval', 43200.0, 'float')
-    log_directory: str = 'tmp-kernel' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+    log_directory: str = 'tmp-kernel' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory: str = 'ready'
     debug_generator_directory: str = 'debuggeneratorlogs'
     os.makedirs(debug_generator_directory, exist_ok=True)
