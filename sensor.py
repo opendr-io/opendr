@@ -27,7 +27,7 @@ def test_connection() -> None:
     with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'),
                         dbname=config.get('Database', 'DatabaseName', fallback='opendr'),
                         user=config.get('Database', 'RootDatabaseUserName', fallback='postgres'), password=config.get('Database', 'RootDatabasePassword'),
-                        sslmode='verify-ca', sslrootcert=config.get('Database', 'SSLRootCert')) as connection:
+                        sslmode=config.get('Database', 'SSLMode'), sslrootcert=config.get('Database', 'SSLRootCert')) as connection:
         _ = connection.cursor()
         connection.close()
   except Exception as e:
