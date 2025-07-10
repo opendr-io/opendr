@@ -104,7 +104,7 @@ def log_drivers(log_directory: str, ready_directory: str) -> NoReturn:
         time.sleep(interval)
 
 def run() -> NoReturn:
-    log_directory = 'tmp-windows-drivers' if attr.get_config_value('Windows', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+    log_directory = 'tmp-windows-drivers' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory = 'ready'
     debug_generator_directory = 'debuggeneratorlogs'
     os.makedirs(debug_generator_directory, exist_ok=True)

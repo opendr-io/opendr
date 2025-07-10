@@ -9,12 +9,25 @@ config = configparser.ConfigParser()
 config.read(pathlib.Path(__file__).parent.absolute() / "agentconfig.ini")
 config.read(pathlib.Path(__file__).parent.absolute() / "dbconfig.ini")
 
-def test_connection():
+os_mode: str = config.get('General', 'OperatingSystem', fallback='Windows')
+os_log: dict[str, list[str]] = {
+  "Windows": ['process', 'network', 'software', 'user', 'endpoint', 'service', 'hotfix', 'driver',  'defender', 'autorun', 'tasks'],
+  "Linux": ['process', 'network', 'software', 'user', 'endpoint', 'service', 'cronjob', 'kernel'],
+  "MacOS": ['process', 'network', 'user', 'endpoint']
+}
+log_profiles: dict[str, list[str]] = {
+  "basic": os_log[os_mode][:3],
+  "advanced": os_log[os_mode][:6],
+  "complete": os_log[os_mode],
+  "custom": config.get(os_mode, 'Scripts', fallback='').split(', ')
+}
+
+def test_connection() -> None:
   try:
     with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'),
                         dbname=config.get('Database', 'DatabaseName', fallback='opendr'),
                         user=config.get('Database', 'RootDatabaseUserName', fallback='postgres'), password=config.get('Database', 'RootDatabasePassword'),
-                        sslmode='verify-ca', sslrootcert=config.get('Database', 'SSLRootCert')) as connection:
+                        sslmode=config.get('Database', 'SSLMode'), sslrootcert=config.get('Database', 'SSLRootCert')) as connection:
         _ = connection.cursor()
         connection.close()
   except Exception as e:
@@ -27,12 +40,14 @@ def execute_scripts(script):
     return script, result.stdout, result.stderr
 
 def run() -> None:
-  os_mode = config.get('General', 'OperatingSystem', fallback='Windows')
-  pathsep = '\\' if os_mode == 'Windows' else '/'
-  generators = [os_mode + pathsep + script for script in config.get(os_mode, 'Scripts', fallback='').split(', ')]
+  path_sep = '\\' if os_mode == 'Windows' else '/'
+  file_path = os_mode + path_sep + os_mode.lower() + '-'
+  logging_scripts = log_profiles[config.get('General', 'LogProfile', fallback='basic')]
+  generators = [file_path + script + '-log.py' for script in logging_scripts]
+
   # this section governs local vs database mode - default is local
-  if config.getboolean(os_mode, 'RunDatabaseOperations', fallback=False):
-    generators.append('Database' + pathsep + 'dboperations.py')
+  if config.getboolean('General', 'RunDatabaseOperations', fallback=False):
+    generators.append('Database' + path_sep + 'dboperations.py')
     test_connection()
 
   print('Starting Scripts')

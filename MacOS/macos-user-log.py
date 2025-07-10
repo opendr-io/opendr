@@ -50,7 +50,7 @@ def monitor_logged_in_users(log_directory: str, ready_directory: str, interval: 
 
 def run() -> NoReturn:
     interval: float = attr.get_config_value('MacOS', 'UserInterval', 1.0, 'float')
-    log_directory: str = 'tmp-user-info' if attr.get_config_value('MacOS', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+    log_directory: str = 'tmp-user-info' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory: str = 'ready'
     debug_generator_directory: str = 'debuggeneratorlogs'
     os.makedirs(debug_generator_directory, exist_ok=True)

@@ -64,7 +64,7 @@ def fetch_hotfixes(log_directory, ready_directory):
 
 def run():
     interval = attr.get_config_value('Windows', 'HotfixInterval', 43200.0, 'float')
-    log_directory = 'tmp-windows-hotfixes' if attr.get_config_value('Windows', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+    log_directory = 'tmp-windows-hotfixes' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory = 'ready'
     debug_generator_directory = 'debuggeneratorlogs'
     os.makedirs(debug_generator_directory, exist_ok=True)
