@@ -60,7 +60,7 @@ def log_existing_modules(taint_info: str, logger) -> list:
     return seen_modules
 
 def log_modules(log_directory: str, ready_directory: str) -> None:
-    interval: float = attr.get_config_value('Linux', 'KernelInterval', 43200.0, 'float')
+    interval: float = attr.get_config_value('Linux', 'KernelInterval', 60.0, 'float')
     logger, last_interval = logfunc.check_logging_interval(log_directory, ready_directory, "KernelMonitor", "kernel", None, None)
 
     taint_val, taint_flags = get_kernel_taint_status()
