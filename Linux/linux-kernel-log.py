@@ -4,7 +4,7 @@ import time
 from datetime import datetime
 from typing import NoReturn
 import common.attributes as attr
-import common.logger as logfunc
+from common.logger import LoggingModule
 
 # Kernel taint bits and their meaning
 TAINT_FLAGS = {
@@ -47,7 +47,7 @@ def get_module_info(module: str):
         return {}
 
 def log_modules(log_directory: str, ready_directory: str) -> None:
-    logger = logfunc.setup_logging(log_directory, ready_directory, "KernelMonitor", "kernel")
+    logger = LoggingModule(log_directory, ready_directory, "KernelMonitor", "kernel")
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     taint_val, taint_flags = get_kernel_taint_status()
@@ -58,9 +58,9 @@ def log_modules(log_directory: str, ready_directory: str) -> None:
         log_line = f"timestamp: {timestamp} | module: {mod} | {taint_info}"
         for key, value in info.items():
             log_line += f" | {key.lower().replace(' ', '_')}: {value}"
-        logger.info(log_line)
+        logger.write_log(log_line)
 
-    logfunc.clear_handlers(log_directory, ready_directory, logger)
+    logger.clear_handlers()
 
 def run() -> NoReturn:
     interval: float = attr.get_config_value('Linux', 'KernelInterval', 43200.0, 'float')

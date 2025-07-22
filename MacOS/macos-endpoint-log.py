@@ -3,15 +3,16 @@ from datetime import datetime
 import os
 from typing import NoReturn
 import common.attributes as attr
-import common.logger as logfunc
+from common.logger import LoggingModule
 
 log_line_count: int = 0
 
 def log_data(log_directory: str, ready_directory: str) -> NoReturn:
   interval: float = attr.get_config_value('MacOS', 'EndpointInterval', 43200.0, 'float')
+  logger = LoggingModule(log_directory, ready_directory, "EndpointMonitor", "endpoint")
+  global log_line_count
   while True:
-    logger = logfunc.setup_logging(log_directory, ready_directory, "EndpointMonitor", "endpoint")
-    global log_line_count
+    logger.check_logging_interval()
     # Configure logging for the new file
     data: str = (
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
@@ -19,10 +20,9 @@ def log_data(log_directory: str, ready_directory: str) -> NoReturn:
         f"ec2_instance_id: {attr.get_ec2_instance_id() or ''} | uuid: {attr.get_mac_computer_uuid() or ''}"
       )
     # Log to the newly created file
-    logger.info(data)
+    logger.write_log(data)
     log_line_count += 1
-    logfunc.enter_debug_logs('endpoint-info', f"Running total log lines written: {log_line_count}  \n")
-    logfunc.clear_handlers(log_directory, ready_directory, logger)
+    logger.clear_handlers()
     time.sleep(interval)  # Log every 60 minutes - or choose an interval
 
 def run() -> NoReturn:

@@ -6,7 +6,7 @@ import logging
 import ipaddress
 from typing import NoReturn
 import common.attributes as attr
-from common.logger import check_logging_interval, enter_debug_logs
+from common.logger import LoggingModule
 
 # Global counter for log lines written
 log_line_count: int = 0
@@ -15,7 +15,7 @@ log_line_count: int = 0
 uuid = attr.get_mac_computer_uuid()
 hostname: str = attr.get_hostname()
 
-def log_connection(logger, event, conn):
+def log_connection(logger: LoggingModule, event: str, conn) -> None:
     """Logs a network connection event (created/terminated/existing)."""
     process_name = attr.get_process_name(conn.pid)
     global log_line_count
@@ -30,7 +30,7 @@ def log_connection(logger, event, conn):
     except (psutil.NoSuchProcess, psutil.AccessDenied):
         username = "N/A"
 
-    logger.info(
+    logger.write_log(
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
         f"hostname: {hostname} |  username: {username}  | "
         f"event: {event} | process: {process_name}   pid: {conn.pid} | "       
@@ -41,15 +41,14 @@ def log_connection(logger, event, conn):
 
     log_line_count += 1
 
-def log_initial_connections(log_directory: str, ready_directory: str):
+def log_initial_connections(logger: LoggingModule) -> dict:
   """Log all currently active connections before starting real-time monitoring."""
-  logger, last_interval = check_logging_interval(log_directory, ready_directory, "NetworkMonitor", "network", None, None)
 
   try:
     connections = psutil.net_connections(kind='inet')
   except Exception as e:
     logging.error(f"Error retrieving existing network connections: {e}")
-    return {}, logger, last_interval
+    return {}
 
   initial_connections = {}
 
@@ -63,14 +62,14 @@ def log_initial_connections(log_directory: str, ready_directory: str):
     initial_connections[key] = conn
     
     log_connection(logger, "existing connection", conn)
-  return initial_connections, logger, last_interval  # Return initial snapshot for comparison in monitoring
+  return initial_connections # Return initial snapshot for comparison in monitoring
 
-def monitor_network_connections(log_directory: str, ready_directory: str, interval: float) -> NoReturn:
+def monitor_network_connections(logger: LoggingModule, debug_logger: LoggingModule, interval: float) -> NoReturn:
   """Continuously monitor new and terminated connections, rotating logs every minute."""
-  previous_connections, logger, last_interval = log_initial_connections(log_directory, ready_directory)  # Log all existing connections first
+  previous_connections = log_initial_connections(logger)  # Log all existing connections first
   
   while True:
-    logger, last_interval = check_logging_interval(log_directory, ready_directory, "NetworkMonitor", "network", logger, last_interval)
+    logger.check_logging_interval()
 
     current_connections = {}
     try:
@@ -98,7 +97,12 @@ def monitor_network_connections(log_directory: str, ready_directory: str, interv
     for key in terminated_keys:
       log_connection(logger, "connection terminated", previous_connections[key])
 
-    enter_debug_logs('network', f"Running total log lines written: {log_line_count}  \n")
+    if int(time.time()) % 10 == 0:
+      debug_logger.check_logging_interval()
+      debug_logger.write_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                      f'hostname: {hostname} | source: network | platform: macos | event: progress | '
+                      f'message: Running {log_line_count} log lines written | value: {log_line_count}')
+
     previous_connections = current_connections.copy()
     
     time.sleep(interval)
@@ -106,9 +110,13 @@ def monitor_network_connections(log_directory: str, ready_directory: str, interv
 def run() -> NoReturn:
   log_directory: str = 'tmp-network' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
   ready_directory: str = 'ready'
+  debug_generator_directory: str = 'debuggeneratorlogs'
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
+  os.makedirs(debug_generator_directory, exist_ok=True)
   interval: float = attr.get_config_value('MacOS', 'NetworkInterval', 0.1, 'float')
-  monitor_network_connections(log_directory, ready_directory, interval)
+  logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "NetworkMonitor", "network")
+  debug_logger: LoggingModule = LoggingModule(debug_generator_directory, ready_directory, "DebugMonitor", "debug")
+  monitor_network_connections(logger, debug_logger, interval)
 
 run()

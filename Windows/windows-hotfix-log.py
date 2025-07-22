@@ -5,14 +5,14 @@ import os
 import time
 from dateutil.parser import parse
 import common.attributes as attr
-import common.logger as logfunc
+from common.logger import LoggingModule
 
 # format output
 def format_row_with_keys(row):
     return " | ".join(f"{col}: {row[col]}" for col in row.index if pd.notna(row[col]))
 
-def fetch_hotfixes(log_directory, ready_directory):
-    logger = logfunc.setup_logging(log_directory, ready_directory, "HotfixMonitor", "hotfix")
+def fetch_hotfixes(logger: LoggingModule):
+    logger.check_logging_interval()
 
     # PowerShell command to get hotfixes and convert to JSON
     command = [
@@ -59,8 +59,8 @@ def fetch_hotfixes(log_directory, ready_directory):
     dfh["sid"] = attr.get_computer_sid()
     lines = dfh.apply(format_row_with_keys, axis=1)
     for line in lines:
-        logger.info(line)
-    logfunc.clear_handlers(log_directory, ready_directory, logger)
+        logger.write_log(line)
+    logger.clear_handlers()
 
 def run():
     interval = attr.get_config_value('Windows', 'HotfixInterval', 43200.0, 'float')
@@ -71,8 +71,10 @@ def run():
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)
     print('hotfixlog running')
+    logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "HotfixMonitor", "hotfix")
+    # debug_logger: LoggingModule = LoggingModule(debug_generator_directory, ready_directory, "DebugMonitor", "debug")
     while True:
-        fetch_hotfixes(log_directory, ready_directory)
+        fetch_hotfixes(logger)
         time.sleep(interval)  # Twice a day by default, can be increased or decreased
 
 run()

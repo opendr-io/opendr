@@ -3,7 +3,7 @@ import shutil
 import os
 import time
 import common.attributes as attr
-import common.logger as logfunc
+from common.logger import LoggingModule
 from datetime import datetime
 from typing import NoReturn
 
@@ -71,20 +71,21 @@ def get_installed_packages():
 log_line_count: int = 0
 
 def log_data(log_directory: str, ready_directory: str) -> NoReturn:
+    global log_line_count
     interval: float = attr.get_config_value('Linux', 'SoftwareInterval', 43200.0, 'float')
+    logger: LoggingModule = LoggingModule(log_directory, ready_directory, "SoftwareMonitor", "installed_software")
     while True:
-        logger = logfunc.setup_logging(log_directory, ready_directory, "SoftwareMonitor", "installed_software")
-        global log_line_count
+        logger.check_logging_interval()
         packages = get_installed_packages()
         for pkg in packages:
-            logger.info((
+            logger.write_log((
                     f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | hostname: {hostname} | "
                     f"name: {pkg['name']} | version: {pkg['version']} | architecture: {pkg['architecture']} | "
                     f"description: {pkg['description']} | uuid: {uuid}"
                     ))
             log_line_count += 1
-        logfunc.enter_debug_logs('software-inventory', f"Running total log lines written: {log_line_count}  \n")
-        logfunc.clear_handlers(log_directory, ready_directory, logger)
+        # logfunc.enter_debug_logs('software-inventory', f"Running total log lines written: {log_line_count}  \n")
+        logger.clear_handlers
         time.sleep(interval)  # Log every 60 minutes - or choose an interval
 
 def run() -> NoReturn:

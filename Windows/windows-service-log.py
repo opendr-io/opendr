@@ -4,7 +4,7 @@ import psutil
 from datetime import datetime
 import time
 import common.attributes as attr
-import common.logger as logfunc
+from common.logger import LoggingModule
 from typing import NoReturn
 
 if os.name != 'nt':
@@ -13,14 +13,13 @@ if os.name != 'nt':
 # Create log directory
 log_line_count: int = 0
 
-def log_services(log_directory: str, ready_directory: str) -> None:
+def log_services(logger: LoggingModule, debug_logger: LoggingModule) -> None:
   """Logs running Windows services, formatted in a single line per service."""
-  logger = logfunc.setup_logging(log_directory, ready_directory, "ServiceMonitor", "services")
+  logger.check_logging_interval()
   
   hostname: str = attr.get_hostname()
   computer_sid: str = attr.get_computer_sid()
   global log_line_count
-  # print(f"Logging to: {log_file}")  # Print log filename for tracking
 
   for service in psutil.win_service_iter():
     try:
@@ -34,13 +33,17 @@ def log_services(log_directory: str, ready_directory: str) -> None:
           f"executable: {info['binpath']} | "
           f"sid: {computer_sid} | "
         )
-        logger.info(service_info)
+        logger.write_log(service_info)
         log_line_count += 1
     except Exception as e:
       print(e)
 
-  logfunc.enter_debug_logs('windows-services', f"Running total log lines written: {log_line_count}  \n")
-  logfunc.clear_handlers(log_directory, ready_directory, logger)
+    debug_logger.check_logging_interval()
+    debug_logger.write_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                    f'hostname: {hostname} | source: service | platform: windows | event: progress | '
+                    f'message: Running {log_line_count} log lines written | value: {log_line_count}')
+
+  logger.clear_handlers()
 
 def run() -> NoReturn:
   interval: float = attr.get_config_value('Windows', 'ServiceInterval', 43200.0, 'float')
@@ -51,8 +54,10 @@ def run() -> NoReturn:
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
   print('windowsserviceslog running')
+  logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "ServiceMonitor", "services")
+  debug_logger: LoggingModule = LoggingModule(debug_generator_directory, ready_directory, "DebugMonitor", "debug")
   while True:
-    log_services(log_directory, ready_directory)
+    log_services(logger, debug_logger)
     time.sleep(interval)  # Twice a day by default, can be increased or decreased
 
 run()

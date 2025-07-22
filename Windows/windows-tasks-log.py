@@ -6,13 +6,13 @@ import io
 import time
 from datetime import datetime
 import common.attributes as attr
-import common.logger as logfunc
+from common.logger import LoggingModule
 
 def format_row_with_keys(row):
     return " | ".join(f"{col}: {row[col]}" for col in row.index if pd.notna(row[col]))
 
-def fetch_scheduled_tasks(log_directory, ready_directory):
-    logger = logfunc.setup_logging(log_directory, ready_directory, "TaskMonitor", "scheduled_task")
+def fetch_scheduled_tasks(logger: LoggingModule, debug_logger: LoggingModule) -> None:
+    logger.check_logging_interval()
 
     # Run schtasks with verbose CSV output
     proc = subprocess.run(
@@ -63,10 +63,9 @@ def fetch_scheduled_tasks(log_directory, ready_directory):
 
     # Format and write each row
     for line in dft.apply(format_row_with_keys, axis=1):
-        logger.info(line)
+        logger.write_log(line)
 
-    logfunc.clear_handlers(log_directory, ready_directory, logger)
-
+    logger.clear_handlers()
 
 def run():
     interval = attr.get_config_value('Windows', 'TaskInterval', 43200.0, 'float')
@@ -77,8 +76,10 @@ def run():
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)
     print('tasklog running')
+    logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "TaskMonitor", "scheduled_task")
+    debug_logger: LoggingModule = LoggingModule(debug_generator_directory, ready_directory, "DebugMonitor", "debug")
     while True:
-        fetch_scheduled_tasks(log_directory, ready_directory)
+        fetch_scheduled_tasks(logger, debug_logger)
         time.sleep(interval)
 
 run()

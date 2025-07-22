@@ -4,7 +4,7 @@ import winreg
 import pandas as pd
 from datetime import datetime
 import common.attributes as attr
-import common.logger as logfunc
+from common.logger import LoggingModule
 
 def format_row_with_keys(row):
     return " | ".join(f"{col}: {row[col]}" for col in row.index if pd.notna(row[col]))
@@ -50,8 +50,8 @@ def enum_startup_folder_entries():
                     })
     return entries
 
-def fetch_autoruns(log_directory, ready_directory):
-    logger = logfunc.setup_logging(log_directory, ready_directory, "AutorunsMonitor", "autoruns")
+def fetch_autoruns(logger: LoggingModule, debug_logger: LoggingModule) -> None:
+    logger.check_logging_interval()
 
     # Gather autorun entries
     entries = []
@@ -89,9 +89,9 @@ def fetch_autoruns(log_directory, ready_directory):
     df = df[[col for col in final_order if col in df.columns]]
 
     for line in df.apply(format_row_with_keys, axis=1):
-        logger.info(line)
+        logger.write_log(line)
 
-    logfunc.clear_handlers(log_directory, ready_directory, logger)
+    logger.clear_handlers()
 
 def run():
     interval = attr.get_config_value('Windows', 'AutorunInterval', 43200.0, 'float')
@@ -102,8 +102,10 @@ def run():
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)
     print('autorunslog running')
+    logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "AutorunsMonitor", "autoruns")
+    debug_logger: LoggingModule = LoggingModule(debug_generator_directory, ready_directory, "DebugMonitor", "debug")
     while True:
-        fetch_autoruns(log_directory, ready_directory)
+        fetch_autoruns(logger, debug_logger)
         time.sleep(interval)
 
 run()
