@@ -36,7 +36,7 @@ The Linux section configures Linux-specific monitoring:
 - SoftwareInterval: Defines software inventory logging interval (default 43200 seconds)
 - ServiceInterval: Controls service logging interval (default 43200 seconds)
 - CronLogInterval: Controls cron job logging interval (default 43200 seconds)
-- KernelInterval: Controls linux kernel logging interval (default 43200 seconds)
+- KernelInterval: Controls linux kernel logging interval (default 60 seconds)
 - UserInterval: Sets user info logging frequency (default 1 second)
 
 The MacOS section configures MacOS-specific monitoring:
