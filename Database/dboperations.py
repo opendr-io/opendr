@@ -47,8 +47,6 @@ def monitor_directory(dir, pat) -> NoReturn:
           dataStorage.store_endpoint_info(fn)
         elif ('user' in fn):
           dataStorage.store_user_info(fn)
-        elif ('newservice' in fn):
-          dataStorage.store_new_service(fn)
         elif ('hotfix' in fn):
           dataStorage.store_hotfix_info(fn)
         elif ('defender' in fn):

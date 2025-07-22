@@ -46,24 +46,42 @@ def get_module_info(module: str):
     except subprocess.CalledProcessError:
         return {}
 
-def log_modules(log_directory: str, ready_directory: str) -> None:
-    logger = LoggingModule(log_directory, ready_directory, "KernelMonitor", "kernel")
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-    taint_val, taint_flags = get_kernel_taint_status()
-    taint_info = f"tainted: {taint_val} | " + " | ".join([f"{flag}=True" for flag in taint_flags]) if taint_flags else "tainted: 0 | clean_kernel=True"
-
+def log_existing_modules(taint_info: str, logger: LoggingModule) -> list:
+    seen_modules: list = []
     for mod in get_module_list():
+        timestamp: str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         info = get_module_info(mod)
-        log_line = f"timestamp: {timestamp} | module: {mod} | {taint_info}"
+        log_line: str = f"timestamp: {timestamp} | module: {mod} | event: existing kernel | {taint_info}"
         for key, value in info.items():
             log_line += f" | {key.lower().replace(' ', '_')}: {value}"
+        
         logger.write_log(log_line)
+        seen_modules.append(mod)
+    return seen_modules
 
-    logger.clear_handlers()
+def log_modules(log_directory: str, ready_directory: str) -> NoReturn:
+    interval: float = attr.get_config_value('Linux', 'KernelInterval', 60.0, 'float')
+    logger = LoggingModule(log_directory, ready_directory, "KernelMonitor", "kernel")
+
+    taint_val, taint_flags = get_kernel_taint_status()
+    taint_info: str = f"tainted: {taint_val} | " + " | ".join([f"{flag}=True" for flag in taint_flags]) if taint_flags else "tainted: 0 | clean_kernel=True"
+    
+    prev_modules: list = log_existing_modules(taint_info, logger)
+    while True:
+        logger.check_logging_interval()
+        for mod in get_module_list():
+            if mod in prev_modules:
+                continue
+            timestamp: str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            info = get_module_info(mod)
+            log_line: str = f"timestamp: {timestamp} | module: {mod} | event: new kernel | {taint_info}"
+            for key, value in info.items():
+                log_line += f" | {key.lower().replace(' ', '_')}: {value}"
+            logger.write_log(log_line)
+            prev_modules.append(mod)
+        time.sleep(interval)
 
 def run() -> NoReturn:
-    interval: float = attr.get_config_value('Linux', 'KernelInterval', 43200.0, 'float')
     log_directory: str = 'tmp-kernel' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory: str = 'ready'
     debug_generator_directory: str = 'debuggeneratorlogs'
@@ -71,9 +89,7 @@ def run() -> NoReturn:
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)
     print("kernel logging running")
-    while True:
-        log_modules(log_directory, ready_directory)
-        time.sleep(interval)
+    log_modules(log_directory, ready_directory)
 
 if __name__ == "__main__":
     run()

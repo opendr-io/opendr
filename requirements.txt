@@ -3,7 +3,7 @@ ipaddress
 ipwhois
 pandas
 psutil
-pywin32
+pywin32; platform_system == "Windows"
 psycopg[binary]
 requests
 schedule
