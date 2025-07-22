@@ -21,6 +21,7 @@ log_profiles: dict[str, list[str]] = {
   "complete": os_log[os_mode],
   "custom": config.get(os_mode, 'Scripts', fallback='').split(', ')
 }
+augment_profiles: list[str] = ["network-aug", "alert-gen"]
 
 def test_connection() -> None:
   try:
@@ -48,6 +49,10 @@ def run() -> None:
   # this section governs local vs database mode - default is local
   if config.getboolean('General', 'RunDatabaseOperations', fallback=False):
     generators.append('Database' + path_sep + 'dboperations.py')
+    test_connection()
+
+  if config.getboolean('General', 'RunAugmentOperations', fallback=False):
+    generators.extend(['Augment' + path_sep + aug + '.py' for aug in augment_profiles])
     test_connection()
 
   print('Starting Scripts')
