@@ -9,7 +9,7 @@ from common.logger import LoggingModule
 def format_row_with_keys(row):
     return " | ".join(f"{col}: {row[col]}" for col in row.index if pd.notna(row[col]))
 
-def enum_run_keys(hive, path):
+def enum_run_keys(hive, path) -> list:
     """Enumerates entries under a Run/RunOnce registry key."""
     entries = []
     try:
@@ -32,7 +32,7 @@ def hive_name(hive):
         winreg.HKEY_CURRENT_USER: "HKCU"
     }.get(hive, str(hive))
 
-def enum_startup_folder_entries():
+def enum_startup_folder_entries() -> list:
     """Lists .lnk files from common Startup folders."""
     startup_dirs = [
         os.path.expandvars(r"%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup"),
@@ -50,7 +50,7 @@ def enum_startup_folder_entries():
                     })
     return entries
 
-def fetch_autoruns(logger: LoggingModule, debug_logger: LoggingModule) -> None:
+def fetch_autoruns(logger: LoggingModule) -> None:
     logger.check_logging_interval()
 
     # Gather autorun entries
@@ -103,9 +103,8 @@ def run():
     os.makedirs(ready_directory, exist_ok=True)
     print('autorunslog running')
     logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "AutorunsMonitor", "autoruns")
-    debug_logger: LoggingModule = LoggingModule(debug_generator_directory, ready_directory, "DebugMonitor", "debug")
     while True:
-        fetch_autoruns(logger, debug_logger)
+        fetch_autoruns(logger)
         time.sleep(interval)
 
 run()

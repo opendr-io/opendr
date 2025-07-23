@@ -8,9 +8,6 @@ import common.attributes as attr
 from common.logger import LoggingModule
 from typing import NoReturn
 
-# Global counter for log lines written
-log_line_count: int = 0
-
 # Retrieve system details once
 sid: str = attr.get_computer_sid()
 hostname: str = attr.get_hostname()
@@ -18,7 +15,6 @@ hostname: str = attr.get_hostname()
 def log_connection(logger: LoggingModule, event: str, conn) -> None:
     """Logs a network connection event (created/terminated/existing)."""
     process_name: str = attr.get_process_name(conn.pid)
-    global log_line_count
 
     # Get remote address
     remote_ip = conn.raddr[0] if conn.raddr else "N/A"
@@ -40,9 +36,7 @@ def log_connection(logger: LoggingModule, event: str, conn) -> None:
         f"status: {conn.status} | sid: {sid}"
     )
 
-    log_line_count += 1
-
-def log_initial_connections(logger: LoggingModule) -> tuple[dict]:
+def log_initial_connections(logger: LoggingModule) -> dict:
   """Log all currently active connections before starting real-time monitoring."""
   logger.check_logging_interval()
 
@@ -66,7 +60,7 @@ def log_initial_connections(logger: LoggingModule) -> tuple[dict]:
     log_connection(logger, "existing connection", conn)
   return initial_connections  # Return initial snapshot for comparison in monitoring
 
-def monitor_network_connections(logger: LoggingModule, debug_logger: LoggingModule, interval: float) -> NoReturn:
+def monitor_network_connections(logger: LoggingModule, interval: float) -> NoReturn:
   """Continuously monitor new and terminated connections, rotating logs every minute."""
   previous_connections = log_initial_connections(logger)  # Log all existing connections first
   
@@ -100,10 +94,9 @@ def monitor_network_connections(logger: LoggingModule, debug_logger: LoggingModu
       log_connection(logger, "connection terminated", previous_connections[key])
 
     if int(time.time()) % 10 == 0:
-      debug_logger.check_logging_interval()
-      debug_logger.write_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+      logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
                       f'hostname: {hostname} | source: network | platform: windows | event: progress | '
-                      f'message: Running {log_line_count} log lines written | value: {log_line_count}')
+                      f'message: Running {logger.log_line_count} log lines written | value: {logger.log_line_count}')
 
     previous_connections = current_connections.copy()
     
@@ -119,8 +112,6 @@ def run() -> NoReturn:
 
   interval = attr.get_config_value('Windows', 'NetworkInterval', 0.1, 'float')
   logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "NetworkMonitor", "network")
-  debug_logger: LoggingModule = LoggingModule(debug_generator_directory, ready_directory, "DebugMonitor", "debug")
-  monitor_network_connections(logger, debug_logger, interval)
-
+  monitor_network_connections(logger, interval)
 
 run()

@@ -6,7 +6,6 @@ import common.attributes as attr
 from common.logger import LoggingModule
 from typing import NoReturn
 
-log_line_count: int = 0
 hostname: str = attr.get_hostname()
 sid: str = attr.get_computer_sid()
 instance_id: str = attr.get_ec2_instance_id()
@@ -37,7 +36,7 @@ def get_installed_software() -> list[tuple]:
       continue
   return software_list
 
-def log_installed_software(logger: LoggingModule, debug_logger: LoggingModule) -> None:
+def log_installed_software(logger: LoggingModule) -> None:
   """Logs installed software with system metadata."""
   global log_line_count
   for name, version in get_installed_software():
@@ -49,12 +48,10 @@ def log_installed_software(logger: LoggingModule, debug_logger: LoggingModule) -
         f"instanceid: {instance_id} | sid: {sid}"
       )
       logger.write_log(log_entry)
-      log_line_count += 1
       if int(time.time()) % 10 == 0:
-        debug_logger.check_logging_interval()
-        debug_logger.write_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
                         f'hostname: {hostname} | source: software | platform: windows | event: progress | '
-                        f'message: Running {log_line_count} log lines written | value: {log_line_count}')
+                        f'message: Running {logger.log_line_count} log lines written | value: {logger.log_line_count}')
 
   logger.clear_handlers()
 
@@ -67,9 +64,8 @@ def run() -> NoReturn:
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
   logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "SoftwareMonitor", "installed_software")
-  debug_logger: LoggingModule = LoggingModule(debug_generator_directory, ready_directory, "DebugMonitor", "debug")
   while True:
-    log_installed_software(logger, debug_logger)
+    log_installed_software(logger)
     time.sleep(interval)  # Twice a day by default, can be increased or decreased
 
 run()

@@ -9,13 +9,13 @@ from common.logger import LoggingModule
 hostname: str = attr.get_hostname()
 uuid = attr.get_system_uuid()
 
-def log_existing_users(logger) -> set:
+def log_existing_users(logger: LoggingModule) -> set:
     previous_users = set()
     users = psutil.users()
     for user in users:
         login_time = datetime.fromtimestamp(user.started).strftime("%Y-%m-%d %H:%M:%S")
         user_entry = (user.name, user.terminal or "N/A", user.host or "N/A", login_time)
-        logger.info(
+        logger.write_log(
             f"timestamp: {login_time} | "
             f"hostname: {hostname} | "
             f"event: existing user | username: {user.name} | "
@@ -25,7 +25,7 @@ def log_existing_users(logger) -> set:
         previous_users.add(user_entry)
     return previous_users
 
-def monitor_logged_in_users(logger: LoggingModule, debug_logger: LoggingModule, interval: float) -> NoReturn:
+def monitor_logged_in_users(logger: LoggingModule, interval: float) -> NoReturn:
     """Monitor and log new user logins only."""
     seen_users: set = log_existing_users(logger)
     
@@ -56,7 +56,6 @@ def run() -> NoReturn:
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)
     logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "UserMonitor", "user")
-    debug_logger: LoggingModule = LoggingModule(debug_generator_directory, ready_directory, "DebugMonitor", "debug")
-    monitor_logged_in_users(logger, debug_logger, interval)
+    monitor_logged_in_users(logger, interval)
 
 run()

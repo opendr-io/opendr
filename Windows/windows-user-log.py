@@ -27,7 +27,6 @@ def log_existing_users(logger: LoggingModule) -> set:
 def monitor_logged_in_users(log_directory, ready_directory, interval):
     """Monitor and log new user logins only."""
     logger = LoggingModule(log_directory, ready_directory, "UserMonitor", "user")
-    # debug_logger: LoggingModule = LoggingModule(debug_generator_directory, ready_directory, "DebugMonitor", "debug")
     seen_users = log_existing_users(logger)
     
     while True:

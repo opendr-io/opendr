@@ -71,8 +71,7 @@ def run():
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)
     print('hotfixlog running')
-    logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "HotfixMonitor", "hotfix")
-    # debug_logger: LoggingModule = LoggingModule(debug_generator_directory, ready_directory, "DebugMonitor", "debug")
+    logger: LoggingModule = LoggingModule(log_directory, ready_directory, "HotfixMonitor", "hotfix")
     while True:
         fetch_hotfixes(logger)
         time.sleep(interval)  # Twice a day by default, can be increased or decreased

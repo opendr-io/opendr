@@ -12,7 +12,7 @@ prev_records = {}
 def format_row_with_keys(row):
     return " | ".join(f"{col}: {row[col]}" for col in row.index if pd.notna(row[col]))
 
-def fetch_defender_events(logger: LoggingModule, debug_logger: LoggingModule) -> None:
+def fetch_defender_events(logger: LoggingModule) -> None:
     # PowerShell command to fetch Event ID 1116
     command = [
         "powershell.exe",
@@ -129,9 +129,8 @@ def run():
     os.makedirs(ready_directory, exist_ok=True)
     print('windowsdefenderlog running')
     logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "DefenderMonitor", "defender")
-    debug_logger: LoggingModule = LoggingModule(debug_generator_directory, ready_directory, "DebugMonitor", "debug")
     while True:
-        fetch_defender_events(logger, debug_logger)
+        fetch_defender_events(logger)
         time.sleep(interval)  # Twice a day by default, can be increased or decreased
 
 run()

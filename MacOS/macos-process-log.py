@@ -6,17 +6,13 @@ from typing import NoReturn
 import common.attributes as attr
 from common.logger import LoggingModule
 
-# Global counter for log lines written
-log_line_count: int = 0
-
 # Retrieve system details once
 uuid = attr.get_mac_computer_uuid()
 hostname: str = attr.get_hostname()
 
 def log_existing_processes(logger: LoggingModule):
   """Logs all currently running processes at script startup."""
-  #log_message(logger, f"Logging all existing processes at startup on {hostname} with uuid: {uuid}")
-  global log_line_count
+
   for proc in psutil.process_iter(attrs=['pid', 'name', 'exe', 'username', 'cmdline']):
     try:
       proc_info = proc.as_dict(attrs=['pid', 'name', 'username', 'exe', 'cmdline'])
@@ -39,13 +35,11 @@ def log_existing_processes(logger: LoggingModule):
           f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
           f"exe: {exe} | cmdline: {cmdline} | uuid: {uuid}"
         )
-      log_line_count += 1
     except (psutil.NoSuchProcess, psutil.AccessDenied):
       continue  # Ignore processes that vanish before logging
 
-def monitor_process_events(logger: LoggingModule, debug_logger: LoggingModule, interval: float) -> NoReturn:
+def monitor_process_events(logger: LoggingModule, interval: float) -> NoReturn:
   """Monitors process creation and termination events while tracking log lines written."""
-  global log_line_count
   previous_processes = set(psutil.pids())
 
   # Log all running processes at startup
@@ -82,7 +76,6 @@ def monitor_process_events(logger: LoggingModule, debug_logger: LoggingModule, i
           f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
           f"exe: {exe} | cmdline: {cmdline} | uuid: {uuid}"
         )
-        log_line_count += 1
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue
 
@@ -110,16 +103,14 @@ def monitor_process_events(logger: LoggingModule, debug_logger: LoggingModule, i
           f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
           f"exe: {exe} | cmdline: {cmdline} | uuid: {uuid}"
         )
-        log_line_count += 1
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue
 
     # Print the current running total of log lines every 10 seconds
     if int(time.time()) % 10 == 0:
-      debug_logger.check_logging_interval()
-      debug_logger.write_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+      logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
                       f'hostname: {hostname} | source: process | platform: macos | event: progress | '
-                      f'message: Running {log_line_count} log lines written | value: {log_line_count}')
+                      f'message: Running {logger.log_line_count} log lines written | value: {logger.log_line_count}')
 
     # Update the previous process set
     previous_processes = current_processes
@@ -135,7 +126,6 @@ def run() -> NoReturn:
   # Run the monitor with a 0.1-second interval
   interval: float = attr.get_config_value('MacOS', 'ProcessInterval', 0.1, 'float')
   logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "ProcessMonitor", "process")
-  debug_logger: LoggingModule = LoggingModule(debug_generator_directory, ready_directory, "DebugMonitor", "debug")
-  monitor_process_events(logger, debug_logger, interval)
+  monitor_process_events(logger, interval)
 
 run()

@@ -11,7 +11,7 @@ from common.logger import LoggingModule
 def format_row_with_keys(row):
     return " | ".join(f"{col}: {row[col]}" for col in row.index if pd.notna(row[col]))
 
-def fetch_scheduled_tasks(logger: LoggingModule, debug_logger: LoggingModule) -> None:
+def fetch_scheduled_tasks(logger: LoggingModule) -> None:
     logger.check_logging_interval()
 
     # Run schtasks with verbose CSV output
@@ -77,9 +77,8 @@ def run():
     os.makedirs(ready_directory, exist_ok=True)
     print('tasklog running')
     logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "TaskMonitor", "scheduled_task")
-    debug_logger: LoggingModule = LoggingModule(debug_generator_directory, ready_directory, "DebugMonitor", "debug")
     while True:
-        fetch_scheduled_tasks(logger, debug_logger)
+        fetch_scheduled_tasks(logger)
         time.sleep(interval)
 
 run()

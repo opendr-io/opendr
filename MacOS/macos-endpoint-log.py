@@ -5,12 +5,10 @@ from typing import NoReturn
 import common.attributes as attr
 from common.logger import LoggingModule
 
-log_line_count: int = 0
 
 def log_data(log_directory: str, ready_directory: str) -> NoReturn:
   interval: float = attr.get_config_value('MacOS', 'EndpointInterval', 43200.0, 'float')
   logger = LoggingModule(log_directory, ready_directory, "EndpointMonitor", "endpoint")
-  global log_line_count
   while True:
     logger.check_logging_interval()
     # Configure logging for the new file
@@ -21,7 +19,6 @@ def log_data(log_directory: str, ready_directory: str) -> NoReturn:
       )
     # Log to the newly created file
     logger.write_log(data)
-    log_line_count += 1
     logger.clear_handlers()
     time.sleep(interval)  # Log every 60 minutes - or choose an interval
 

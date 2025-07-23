@@ -8,9 +8,8 @@ from common.logger import LoggingModule
 from typing import NoReturn
 
 if os.name != 'nt':
-  sys.exit("platform not supported (Windows only)")
+    sys.exit("platform not supported (Windows only)")
 
-log_line_count: int = 0
 hostname: str = attr.get_hostname()
 computer_sid: str = attr.get_computer_sid()
 
@@ -28,14 +27,13 @@ def log_existing_services(logger: LoggingModule) -> list:
                     f"executable: {info['binpath']} | sid: {computer_sid}"
                 )
                 logger.write_log(service_info)
-                log_line_count += 1
                 previous_services.append(str((info['pid'], info['name'])))
         except Exception as e:
             print(e)
 
     return previous_services
 
-def log_services(logger: LoggingModule, debug_logger: LoggingModule, interval: float) -> NoReturn:
+def log_services(logger: LoggingModule, interval: float) -> NoReturn:
     """Logs running Windows services, formatted in a single line per service."""
     previous_services: list = log_existing_services(logger)
     while True:
@@ -53,7 +51,6 @@ def log_services(logger: LoggingModule, debug_logger: LoggingModule, interval: f
                         f"executable: {info['binpath']} | sid: {computer_sid}"
                     )
                     logger.write_log(service_info)
-                    log_line_count += 1
                     previous_services.append(str((info['pid'], info['name'])))
             except Exception as e:
                 print(e)
@@ -69,7 +66,6 @@ def run() -> NoReturn:
     os.makedirs(ready_directory, exist_ok=True)
     print('windowsserviceslog running')
     logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "ServiceMonitor", "services")
-    debug_logger: LoggingModule = LoggingModule(debug_generator_directory, ready_directory, "DebugMonitor", "debug")
-    log_services(logger, debug_logger, interval)
+    log_services(logger, interval)
 
 run()

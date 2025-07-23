@@ -6,7 +6,7 @@ from datetime import datetime
 import common.attributes as attr
 from common.logger import LoggingModule
 
-def get_crontab_jobs(filepath) -> list:
+def get_crontab_jobs(filepath: str) -> list:
     jobs: list = []
     try:
         with open(filepath, 'r', encoding='utf-8') as f:

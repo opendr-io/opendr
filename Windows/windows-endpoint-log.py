@@ -5,14 +5,11 @@ from typing import NoReturn
 import common.attributes as attr
 from common.logger import LoggingModule
 
-log_line_count: int = 0
-
-def log_data(logger: LoggingModule, debug_logger: LoggingModule) -> NoReturn:
+def log_data(logger: LoggingModule) -> NoReturn:
   interval = attr.get_config_value('Windows', 'EndpointInterval', 43200.0, 'float')
   global log_line_count
   while True:
     logger.check_logging_interval()
-    
     # Configure logging for the new file
     data = (
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
@@ -21,11 +18,9 @@ def log_data(logger: LoggingModule, debug_logger: LoggingModule) -> NoReturn:
       )
     # Log to the newly created file
     logger.write_log(data)
-    log_line_count += 1
-    debug_logger.check_logging_interval
-    debug_logger.write_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                    f'hostname: {attr.get_hostname()} | source: endpoint | platform: windows | event: progress | '
-                    f'message: Running {log_line_count} log lines written | value: {log_line_count}')
+    logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                          f'hostname: {attr.get_hostname()} | source: endpoint | platform: windows | event: progress | '
+                          f'message: Running {logger.log_line_count} log lines written | value: {logger.log_line_count}')
     logger.clear_handlers()
     time.sleep(interval)  # Log every 12 hours - or choose an interval
 
@@ -37,7 +32,6 @@ def run() -> NoReturn:
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
   logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "EndpointMonitor", "endpoint")
-  debug_logger: LoggingModule = LoggingModule(debug_generator_directory, ready_directory, "DebugMonitor", "debug")
-  log_data(logger, debug_logger)
+  log_data(logger)
 
 run()
