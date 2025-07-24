@@ -4,7 +4,8 @@ import re
 import os
 import time
 import common.attributes as attr
-import common.logger as logfunc
+from datetime import datetime
+from common.logger import LoggingModule
 
 prev_records = {}
 
@@ -12,7 +13,7 @@ prev_records = {}
 def format_row_with_keys(row):
     return " | ".join(f"{col}: {row[col]}" for col in row.index if pd.notna(row[col]))
 
-def fetch_defender_events(log_directory, ready_directory):
+def fetch_defender_events(logger: LoggingModule) -> None:
     # PowerShell command to fetch Event ID 1116
     command = [
         "powershell.exe",
@@ -57,7 +58,7 @@ def fetch_defender_events(log_directory, ready_directory):
     if not records:
         return
 
-    logger = logfunc.setup_logging(log_directory, ready_directory, "DefenderMonitor", "defender")
+    logger.check_logging_interval()
     dfwdf = pd.DataFrame(records)
     dfwdf = dfwdf.rename(columns={
         "TimeCreated": "timestamp",
@@ -116,8 +117,12 @@ def fetch_defender_events(log_directory, ready_directory):
 
     lines = dfwdf.apply(format_row_with_keys, axis=1)
     for line in lines:
-        logger.info(line)
-    logfunc.clear_handlers(log_directory, ready_directory, logger)
+        logger.write_log(line)
+
+    logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                        f'hostname: {attr.get_hostname()} | source: defender | platform: windows | event: progress | '
+                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+    logger.clear_handlers()
 
 def run():
     interval = attr.get_config_value('Windows', 'DefenderInterval', 60.0, 'float')
@@ -128,8 +133,9 @@ def run():
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)
     print('windowsdefenderlog running')
+    logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "DefenderMonitor", "defender")
     while True:
-        fetch_defender_events(log_directory, ready_directory)
+        fetch_defender_events(logger)
         time.sleep(interval)  # Twice a day by default, can be increased or decreased
 
 run()
