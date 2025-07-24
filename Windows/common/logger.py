@@ -14,7 +14,7 @@ class LoggingModule:
         self.logger_name: str = logger_name
         self.file_name: str = file_name
         self.log_line_count: int = 0
-        self.debug_mode: bool = get_config_value('General', 'Debugging', False, 'bool')
+        self.debug_mode: bool = get_config_value('General', 'DebuggingMode', False, 'bool')
         self.logger: logging.Logger
         self.debug_logger: Optional[logging.Logger] = None
         self.last_interval: Optional[int] = self.fetch_interval()
