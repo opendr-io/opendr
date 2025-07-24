@@ -44,7 +44,10 @@ def monitor_logged_in_users(logger: LoggingModule, interval: float) -> NoReturn:
                     f"sourceip: {user.host or 'n/a'} | "
                     f"uuid: {uuid}"
                 )
-                seen_users.add(user_entry)  
+                seen_users.add(user_entry)
+        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                        f'hostname: {hostname} | source: user | platform: linux | event: progress | '
+                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')  
         time.sleep(interval)
 
 def run() -> NoReturn:

@@ -99,6 +99,9 @@ def log_drivers(logger: LoggingModule) -> NoReturn:
         for line in lines:
             logger.write_log(line)
         prev_dfd = cur_dfd
+        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                        f'hostname: {hostname} | source: defender | platform: windows | event: progress | '
+                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
         time.sleep(interval)
 
 def run() -> NoReturn:

@@ -37,7 +37,7 @@ def log_data(logger: LoggingModule) -> NoReturn:
 
         logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
                             f'hostname: {hostname} | source: service | platform: linux | event: progress | '
-                            f'message: Running {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+                            f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
         time.sleep(interval)
 
 def run() -> NoReturn:

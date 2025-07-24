@@ -3,6 +3,7 @@ import pandas as pd
 import json
 import os
 import time
+from datetime import datetime
 from dateutil.parser import parse
 import common.attributes as attr
 from common.logger import LoggingModule
@@ -60,6 +61,10 @@ def fetch_hotfixes(logger: LoggingModule):
     lines = dfh.apply(format_row_with_keys, axis=1)
     for line in lines:
         logger.write_log(line)
+
+    logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                        f'hostname: {attr.get_hostname()} | source: hotfix | platform: windows | event: progress | '
+                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
     logger.clear_handlers()
 
 def run():

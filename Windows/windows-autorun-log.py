@@ -91,6 +91,9 @@ def fetch_autoruns(logger: LoggingModule) -> None:
     for line in df.apply(format_row_with_keys, axis=1):
         logger.write_log(line)
 
+    logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                        f'hostname: {attr.get_hostname()} | source: autorun | platform: windows | event: progress | '
+                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
     logger.clear_handlers()
 
 def run():

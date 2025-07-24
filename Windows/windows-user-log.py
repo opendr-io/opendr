@@ -44,7 +44,10 @@ def monitor_logged_in_users(log_directory, ready_directory, interval):
                     f"sourceip: {user.host or 'n/a'} | "
                     f"sid: {sid}"
                 )
-                seen_users.add(user_entry)  
+                seen_users.add(user_entry)
+        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                        f'hostname: {hostname} | source: user | platform: windows | event: progress | '
+                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
         time.sleep(interval)
 
 def run():

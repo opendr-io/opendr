@@ -4,6 +4,7 @@ import re
 import os
 import time
 import common.attributes as attr
+from datetime import datetime
 from common.logger import LoggingModule
 
 prev_records = {}
@@ -117,6 +118,10 @@ def fetch_defender_events(logger: LoggingModule) -> None:
     lines = dfwdf.apply(format_row_with_keys, axis=1)
     for line in lines:
         logger.write_log(line)
+
+    logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                        f'hostname: {attr.get_hostname()} | source: defender | platform: windows | event: progress | '
+                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
     logger.clear_handlers()
 
 def run():
