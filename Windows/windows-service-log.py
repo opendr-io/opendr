@@ -37,7 +37,7 @@ def log_services(logger: LoggingModule, interval: float) -> NoReturn:
     """Logs running Windows services, formatted in a single line per service."""
     previous_services: list = log_existing_services(logger)
     while True:
-        logger.check_logging_interval
+        logger.check_logging_interval()
 
         for service in psutil.win_service_iter():
             try:

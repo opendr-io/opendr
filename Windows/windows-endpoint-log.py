@@ -7,7 +7,6 @@ from common.logger import LoggingModule
 
 def log_data(logger: LoggingModule) -> NoReturn:
   interval = attr.get_config_value('Windows', 'EndpointInterval', 43200.0, 'float')
-  global log_line_count
   while True:
     logger.check_logging_interval()
     # Configure logging for the new file

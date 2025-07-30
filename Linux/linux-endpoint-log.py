@@ -12,6 +12,7 @@ def log_data(log_directory: str, ready_directory: str) -> NoReturn:
   logger = LoggingModule(log_directory, ready_directory, "EndpointMonitor", "endpoint")
   while True:
     # Configure logging for the new file
+    logger.check_logging_interval()
     data: str = (
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
         f"hostname: {hostname} | private_ips: {attr.get_private_ips()} | public_ip: {attr.get_public_ip()} | "

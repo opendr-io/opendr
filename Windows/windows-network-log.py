@@ -99,7 +99,6 @@ def monitor_network_connections(logger: LoggingModule, interval: float) -> NoRet
                       f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
 
     previous_connections = current_connections.copy()
-    
     time.sleep(interval)
 
 def run() -> NoReturn:

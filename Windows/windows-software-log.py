@@ -38,9 +38,8 @@ def get_installed_software() -> list[tuple]:
 
 def log_installed_software(logger: LoggingModule) -> None:
   """Logs installed software with system metadata."""
-  global log_line_count
+  logger.check_logging_interval()
   for name, version in get_installed_software():
-      logger.check_logging_interval()
       log_entry = (
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
         f"hostname: {hostname} | "

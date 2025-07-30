@@ -40,7 +40,6 @@ def log_existing_processes(logger: LoggingModule) -> None:
 
 def monitor_process_events(logger: LoggingModule, interval: float=1.0) -> NoReturn:
   """Monitors process creation and termination events while tracking log lines written."""
-  logger.check_logging_interval()
   previous_processes: set[int] = set(psutil.pids())
 
   # Log all running processes at startup
