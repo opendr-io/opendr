@@ -10,11 +10,7 @@
 # OpenDR logs
 *logs/
 *ready/
-*tmp-endpoint-info/
-*tmp-network/
-*tmp-process/
-*tmp-software-inventory/
-*tmp-user-info/
+*tmp-*/
 
 # API keys and credentials
 *.env
@@ -70,4 +66,6 @@ Thumbs.db           # Windows
 .env
 .env.*
 
-
+# Ignore all configuration files
+*.ini
+*.config

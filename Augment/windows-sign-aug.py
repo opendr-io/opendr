@@ -38,7 +38,7 @@ def fetch_unique_process(interval):
     with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'), dbname=config.get('Database', 'DatabaseName', fallback='opendr'),
                         user=config.get('Database', 'RootDatabaseUserName', fallback='postgres'), password=config.get('Database', 'RootDatabasePassword'), autocommit=True) as connection:
         with connection.cursor() as cursor:
-            exes = cursor.execute(f"SELECT DISTINCT(exe) FROM systemevents WHERE timestmp > '{(datetime.now() - timedelta(seconds=interval)).strftime('%Y-%m-%d %H:%M:%S')}'").fetchall()
+            exes = cursor.execute(f"SELECT DISTINCT(exe, pid) FROM systemevents WHERE timestmp > '{(datetime.now() - timedelta(seconds=interval)).strftime('%Y-%m-%d %H:%M:%S')}'").fetchall()
         connection.close()
     return [exe[0] for exe in exes]
 
@@ -46,7 +46,7 @@ def enrich_process(exe, status, signer, interval):
     with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'), dbname=config.get('Database', 'DatabaseName', fallback='opendr'),
                         user=config.get('Database', 'RootDatabaseUserName', fallback='postgres'), password=config.get('Database', 'RootDatabasePassword'), autocommit=True) as connection:
         with connection.cursor() as cursor:
-            cursor.execute(f"UPDATE systemevents SET status = '{status}', signer = '{signer}' WHERE exe = '{exe}' AND timestmp > '{(datetime.now() - timedelta(seconds=interval)).strftime('%Y-%m-%d %H:%M:%S')}'")
+            cursor.execute(f"UPDATE systemevents SET status = '{status}', signer = '{signer}' WHERE exe = '{exe[0]}' AND pid = '{exe[1]}' AND timestmp > '{(datetime.now() - timedelta(seconds=interval)).strftime('%Y-%m-%d %H:%M:%S')}'")
         connection.commit()
 
 def run():
@@ -55,9 +55,9 @@ def run():
     while True:
         exes = fetch_unique_process(interval)
         for exe in exes:
-            if not exe or not exe.lower().endswith(".exe"):
+            if not exe or not exe[0].lower().endswith(".exe"):
                 continue
-            status, signer = get_signature_info(exe)
+            status, signer = get_signature_info(exe[0])
             enrich_process(exe, status, signer, interval)
         time.sleep(interval)
 
