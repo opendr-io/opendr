@@ -26,7 +26,10 @@ def log_ssh_keys(log_directory: str, ready_directory: str) -> None:
     for key in get_ssh_keys():
         entry: str = f"timestamp: {timestamp} | hostname: {hostname} | source: user_sshkey | filepath: {key}"
         logger.write_log(entry)
-
+    
+    logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                        f'hostname: {hostname} | source: ssh | platform: linux | event: progress | '
+                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
     logger.clear_handlers()
 
 def run():
