@@ -5,7 +5,7 @@ import os
 import time
 from datetime import datetime
 import common.attributes as attr
-import common.logger as logfunc
+from common.logger import LoggingModule
 from typing import NoReturn
 
 # Enumerates Windows Plug and Play drivers
@@ -13,10 +13,9 @@ from typing import NoReturn
 # most hardware device activations on a Windows PC
 # should be detected by this component.
 
-timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-hostname = attr.get_hostname()
-computer_sid = attr.get_computer_sid() or ''
-ec2_instance_id = attr.get_ec2_instance_id() or ''
+hostname: str = attr.get_hostname()
+computer_sid: str = attr.get_computer_sid() or ''
+ec2_instance_id: str = attr.get_ec2_instance_id() or ''
 
 # format output
 def format_row_with_keys(row) -> str:
@@ -68,10 +67,9 @@ def fetch_defender_events() -> pd.DataFrame:
         'Signer': 'signer'
     })
 
-    dfd['timestamp'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     dfd["event"] = "existing driver"
     dfd["sid"] = computer_sid
-    dfd["timestamp"] = timestamp
+    dfd["timestamp"] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     dfd["hostname"] = hostname
     dfd["ec2_instance_id"] = ec2_instance_id
 
@@ -85,22 +83,25 @@ def fetch_defender_events() -> pd.DataFrame:
     dfd = dfd[[col for col in final_order if col in dfd.columns]]
     return dfd
 
-def log_drivers(log_directory: str, ready_directory: str) -> NoReturn:
+def log_drivers(logger: LoggingModule) -> NoReturn:
     interval: float = attr.get_config_value('Windows', 'DriverInterval', 60.0, 'float')
-    logger, last_interval  = logfunc.check_logging_interval(log_directory, ready_directory, "DriverMonitor", "driver", None, None)
+    logger.check_logging_interval()
     prev_dfd: pd.DataFrame = fetch_defender_events()
     lines = prev_dfd.apply(format_row_with_keys, axis=1)
     for line in lines:
-        logger.info(line)
+        logger.write_log(line)
     while True:
-        logger, last_interval  = logfunc.check_logging_interval(log_directory, ready_directory, "DriverMonitor", "driver", logger, last_interval)
+        logger.check_logging_interval()
         cur_dfd: pd.DataFrame = fetch_defender_events()
         df_new: pd.DataFrame = pd.concat([cur_dfd, prev_dfd, prev_dfd]).drop_duplicates(keep=False)
         df_new["event"] = "new driver found"
         lines = df_new.apply(format_row_with_keys, axis=1)
         for line in lines:
-            logger.info(line)
+            logger.write_log(line)
         prev_dfd = cur_dfd
+        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                        f'hostname: {hostname} | source: defender | platform: windows | event: progress | '
+                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
         time.sleep(interval)
 
 def run() -> NoReturn:
@@ -111,6 +112,7 @@ def run() -> NoReturn:
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)
     print('driverlog running')
-    log_drivers(log_directory, ready_directory)
+    logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "DriverMonitor", "driver")
+    log_drivers(logger)
 
 run()
