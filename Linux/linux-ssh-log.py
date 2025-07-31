@@ -3,7 +3,7 @@ import time
 import subprocess
 from datetime import datetime
 import common.attributes as attr
-import common.logger as logfunc
+from common.logger import LoggingModule
 
 def get_ssh_keys() -> list:
     keys: list = []
@@ -19,18 +19,18 @@ def get_ssh_keys() -> list:
     return keys
 
 def log_ssh_keys(log_directory: str, ready_directory: str) -> None:
-    logger = logfunc.setup_logging(log_directory, ready_directory, "SSHKeyMonitor", "sshkey")
+    logger = LoggingModule(log_directory, ready_directory, "SSHKeyMonitor", "sshkey")
     hostname: str = attr.get_hostname()
     timestamp: str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     for key in get_ssh_keys():
         entry: str = f"timestamp: {timestamp} | hostname: {hostname} | source: user_sshkey | filepath: {key}"
-        logger.info(entry)
+        logger.write_log(entry)
 
-    logfunc.clear_handlers(log_directory, ready_directory, logger)
+    logger.clear_handlers()
 
 def run():
-    interval: float = attr.get_config_value('Linux', 'CronLogInterval', 43200.0, 'float')
+    interval: float = attr.get_config_value('Linux', 'SSHLogInterval', 43200.0, 'float')
     log_directory: str = 'tmp-ssh-key' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory: str = 'ready'
     debug_generator_directory: str = 'debuggeneratorlogs'
