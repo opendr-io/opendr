@@ -3,11 +3,12 @@ import winreg
 from datetime import datetime
 import time
 import common.attributes as attr
-import common.logger as logfunc
-import logging
+from common.logger import LoggingModule
 from typing import NoReturn
 
-log_line_count: int = 0
+hostname: str = attr.get_hostname()
+sid: str = attr.get_computer_sid()
+instance_id: str = attr.get_ec2_instance_id()
 
 def get_installed_software() -> list[tuple]:
   """Retrieve installed software from Windows registry."""
@@ -35,13 +36,9 @@ def get_installed_software() -> list[tuple]:
       continue
   return software_list
 
-def log_installed_software(log_directory: str, ready_directory: str) -> None:
+def log_installed_software(logger: LoggingModule) -> None:
   """Logs installed software with system metadata."""
-  logger: logging.Logger = logfunc.setup_logging(log_directory, ready_directory, "SoftwareMonitor", "installed_software")
-  hostname: str = attr.get_hostname()
-  sid: str = attr.get_computer_sid()
-  instance_id: str = attr.get_ec2_instance_id()
-  global log_line_count
+  logger.check_logging_interval()
   for name, version in get_installed_software():
       log_entry = (
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
@@ -49,12 +46,13 @@ def log_installed_software(log_directory: str, ready_directory: str) -> None:
         f"program: {name} | version: {version} | "
         f"instanceid: {instance_id} | sid: {sid}"
       )
-      logger.info(log_entry)
-      log_line_count += 1
+      logger.write_log(log_entry)
       if int(time.time()) % 10 == 0:
-        logfunc.enter_debug_logs('software-inventory', f"Running total log lines written: {log_line_count}  \n")
+        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                        f'hostname: {hostname} | source: software | platform: windows | event: progress | '
+                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
 
-  logfunc.clear_handlers(log_directory, ready_directory, logger)
+  logger.clear_handlers()
 
 def run() -> NoReturn:
   interval: float = attr.get_config_value('Windows', 'SoftwareInterval', 43200.0, 'float')
@@ -64,8 +62,9 @@ def run() -> NoReturn:
   os.makedirs(debug_generator_directory, exist_ok=True)
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
+  logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "SoftwareMonitor", "installed_software")
   while True:
-    log_installed_software(log_directory, ready_directory)
+    log_installed_software(logger)
     time.sleep(interval)  # Twice a day by default, can be increased or decreased
 
 run()
