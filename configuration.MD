@@ -10,7 +10,9 @@ The General section controls system-wide parameters:
 - OperatingSystem: Set the operating system mode (Windows, Linux, or MacOS)
 - LogProfile: Set the logging scripts to be executed by assigning one of three pre-baked profiles (basic, advanced or complete) or 'custom' which will allow you to run your preference based on the Scripts parameter of the OS mode
 - RunDatabaseOperations: Controls whether database operations are enabled (default False)
+- RunAugmentOperations: Controls whether data augment operations are enabled (default False)
 - LoggingInterval: Determines the frequency of log file rotation (minute, hour, or day)
+- DebuggingMode: Determines whether debugging logs are generated for monitoring scripts (default False)
 - DatabaseInterval: Sets the interval for database operations (default 30 seconds)
 - CleanupInterval: Specifies the cleanup interval for processed log files (default 30 minutes)
 

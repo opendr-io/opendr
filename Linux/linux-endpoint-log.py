@@ -2,28 +2,29 @@ import time
 from datetime import datetime
 import os
 import common.attributes as attr
-import common.logger as logfunc
+from common.logger import LoggingModule
 from typing import NoReturn
 
-log_line_count: int = 0
+hostname: str = attr.get_hostname()
 
 def log_data(log_directory: str, ready_directory: str) -> NoReturn:
   interval: float = attr.get_config_value('Linux', 'EndpointInterval', 43200.0, 'float')
+  logger = LoggingModule(log_directory, ready_directory, "EndpointMonitor", "endpoint")
   while True:
-    logger = logfunc.setup_logging(log_directory, ready_directory, "EndpointMonitor", "endpoint")
-    global log_line_count
     # Configure logging for the new file
+    logger.check_logging_interval()
     data: str = (
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-        f"hostname: {attr.get_hostname()} | private_ips: {attr.get_private_ips()} | public_ip: {attr.get_public_ip()} | "
+        f"hostname: {hostname} | private_ips: {attr.get_private_ips()} | public_ip: {attr.get_public_ip()} | "
         f"ec2_instance_id: {attr.get_ec2_instance_id() or ''} | computer_uuid: {attr.get_system_uuid() or ''}"
       )
     # Log to the newly created file
-    logger.info(data)
-    log_line_count += 1
-    logfunc.enter_debug_logs('endpoint-info', f"Running total log lines written: {log_line_count}  \n")
-    logfunc.clear_handlers(log_directory, ready_directory, logger)
-    time.sleep(interval)  # Log every 60 minutes - or choose an interval
+    logger.write_log(data)
+    logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                        f'hostname: {hostname} | source: endpoint | platform: linux | event: progress | '
+                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+    logger.clear_handlers()
+    time.sleep(interval)
 
 def run() -> NoReturn:
   log_directory: str = 'tmp-endpoint-info' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'

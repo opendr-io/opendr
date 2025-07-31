@@ -4,7 +4,7 @@ import time
 from datetime import datetime
 from typing import NoReturn
 import common.attributes as attr
-import common.logger as logfunc
+from common.logger import LoggingModule
 
 # Kernel taint bits and their meaning
 TAINT_FLAGS = {
@@ -46,30 +46,29 @@ def get_module_info(module: str):
     except subprocess.CalledProcessError:
         return {}
 
-def log_existing_modules(taint_info: str, logger) -> list:
+def log_existing_modules(taint_info: str, logger: LoggingModule) -> list:
     seen_modules: list = []
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     for mod in get_module_list():
         timestamp: str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         info = get_module_info(mod)
         log_line: str = f"timestamp: {timestamp} | module: {mod} | event: existing kernel | {taint_info}"
         for key, value in info.items():
             log_line += f" | {key.lower().replace(' ', '_')}: {value}"
-        logger.info(log_line)
+        
+        logger.write_log(log_line)
         seen_modules.append(mod)
     return seen_modules
 
-def log_modules(log_directory: str, ready_directory: str) -> None:
+def log_modules(log_directory: str, ready_directory: str) -> NoReturn:
     interval: float = attr.get_config_value('Linux', 'KernelInterval', 60.0, 'float')
-    logger, last_interval = logfunc.check_logging_interval(log_directory, ready_directory, "KernelMonitor", "kernel", None, None)
+    logger = LoggingModule(log_directory, ready_directory, "KernelMonitor", "kernel")
 
     taint_val, taint_flags = get_kernel_taint_status()
     taint_info: str = f"tainted: {taint_val} | " + " | ".join([f"{flag}=True" for flag in taint_flags]) if taint_flags else "tainted: 0 | clean_kernel=True"
     
     prev_modules: list = log_existing_modules(taint_info, logger)
-    
     while True:
-        logger, last_interval = logfunc.check_logging_interval(log_directory, ready_directory, "KernelMonitor", "kernel", logger, last_interval)
+        logger.check_logging_interval()
         for mod in get_module_list():
             if mod in prev_modules:
                 continue
@@ -78,8 +77,11 @@ def log_modules(log_directory: str, ready_directory: str) -> None:
             log_line: str = f"timestamp: {timestamp} | module: {mod} | event: new kernel | {taint_info}"
             for key, value in info.items():
                 log_line += f" | {key.lower().replace(' ', '_')}: {value}"
-            logger.info(log_line)
+            logger.write_log(log_line)
             prev_modules.append(mod)
+        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                        f'hostname: {attr.get_hostname()} | source: kernel | platform: linux | event: progress | '
+                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
         time.sleep(interval)
 
 def run() -> NoReturn:
