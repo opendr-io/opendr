@@ -13,7 +13,7 @@ class StoreData:
     self.db: str = config.get('Database', 'DatabaseName', fallback='opendr')
     self.user: str = config.get('Database', 'AgentUserName', fallback='agent')
     self.password: str = config.get('Database', 'AgentPassword')
-    self.sslmode = 'verify-ca'
+    self.sslmode: str = config.get('Database', 'SSLMode')
     self.sslrootcert: str = config.get('Database', 'SSLRootCert')
     self.users_log_counter: int = 0
     self.endpoint_log_counter: int = 0
@@ -63,7 +63,7 @@ class StoreData:
           connection.commit()
 
   def store_installed_services(self, filename: str) -> None:
-    table: str = 'applications(timestmp, hostname, pid, ec2instanceid, program, servicename, displayname, status, start, username, executable, sid)'
+    table: str = 'applications(timestmp, event, hostname, pid, ec2instanceid, program, servicename, displayname, status, start, username, executable, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
         lines: list[str] = file.readlines()
@@ -71,15 +71,15 @@ class StoreData:
           if(not line):
             continue
           data = self.find_pattern(line)
-          final_params = [data.get('timestamp'),  data.get('hostname'), data.get('pid'), '', '', data.get('servicename'), data.get('displayname'), data.get('status'), data.get('start'),
-                          data.get('username'),  data.get('executable'), data.get('sid') or data.get('uuid')]
-          fillers = ("%s," * 12)[:-1]
+          final_params = [data.get('timestamp'), data.get('event'), data.get('hostname'), data.get('pid'), '', '', data.get('servicename'), data.get('displayname'), data.get('status'), data.get('start'),
+                          data.get('username'), data.get('executable'), data.get('sid') or data.get('uuid')]
+          fillers = ("%s," * 13)[:-1]
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
 
   def store_installed_applications(self, filename: str) -> None:
-    table: str = 'applications(timestmp, hostname, pid, ec2instanceid, program, servicename, displayname, status, start, username, executable, sid)'
+    table: str = 'applications(timestmp, event, hostname, pid, ec2instanceid, program, servicename, displayname, status, start, username, executable, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
         lines: list[str] = file.readlines()
@@ -87,8 +87,8 @@ class StoreData:
           if(not line):
             continue
           data = self.find_pattern(line)
-          final_params = [data.get('timestamp'),  data.get('hostname'), '', data.get('instanceid'), data.get('program'), '', '', '', '', '', '', data.get('sid') or data.get('uuid')]
-          fillers = ("%s," * 12)[:-1]
+          final_params = [data.get('timestamp'), data.get('event'), data.get('hostname'), '', data.get('instanceid'), data.get('program'), '', '', '', '', '', '', data.get('sid') or data.get('uuid')]
+          fillers = ("%s," * 13)[:-1]
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
@@ -117,31 +117,15 @@ class StoreData:
           if(not line):
             continue
           data = self.find_pattern(line)
-          final_params = [data.get('timestamp'), data.get('event'), '', '', data.get('hostname'), '', '',
+          final_params = [data.get('timestamp'), data.get('event'), 0, '', data.get('hostname'), '', '',
                           data.get('username'), '', '', data.get('sourceip'), '', '', '', '', '', '', '', data.get('sid') or data.get('uuid')]
           fillers = ("%s," * 19)[:-1]
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
 
-  def store_new_service(self, filename: str) -> None:
-    table = 'applications(timestmp, hostname, pid, ec2instanceid, program, servicename, displayname, status, start, username, executable, sid)'
-    with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
-      with open(filename, 'r') as file:
-        lines = file.readlines()
-        for line in lines:
-          if(not line):
-            continue
-          data = self.find_pattern(line)
-          final_params = [data.get('timestamp'),  data.get('hostname'), data.get('pid'), '', '', data.get('servicename'), data.get('displayname'), data.get('status'), 
-                          data.get('start'), data.get('username'),  data.get('executable'), data.get('sid') or data.get('uuid')]
-          fillers = ("%s," * 12)[:-1]
-          sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
-          connection.execute(sqlInsertStatement, final_params)
-          connection.commit()
-
   def store_hotfix_info(self, filename: str) -> None:
-    table = 'applications(timestmp, hostname, pid, ec2instanceid, program, servicename, displayname, status, start, username, executable, sid)'
+    table = 'applications(timestmp, event, hostname, pid, ec2instanceid, program, servicename, displayname, status, start, username, executable, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
         lines = file.readlines()
@@ -149,8 +133,8 @@ class StoreData:
           if(not line):
             continue
           data = self.find_pattern(line)
-          final_params = [data.get('timestamp'), data.get('hostname'), '', '', '', data.get('name'), '', data.get('description'), '', data.get('username'), '', data.get('sid') or data.get('uuid')]
-          fillers = ("%s," * 12)[:-1]
+          final_params = [data.get('timestamp'), data.get('event'), data.get('hostname'), '', '', '', data.get('name'), '', data.get('description'), '', data.get('username'), '', data.get('sid') or data.get('uuid')]
+          fillers = ("%s," * 13)[:-1]
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()

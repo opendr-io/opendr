@@ -3,7 +3,7 @@ import shutil
 import os
 import time
 import common.attributes as attr
-import common.logger as logfunc
+from common.logger import LoggingModule
 from datetime import datetime
 from typing import NoReturn
 
@@ -68,27 +68,26 @@ def get_installed_packages():
         print(f"Failed to retrieve packages: {str(e)}")
         return []
 
-log_line_count: int = 0
-
 def log_data(log_directory: str, ready_directory: str) -> NoReturn:
     interval: float = attr.get_config_value('Linux', 'SoftwareInterval', 43200.0, 'float')
+    logger: LoggingModule = LoggingModule(log_directory, ready_directory, "SoftwareMonitor", "installed_software")
     while True:
-        logger = logfunc.setup_logging(log_directory, ready_directory, "SoftwareMonitor", "installed_software")
-        global log_line_count
+        logger.check_logging_interval()
         packages = get_installed_packages()
         for pkg in packages:
-            logger.info((
+            logger.write_log((
                     f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | hostname: {hostname} | "
                     f"name: {pkg['name']} | version: {pkg['version']} | architecture: {pkg['architecture']} | "
                     f"description: {pkg['description']} | uuid: {uuid}"
                     ))
-            log_line_count += 1
-        logfunc.enter_debug_logs('software-inventory', f"Running total log lines written: {log_line_count}  \n")
-        logfunc.clear_handlers(log_directory, ready_directory, logger)
-        time.sleep(interval)  # Log every 60 minutes - or choose an interval
+        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                        f'hostname: {hostname} | source: software | platform: linux | event: progress | '
+                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+        logger.clear_handlers()
+        time.sleep(interval)
 
 def run() -> NoReturn:
-    log_directory: str = 'tmp-software-inventory' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+    log_directory: str = 'tmp-software-inventory' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory: str = 'ready'
     debug_generator_directory: str = 'debuggeneratorlogs'
     os.makedirs(debug_generator_directory, exist_ok=True)

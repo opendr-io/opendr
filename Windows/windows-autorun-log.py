@@ -4,12 +4,12 @@ import winreg
 import pandas as pd
 from datetime import datetime
 import common.attributes as attr
-import common.logger as logfunc
+from common.logger import LoggingModule
 
 def format_row_with_keys(row):
     return " | ".join(f"{col}: {row[col]}" for col in row.index if pd.notna(row[col]))
 
-def enum_run_keys(hive, path):
+def enum_run_keys(hive, path) -> list:
     """Enumerates entries under a Run/RunOnce registry key."""
     entries = []
     try:
@@ -32,7 +32,7 @@ def hive_name(hive):
         winreg.HKEY_CURRENT_USER: "HKCU"
     }.get(hive, str(hive))
 
-def enum_startup_folder_entries():
+def enum_startup_folder_entries() -> list:
     """Lists .lnk files from common Startup folders."""
     startup_dirs = [
         os.path.expandvars(r"%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup"),
@@ -50,8 +50,8 @@ def enum_startup_folder_entries():
                     })
     return entries
 
-def fetch_autoruns(log_directory, ready_directory):
-    logger = logfunc.setup_logging(log_directory, ready_directory, "AutorunsMonitor", "autoruns")
+def fetch_autoruns(logger: LoggingModule) -> None:
+    logger.check_logging_interval()
 
     # Gather autorun entries
     entries = []
@@ -89,21 +89,25 @@ def fetch_autoruns(log_directory, ready_directory):
     df = df[[col for col in final_order if col in df.columns]]
 
     for line in df.apply(format_row_with_keys, axis=1):
-        logger.info(line)
+        logger.write_log(line)
 
-    logfunc.clear_handlers(log_directory, ready_directory, logger)
+    logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                        f'hostname: {attr.get_hostname()} | source: autorun | platform: windows | event: progress | '
+                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+    logger.clear_handlers()
 
 def run():
     interval = attr.get_config_value('Windows', 'AutorunInterval', 43200.0, 'float')
-    log_directory = 'tmp-windows-autoruns' if attr.get_config_value('Windows', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+    log_directory = 'tmp-windows-autoruns' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory = 'ready'
     debug_generator_directory = 'debuggeneratorlogs'
     os.makedirs(debug_generator_directory, exist_ok=True)
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)
     print('autorunslog running')
+    logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "AutorunsMonitor", "autoruns")
     while True:
-        fetch_autoruns(log_directory, ready_directory)
+        fetch_autoruns(logger)
         time.sleep(interval)
 
 run()

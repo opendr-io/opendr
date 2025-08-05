@@ -5,22 +5,25 @@ import os
 import time
 from datetime import datetime
 import common.attributes as attr
-import common.logger as logfunc
+from common.logger import LoggingModule
+from typing import NoReturn
 
-timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-hostname = attr.get_hostname()
-computer_sid = attr.get_computer_sid() or ''
-ec2_instance_id = attr.get_ec2_instance_id() or ''
+# Enumerates Windows Plug and Play drivers
+# Not all Windows drivers will be output here, but 
+# most hardware device activations on a Windows PC
+# should be detected by this component.
+
+hostname: str = attr.get_hostname()
+computer_sid: str = attr.get_computer_sid() or ''
+ec2_instance_id: str = attr.get_ec2_instance_id() or ''
 
 # format output
-def format_row_with_keys(row):
+def format_row_with_keys(row) -> str:
     return " | ".join(f"{col}: {row[col]}" for col in row.index if pd.notna(row[col]))
 
-def fetch_drivers(log_directory, ready_directory):
-    logger = logfunc.setup_logging(log_directory, ready_directory, "DriverMonitor", "driver")
-
+def fetch_defender_events() -> pd.DataFrame:
     # PowerShell command to get drivers and convert to JSON
-    command = [
+    command: list[str] = [
         "powershell",
         "-NoProfile",
         "-Command",
@@ -31,12 +34,13 @@ def fetch_drivers(log_directory, ready_directory):
     # JSON  to DataFrame
     try:
         driver_data = json.loads(result.stdout)
-        dfd = pd.DataFrame(driver_data)
+        dfd: pd.DataFrame = pd.DataFrame(driver_data)
     except json.JSONDecodeError as e:
         print("JSON parse error:", e)
         print(result.stdout)
+        return pd.DataFrame()
     # Fields to retain and optional renaming
-    keep = [
+    keep: list[str] = [
         'Description','ClassGuid','CompatID','DeviceClass','DeviceID','DeviceName',
         'DriverDate','DriverName','DriverProviderName','DriverVersion','FriendlyName',
         'HardWareID','InfName','IsSigned','Location','Manufacturer','PDO','Signer'
@@ -63,37 +67,52 @@ def fetch_drivers(log_directory, ready_directory):
         'Signer': 'signer'
     })
 
-    dfd['timestamp'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    dfd["event"] = "driver"
+    dfd["event"] = "existing driver"
     dfd["sid"] = computer_sid
-    dfd["timestamp"] = timestamp
+    dfd["timestamp"] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     dfd["hostname"] = hostname
     dfd["ec2_instance_id"] = ec2_instance_id
 
-    final_order = [
-        "timestamp", "hostname", 'event',
+    final_order: list[str] = [
+        "timestamp", "hostname", "event",
         "name", "desc", "signer","class_guid", "compat_id", "device_class", "device_id",  "device_name",
         "driver_provider", "driver_version", "friendly_name", "hardware_id", "inf_name",
         "is_signed", "location", "manufacturer", "pdo",
         "sid", "ec2_instance_id",
     ]
     dfd = dfd[[col for col in final_order if col in dfd.columns]]
-    lines = dfd.apply(format_row_with_keys, axis=1)
-    for line in lines:
-        logger.info(line)
-    logfunc.clear_handlers(log_directory, ready_directory, logger)
+    return dfd
 
-def run():
-    interval = attr.get_config_value('Windows', 'DriverInterval', 43200.0, 'float')
-    log_directory = 'tmp-windows-drivers' if attr.get_config_value('Windows', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+def log_drivers(logger: LoggingModule) -> NoReturn:
+    interval: float = attr.get_config_value('Windows', 'DriverInterval', 60.0, 'float')
+    logger.check_logging_interval()
+    prev_dfd: pd.DataFrame = fetch_defender_events()
+    lines = prev_dfd.apply(format_row_with_keys, axis=1)
+    for line in lines:
+        logger.write_log(line)
+    while True:
+        logger.check_logging_interval()
+        cur_dfd: pd.DataFrame = fetch_defender_events()
+        df_new: pd.DataFrame = pd.concat([cur_dfd, prev_dfd, prev_dfd]).drop_duplicates(keep=False)
+        df_new["event"] = "new driver found"
+        lines = df_new.apply(format_row_with_keys, axis=1)
+        for line in lines:
+            logger.write_log(line)
+        prev_dfd = cur_dfd
+        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                        f'hostname: {hostname} | source: defender | platform: windows | event: progress | '
+                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+        time.sleep(interval)
+
+def run() -> NoReturn:
+    log_directory = 'tmp-windows-drivers' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory = 'ready'
     debug_generator_directory = 'debuggeneratorlogs'
     os.makedirs(debug_generator_directory, exist_ok=True)
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)
     print('driverlog running')
-    while True:
-        fetch_drivers(log_directory, ready_directory)
-        time.sleep(interval)  # Twice a day by default, can be increased or decreased
+    logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "DriverMonitor", "driver")
+    log_drivers(logger)
 
 run()

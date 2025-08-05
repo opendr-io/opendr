@@ -4,9 +4,9 @@ import time
 import subprocess
 from datetime import datetime
 import common.attributes as attr
-import common.logger as logfunc
+from common.logger import LoggingModule
 
-def get_crontab_jobs(filepath) -> list:
+def get_crontab_jobs(filepath: str) -> list:
     jobs: list = []
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
@@ -34,7 +34,7 @@ def get_user_crontabs() -> list:
     return jobs
 
 def log_cron_jobs(log_directory: str, ready_directory: str) -> None:
-    logger = logfunc.setup_logging(log_directory, ready_directory, "CronJobMonitor", "cronjob")
+    logger = LoggingModule(log_directory, ready_directory, "CronJobMonitor", "cronjob")
     hostname: str = attr.get_hostname()
     timestamp: str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -47,17 +47,20 @@ def log_cron_jobs(log_directory: str, ready_directory: str) -> None:
     for path in cron_files:
         for job in get_crontab_jobs(path):
             entry: str = f"timestamp: {timestamp} | hostname: {hostname} | file: {path} | job: {job}"
-            logger.info(entry)
+            logger.write_log(entry)
 
     for job in get_user_crontabs():
         entry: str = f"timestamp: {timestamp} | hostname: {hostname} | source: user_crontab | {job}"
-        logger.info(entry)
+        logger.write_log(entry)
 
-    logfunc.clear_handlers(log_directory, ready_directory, logger)
+    logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                        f'hostname: {hostname} | source: cronjob | platform: linux | event: progress | '
+                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+    logger.clear_handlers()
 
 def run():
     interval: float = attr.get_config_value('Linux', 'CronLogInterval', 43200.0, 'float')
-    log_directory: str = 'tmp-cron-job' if attr.get_config_value('Linux', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+    log_directory: str = 'tmp-cron-job' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory: str = 'ready'
     debug_generator_directory: str = 'debuggeneratorlogs'
     os.makedirs(debug_generator_directory, exist_ok=True)
