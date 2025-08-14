@@ -2,7 +2,6 @@ import wmi
 import win32file
 import win32api
 import time
-import os
 from threading import Thread
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
