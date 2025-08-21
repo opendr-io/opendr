@@ -42,7 +42,7 @@ def log_installed_software(logger: LoggingModule) -> None:
   for name, version in get_installed_software():
       log_entry = (
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-        f"hostname: {hostname} | "
+        f"hostname: {hostname} | event: software | "
         f"program: {name} | version: {version} | "
         f"instanceid: {instance_id} | sid: {sid}"
       )

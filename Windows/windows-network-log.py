@@ -29,10 +29,10 @@ def log_connection(logger: LoggingModule, event: str, conn) -> None:
 
     logger.write_log(
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-        f"hostname: {hostname} |  username: {username}  | "
-        f"event: {event} | name: {process_name} | pid: {conn.pid} | "
+        f"hostname: {hostname} | username: {username} | "
+        f"category: {event} | process: {process_name} | processid: {conn.pid} | "
         f"sourceip: {conn.laddr[0]} | sourceport: {conn.laddr[1]} | "
-        f"destip: {remote_ip} | destport: {remote_port} | "
+        f"destinationip: {remote_ip} | destinationport: {remote_port} | "
         f"status: {conn.status} | sid: {sid}"
     )
 
@@ -57,7 +57,7 @@ def log_initial_connections(logger: LoggingModule) -> dict:
     key = (conn.pid, conn.laddr, conn.raddr, conn.status)
     initial_connections[key] = conn
     
-    log_connection(logger, "existing connection", conn)
+    log_connection(logger, " network_existing", conn)
   return initial_connections  # Return initial snapshot for comparison in monitoring
 
 def monitor_network_connections(logger: LoggingModule, interval: float) -> NoReturn:
@@ -88,10 +88,10 @@ def monitor_network_connections(logger: LoggingModule, interval: float) -> NoRet
     terminated_keys = set(previous_connections.keys()) - set(current_connections.keys())
 
     for key in created_keys:
-      log_connection(logger, "connection created", current_connections[key])
+      log_connection(logger, "network_connection", current_connections[key])
 
     for key in terminated_keys:
-      log_connection(logger, "connection terminated", previous_connections[key])
+      log_connection(logger, "network_termination", previous_connections[key])
 
     if int(time.time()) % 10 == 0:
       logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '

@@ -18,7 +18,7 @@ def log_existing_users(logger: LoggingModule) -> set:
         logger.write_log(
             f"timestamp: {login_time} | "
             f"hostname: {hostname} | "
-            f"event: existing user | username: {user.name} | "
+            f"category: user_existing | username: {user.name} | "
             f"sourceip: {user.host or 'n/a'} | "
             f"uuid: {uuid}"
         )
@@ -40,7 +40,7 @@ def monitor_logged_in_users(logger: LoggingModule, interval: float) -> NoReturn:
                 logger.write_log(
                     f"timestamp: {login_time} | "
                     f"hostname: {hostname} | "
-                    f"event: new user detected | username: {user.name} | "
+                    f"category: new_user_detected | username: {user.name} | "
                     f"sourceip: {user.host or 'n/a'} | "
                     f"uuid: {uuid}"
                 )

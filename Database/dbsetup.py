@@ -20,14 +20,83 @@ def setup_postgres_tables() -> None:
   with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'), dbname=config.get('Database', 'DatabaseName', fallback='opendr'),
                       user=config.get('Database', 'RootDatabaseUserName', fallback='postgres'), password=config.get('Database', 'RootDatabasePassword')) as connection:
     with connection.cursor() as cursor:
-      cursor.execute("""CREATE TABLE applications (id serial PRIMARY KEY, timestmp text, hostname text, event text, ec2instanceid text, program text, servicename text, 
-                    displayname text, status text, start text, username text, pid TEXT, executable text, sid text)""")
-      cursor.execute("""CREATE TABLE endpointinfo (id serial PRIMARY KEY, timestmp text, hostname text,  ec2instanceid text, privateips text, publicip text, event text, username text,
-        onterminal text, fromhostname text, logintime text, sid text)""")
-      cursor.execute("""CREATE TABLE systemevents (id serial PRIMARY KEY, timestmp text, event text, pid integer, name text, hostname text, ppid text,
-        parent text, username text, dnsname text, dnsdate text, sourceip text, sourceport text, destip text, destport text, asname text, status text, exe text, cmdline text, sid text)""")
-      cursor.execute("""CREATE TABLE systemalerts (id serial PRIMARY KEY, timestmp text, event text, username text, title text, severity text,
-        category text, executable text, filepath text, eventid integer, threatid integer, origin text, type text, source text, description text, reference text, sid text)""")
+      cursor.execute("""
+        CREATE TABLE applications (
+          id serial PRIMARY KEY, 
+          timestamp text, 
+          hostname text, 
+          event text, 
+          ec2_instance_id text, 
+          program text, 
+          description text, 
+          name text, 
+          status text, 
+          state text, 
+          username text, 
+          identifier text, 
+          image text,
+          vendor text,
+          version text,
+          guid text
+        )""")
+      cursor.execute("""
+          CREATE TABLE endpointinfo (
+            id serial PRIMARY KEY, 
+            timestmp text, 
+            hostname text,  
+            ec2instanceid text, 
+            privateips text, 
+            publicip text, 
+            event text, 
+            username text,
+            onterminal text, 
+            fromhostname text, 
+            logintime text, 
+            sid text
+          )""")
+      cursor.execute("""
+          CREATE TABLE systemevents (
+            id serial PRIMARY KEY, 
+            timestamp text, 
+            category text, 
+            processid integer, 
+            process text, 
+            hostname text, 
+            parentprocessid text,
+            parentimage text, 
+            username text, 
+            dnsname text, 
+            dnsdate text, 
+            sourceip text, 
+            sourceport text, 
+            destinationip text, 
+            destinationport text, 
+            asname text, 
+            status text, 
+            image text, 
+            commandline text, 
+            sid text
+          )""")
+      cursor.execute("""
+          CREATE TABLE systemalerts (
+            id serial PRIMARY KEY, 
+            timestmp text, 
+            event text, 
+            username text, 
+            title text, 
+            severity text,
+            category text, 
+            executable text, 
+            filepath text, 
+            eventid integer, 
+            threatid integer, 
+            origin text, 
+            type text, 
+            source text, 
+            description text, 
+            reference text, 
+            sid text
+          )""")
       connection.commit()
       print('Tables Created!')
 

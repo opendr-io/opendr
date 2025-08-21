@@ -31,9 +31,9 @@ def log_existing_processes(logger: LoggingModule) -> None:
           parent_name = parent.name()
 
       logger.write_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-          f"hostname: {hostname} | username: {user} | event: existing process | "
-          f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
-          f"exe: {exe} | cmdline: {cmdline} | uuid: {uuid}"
+          f"hostname: {hostname} | username: {user} | category: process_existing | "
+          f"processid: {pid} | process: {proc_name} | parentprocessid: {parent_pid} | parentimage: {parent_name} | "
+          f"image: {exe} | commandline: {cmdline} | uuid: {uuid}"
         )
     except (psutil.NoSuchProcess, psutil.AccessDenied):
       continue  # Ignore processes that vanish before logging
@@ -72,9 +72,9 @@ def monitor_process_events(logger: LoggingModule, interval: float=1.0) -> NoRetu
             parent_name: str = parent.name()
 
         logger.write_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-          f"hostname: {hostname} | username: {user} | event: process created | "
-          f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
-          f"exe: {exe} | cmdline: {cmdline} | uuid: {uuid}"
+          f"hostname: {hostname} | username: {user} | category: process_creation | "
+          f"processid: {pid} | process: {proc_name} | parentprocessid: {parent_pid} | parentimage: {parent_name} | "
+          f"image: {exe} | commandline: {cmdline} | uuid: {uuid}"
         )
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue
@@ -98,9 +98,9 @@ def monitor_process_events(logger: LoggingModule, interval: float=1.0) -> NoRetu
             parent_name: str = parent.name()
 
         logger.write_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-          f"hostname: {hostname} | username: {user} | event: process terminated | "
-          f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
-          f"exe: {exe} | cmdline: {cmdline} | uuid: {uuid}"
+          f"hostname: {hostname} | username: {user} | category: process_termination | "
+          f"processid: {pid} | process: {proc_name} | parentprocessid: {parent_pid} | parentimage: {parent_name} | "
+          f"image: {exe} | commandline: {cmdline} | uuid: {uuid}"
         )
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue

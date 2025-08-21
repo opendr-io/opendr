@@ -6,5 +6,27 @@
     "June-25": [
         "ALTER TABLE systemevents ADD exe text;",
         "ALTER TABLE systemevents ADD cmdline text;"
+        ],
+    "August-25": [
+        "ALTER TABLE systemevents RENAME COLUMN timestmp TO timestamp;",
+        "ALTER TABLE systemevents RENAME COLUMN event TO category;",
+        "ALTER TABLE systemevents RENAME COLUMN pid TO processid;",
+        "ALTER TABLE systemevents RENAME COLUMN name TO process;",
+        "ALTER TABLE systemevents RENAME COLUMN ppid TO parentprocessid;",
+        "ALTER TABLE systemevents RENAME COLUMN parent TO parentimage;",
+        "ALTER TABLE systemevents RENAME COLUMN exe TO image;",
+        "ALTER TABLE systemevents RENAME COLUMN cmdline TO commandline;",
+        "ALTER TABLE systemevents RENAME COLUMN destip TO destinationip;",
+        "ALTER TABLE systemevents RENAME COLUMN destport TO destinationport;",
+        "ALTER TABLE applications RENAME COLUMN timestmp TO timestamp;",
+        "ALTER TABLE applications RENAME COLUMN pid TO identifier;",
+        "ALTER TABLE applications RENAME COLUMN ec2instanceid TO ec2_instance_id;",
+        "ALTER TABLE applications RENAME COLUMN servicename TO description;",
+        "ALTER TABLE applications RENAME COLUMN displayname TO name;",
+        "ALTER TABLE applications RENAME COLUMN executable TO image;",
+        "ALTER TABLE applications RENAME COLUMN start TO state;",
+        "ALTER TABLE applications RENAME COLUMN sid TO guid;",
+        "ALTER TABLE applications ADD vendor text;",
+        "ALTER TABLE applications ADD version text;"
         ]
 }
