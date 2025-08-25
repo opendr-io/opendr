@@ -11,12 +11,12 @@ class WindowsSoftwareLogger():
     self.sid: str = attr.get_computer_sid()
     self.hostname: str = attr.get_hostname()
     self.instance_id: str = attr.get_ec2_instance_id()
-    self.interval: float = attr.get_config_value('Windows', 'SoftwareInterval', 43200.0, 'float')
+    self.interval: float = attr.get_config_value('Windows', 'SoftwareInterval', 60.0, 'float')
     self.logger = None
-    self.previous_processes: set[int] = set()
+    self.seen_software: set = set()
     self.setup_logger()
     self.log_existing()
-    print('WindowsProcessLogger Initialization complete')
+    print('WindowsSoftwareLogger Initialization complete')
 
   def setup_logger(self) -> None:
     log_directory: str = 'tmp-software-inventory' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
@@ -25,7 +25,7 @@ class WindowsSoftwareLogger():
     os.makedirs(debug_generator_directory, exist_ok=True)
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)
-    self.logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "ProcessMonitor", "process")
+    self.logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "SoftwareMonitor", "installed_software")
 
   @staticmethod
   def get_installed_software() -> list[tuple]:
@@ -54,20 +54,38 @@ class WindowsSoftwareLogger():
         continue
     return software_list
 
-  def monitor_events(self) -> None:
+  def log_existing(self) -> None:
     """Logs installed software with system metadata."""
     self.logger.check_logging_interval()
     for name, version in self.get_installed_software():
         log_entry = (
           f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-          f"hostname: {self.hostname} | "
+          f"hostname: {self.hostname} | event: existing software | "
           f"program: {name} | version: {version} | "
           f"instanceid: {self.instance_id} | sid: {self.sid}"
         )
         self.logger.write_log(log_entry)
+        self.seen_software.add((name, version))
         if int(time.time()) % 10 == 0:
           self.logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
                           f'hostname: {self.hostname} | source: software | platform: windows | event: progress | '
                           f'message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}')
 
-    self.logger.clear_handlers()
+  def monitor_events(self) -> None:
+    """Logs installed software with system metadata."""
+    self.logger.check_logging_interval()
+    for name, version in self.get_installed_software():
+        if (name, version) in self.seen_software:
+          continue
+        log_entry = (
+          f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+          f"hostname: {self.hostname} | event: new software | "
+          f"program: {name} | version: {version} | "
+          f"instanceid: {self.instance_id} | sid: {self.sid}"
+        )
+        self.logger.write_log(log_entry)
+        self.seen_software.add((name, version))
+        if int(time.time()) % 10 == 0:
+          self.logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                          f'hostname: {self.hostname} | source: software | platform: windows | event: progress | '
+                          f'message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}')
