@@ -13,6 +13,7 @@ from common.logger import LoggingModule
 logger: LoggingModule = None
 hostname: str = attr.get_hostname()
 computer_sid: str = attr.get_computer_sid()
+observers = {}
 
 class USBFileLogger(FileSystemEventHandler):
     def on_created(self, event):
@@ -42,12 +43,15 @@ def get_usb_drives():
         if win32file.GetDriveType(d) == win32file.DRIVE_REMOVABLE and not d.startswith(('A:', 'B:'))
     ]
 
-def monitor_usb(drive):
-    logger.write_log(f"[MONITORING] {drive}")
+def start_usb_watchdog(drive):
+    if drive in observers:
+        print(f"[!] Already monitoring {drive}")
+        return
     observer = Observer()
     event_handler = USBFileLogger()
     observer.schedule(event_handler, path=drive, recursive=True)
     observer.start()
+    observers[drive] = observer
     try:
         while True:
             time.sleep(1)
@@ -56,21 +60,38 @@ def monitor_usb(drive):
     observer.join()
 
 def watch_usb_events():
-    c = wmi.WMI()
-    watcher = c.Win32_VolumeChangeEvent.watch_for(notification_type="Creation")
+    interval = attr.get_config_value('Windows', 'UsbInterval', 1.0, 'float')
+    previous_drives = get_usb_drives()
+    for drive in previous_drives:
+        logger.write_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                        f"hostname: {hostname} | event: usb detected | "
+                        f"filepath: {drive} | sid: {computer_sid}")
+        Thread(target=start_usb_watchdog, args=(drive,), daemon=True).start()
 
-    logger.write_log("[WAITING FOR USB]")
     while True:
-        event = watcher()
-        logger.write_log("[USB INSERTED] Event detected")
-        time.sleep(1)  # allow mount time
+        logger.check_logging_interval()
+        current_drives = get_usb_drives()
+        inserted_drives = set(current_drives) - set(previous_drives)
+        
+        for drive in inserted_drives:
+            logger.write_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                        f"hostname: {hostname} | event: usb inserted | "
+                        f"filepath: {drive} | sid: {computer_sid}")
+            Thread(target=start_usb_watchdog, args=(drive,), daemon=True).start()
+        
+        removed_drives = set(previous_drives) - set(current_drives)
+        for drive in removed_drives:
+            observer = observers.pop(drive, None)
+            observer.stop()
+            observer.join()
+            logger.write_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                        f"hostname: {hostname} | event: usb removed | "
+                        f"filepath: {drive} | sid: {computer_sid}")
 
-        usb_drives = get_usb_drives()
-        for drive in usb_drives:
-            Thread(target=monitor_usb, args=(drive,), daemon=True).start()
+        previous_drives = current_drives
+        time.sleep(interval)
 
 if __name__ == "__main__":
-    # interval = attr.get_config_value('Windows', 'UsbInterval', 1.0, 'float')
     log_directory = 'tmp-user-info' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory = 'ready'
     debug_generator_directory = 'debuggeneratorlogs'
