@@ -109,7 +109,7 @@ def monitor_process_events(logger: LoggingModule, interval: float) -> NoReturn:
                             f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
 
     # Update the previous process set
-    previous_processes = current_processes
+    previous_processes = current_processes.copy()
     time.sleep(interval)
 
 def run() -> NoReturn:
