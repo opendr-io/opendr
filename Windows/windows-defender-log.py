@@ -122,7 +122,6 @@ def fetch_defender_events(logger: LoggingModule) -> None:
     logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
                         f'hostname: {attr.get_hostname()} | source: defender | platform: windows | event: progress | '
                         f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
-    logger.clear_handlers()
 
 def run():
     interval = attr.get_config_value('Windows', 'DefenderInterval', 60.0, 'float')
@@ -136,6 +135,6 @@ def run():
     logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "DefenderMonitor", "defender")
     while True:
         fetch_defender_events(logger)
-        time.sleep(interval)  # Twice a day by default, can be increased or decreased
+        time.sleep(interval)
 
 run()

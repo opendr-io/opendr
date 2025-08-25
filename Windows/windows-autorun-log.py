@@ -6,6 +6,11 @@ from datetime import datetime
 import common.attributes as attr
 from common.logger import LoggingModule
 
+hostname: str = attr.get_hostname()
+computer_sid: str = attr.get_computer_sid() or ''
+ec2_instance_id: str = attr.get_ec2_instance_id() or ''
+timestamp: str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
 def format_row_with_keys(row):
     return " | ".join(f"{col}: {row[col]}" for col in row.index if pd.notna(row[col]))
 
@@ -50,9 +55,7 @@ def enum_startup_folder_entries() -> list:
                     })
     return entries
 
-def fetch_autoruns(logger: LoggingModule) -> None:
-    logger.check_logging_interval()
-
+def fetch_autorun_events() -> pd.DataFrame:
     # Gather autorun entries
     entries = []
 
@@ -75,29 +78,43 @@ def fetch_autoruns(logger: LoggingModule) -> None:
     if df.empty:
         return
 
-    # Add metadata
-    df["timestamp"] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    df["hostname"] = attr.get_hostname()
-    df["sid"] = attr.get_computer_sid() or ''
-    df["ec2_instance_id"] = attr.get_ec2_instance_id() or ''
-    df["event"] = "autorun"
-    # Column order
-    final_order = [
+    df["timestamp"] = timestamp
+    df["hostname"] = hostname
+    df["sid"] = computer_sid
+    df["ec2_instance_id"] = ec2_instance_id
+    df["event"] = "existing autorun"
+
+    final_order: list[str] = [
         "timestamp", "hostname", 'event',
         "source", "entry", "path", "sid", "ec2_instance_id"
     ]
     df = df[[col for col in final_order if col in df.columns]]
+    return df
 
-    for line in df.apply(format_row_with_keys, axis=1):
+def log_autoruns(logger: LoggingModule) -> None:
+    interval = attr.get_config_value('Windows', 'AutorunInterval', 60.0, 'float')
+    prev_df: pd.DataFrame = fetch_autorun_events()
+    lines = prev_df.apply(format_row_with_keys, axis=1)
+    for line in lines:
         logger.write_log(line)
 
-    logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                        f'hostname: {attr.get_hostname()} | source: autorun | platform: windows | event: progress | '
-                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
-    logger.clear_handlers()
+    while True:
+        logger.check_logging_interval()
+        cur_df: pd.DataFrame = fetch_autorun_events()
+        df_new: pd.DataFrame = pd.concat([cur_df, prev_df, prev_df]).drop_duplicates(keep=False)
+        df_new["event"] = "new autorun found"
+        df_new["timestamp"] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        lines = df_new.apply(format_row_with_keys, axis=1)
+        for line in lines:
+            logger.write_log(line)
+
+        prev_df = cur_df
+        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                            f'hostname: {hostname} | source: autorun | platform: windows | event: progress | '
+                            f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+        time.sleep(interval)
 
 def run():
-    interval = attr.get_config_value('Windows', 'AutorunInterval', 43200.0, 'float')
     log_directory = 'tmp-windows-autoruns' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory = 'ready'
     debug_generator_directory = 'debuggeneratorlogs'
@@ -106,8 +123,6 @@ def run():
     os.makedirs(ready_directory, exist_ok=True)
     print('autorunslog running')
     logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "AutorunsMonitor", "autoruns")
-    while True:
-        fetch_autoruns(logger)
-        time.sleep(interval)
+    log_autoruns(logger)
 
 run()
