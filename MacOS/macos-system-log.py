@@ -25,7 +25,7 @@ def log_installed_software(logger: LoggingModule) -> NoReturn:
         log_entry = (
             f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
             f"hostname: {hostname} | event: system check | "
-            f"cpu_usage: {psutil.cpu_percent()}% | cpu_freq: {psutil.cpu_freq().current}Hz | ram_usage: {psutil.virtual_memory().percent}% | "
+            f"cpu_usage: {psutil.cpu_percent()}% | cpu_freq: {round(psutil.cpu_freq().current, 2)}Hz | ram_usage: {psutil.virtual_memory().percent}% | "
             f"disk_read: {round((cur_read - prev_read)/10, 2)} MB/s | disk_write: {round((cur_write - prev_write)/10, 2)} MB/s | "
             f"network_received: {round((cur_rec - prev_rec)/10, 2)} MB/s | network_sent: {round((cur_sent - prev_sent)/10, 2)} MB/s | "
             f"process_count: {len(psutil.pids())} | uuid: {uuid}"
