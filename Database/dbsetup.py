@@ -97,6 +97,17 @@ def setup_postgres_tables() -> None:
             reference text, 
             sid text
           )""")
+      cursor.execute("""
+          CREATE TABLE IF NOT EXISTS systemlog (
+            id serial PRIMARY KEY, 
+            timestamp text, 
+            event text, 
+            hostname text, 
+            source text, 
+            platform text, 
+            message text, 
+            value text
+          )""")
       connection.commit()
       print('Tables Created!')
 

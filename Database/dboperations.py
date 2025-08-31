@@ -35,7 +35,9 @@ def monitor_directory(dir, pat) -> NoReturn:
         continue            
       for new_file in new_files:
         fn = str(new_file)
-        if ('process' in fn):
+        if ('debug' in fn):
+          dataStorage.store_debug_events(fn)
+        elif ('process' in fn):
           dataStorage.store_process_events(fn)
         elif ('network' in fn):
           dataStorage.store_network_events(fn)

@@ -27,6 +27,7 @@
         "ALTER TABLE applications RENAME COLUMN start TO state;",
         "ALTER TABLE applications RENAME COLUMN sid TO guid;",
         "ALTER TABLE applications ADD vendor text;",
-        "ALTER TABLE applications ADD version text;"
+        "ALTER TABLE applications ADD version text;",
+        "CREATE TABLE IF NOT EXISTS systemlog (id serial PRIMARY KEY, timestamp text, event text, hostname text, source text, platform text, message text, value text)"
         ]
 }

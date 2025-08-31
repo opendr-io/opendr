@@ -15,12 +15,6 @@ class StoreData:
     self.password: str = config.get('Database', 'AgentPassword')
     self.sslmode: str = config.get('Database', 'SSLMode')
     self.sslrootcert: str = config.get('Database', 'SSLRootCert')
-    self.users_log_counter: int = 0
-    self.endpoint_log_counter: int = 0
-    self.network_log_counter: int = 0
-    self.process_log_counter: int = 0
-    self.services_log_counter: int = 0
-    self.applications_installed_log_counter: int = 0
 
   @staticmethod
   def find_pattern(line):
@@ -191,7 +185,7 @@ class StoreData:
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
-          
+
   def store_scheduled_task_info(self, filename: str) -> None:
     table = 'applications(timestamp, event, hostname, identifier, ec2_instance_id, program, description, name, status, state, username, image, vendor, version, guid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
@@ -205,6 +199,22 @@ class StoreData:
                           '', data.get('task_to_run'), data.get('task_name'), data.get('status'), data.get('schedule'), data.get('author'), '', '', 
                           '', data.get('sid') or data.get('uuid')]
           fillers = ("%s," * 15)[:-1]
+          sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
+          connection.execute(sqlInsertStatement, final_params)
+          connection.commit()
+
+  def store_debug_events(self, filename: str) -> None:
+    table = 'systemlog(timestamp, event, hostname, source, platform, message, value)'
+    with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
+      with open(filename, 'r') as file:
+        lines = file.readlines()
+        for line in lines:
+          if(not line):
+            continue
+          data = self.find_pattern(line)
+          final_params = [data.get('timestamp'), data.get('event'), data.get('hostname'),
+                          data.get('source'), data.get('platform'), data.get('message'), data.get('value')]
+          fillers = ("%s," * 7)[:-1]
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
           connection.execute(sqlInsertStatement, final_params)
           connection.commit()
