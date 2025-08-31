@@ -1,12 +1,11 @@
-import wmi
-import win32file
-import win32api
 import time
 import os
 from threading import Thread
 from datetime import datetime
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+import psutil
+import ctypes
 import common.attributes as attr
 from common.logger import LoggingModule
 
@@ -36,12 +35,16 @@ class USBFileLogger(FileSystemEventHandler):
                         f"hostname: {hostname} | event: file moved to {event.dest_path} | "
                         f"filepath: {event.src_path} | sid: {computer_sid}")
 
+def get_drive_type(path):
+    DRIVE_REMOVABLE = 2
+    return ctypes.windll.kernel32.GetDriveTypeW(ctypes.c_wchar_p(path)) == DRIVE_REMOVABLE
+
 def get_usb_drives():
-    drives = win32api.GetLogicalDriveStrings().split('\000')[:-1]
-    return [
-        d for d in drives
-        if win32file.GetDriveType(d) == win32file.DRIVE_REMOVABLE and not d.startswith(('A:', 'B:'))
-    ]
+    usb_drives = []
+    for part in psutil.disk_partitions(all=False):
+        if get_drive_type(part.device):
+            usb_drives.append(part.device)
+    return usb_drives
 
 def start_usb_watchdog(drive):
     if drive in observers:
