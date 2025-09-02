@@ -4,7 +4,6 @@ from datetime import datetime
 import time
 import common.attributes as attr
 from common.logger import LoggingModule
-from typing import NoReturn
 
 class WindowsSoftwareLogger():
   def __init__(self):

@@ -6,10 +6,11 @@ from importlib import import_module
 import time
 import schedule
 import threading
+from typing import NoReturn
 
 config = configparser.ConfigParser()
-config.read(pathlib.Path(__file__).parent.absolute() / "agentconfig.ini")
-config.read(pathlib.Path(__file__).parent.absolute() / "dbconfig.ini")
+config.read(pathlib.Path(__file__).parent.absolute() / "../agentconfig.ini")
+config.read(pathlib.Path(__file__).parent.absolute() / "../dbconfig.ini")
 
 def dynamic_imp(name, class_name):
     try:
@@ -38,6 +39,7 @@ log_profiles: dict[str, list[str]] = {
     "custom": config.get(os_mode, 'Scripts', fallback='').split(', ')
 }
 augment_profiles: list[str] = ["network-aug", "alert-gen"]
+stop_event = threading.Event()
 
 def test_connection() -> None:
     try:
@@ -51,23 +53,41 @@ def test_connection() -> None:
         print(e)
         sys.exit(1)
 
-def execute_scripts(func):
-    t = threading.Thread(target=func)
+def execute_inf_script(func) -> NoReturn:
+    while not stop_event.is_set():
+        t = threading.Thread(target=func)
+        t.start()
+        t.join()
+
+def execute_script(func, i) -> NoReturn:
+    if i:
+        t = threading.Thread(target=func, args=(i,))
+    else:
+        t = threading.Thread(target=func)
     t.start()
 
 def run() -> None:
-    path_sep = '\\' if os_mode == 'Windows' else '/'
+    # path_sep = '\\' if os_mode == 'Windows' else '/'
     file_path = os_mode.lower() + '-'
     logging_scripts = log_profiles[config.get('General', 'LogProfile', fallback='basic')]
     generators = [file_path + script + '-log' for script in logging_scripts]
     classes = [os_mode + script.capitalize() + 'Logger' for script in logging_scripts]
     for i in range(len(generators)):
         test = dynamic_imp(generators[i], classes[i])
-        schedule.every(int(test.interval)).seconds.do(execute_scripts, test.monitor_events)
+        if int(test.interval) < 1:
+            schedule.every().day.do(execute_script, execute_inf_script, test.monitor_events).tag('inf-task')
+        else:
+            schedule.every(int(test.interval)).seconds.do(execute_script, test.monitor_events, None)
 
-    time.sleep(1)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    time.sleep(5)
+    schedule.run_all()
+    schedule.clear('inf-task')
+    try:
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+    except KeyboardInterrupt:
+        stop_event.set()
+        schedule.clear()
 
 run()
