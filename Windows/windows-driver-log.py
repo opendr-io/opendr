@@ -1,5 +1,4 @@
 import subprocess
-import pandas as pd
 import json
 import os
 import time
@@ -18,92 +17,72 @@ hostname: str = attr.get_hostname()
 computer_sid: str = attr.get_computer_sid() or ''
 ec2_instance_id: str = attr.get_ec2_instance_id() or ''
 
-# format output
-def format_row_with_keys(row) -> str:
-    return " | ".join(f"{col}: {row[col]}" for col in row.index if pd.notna(row[col]))
-
-def fetch_defender_events() -> pd.DataFrame:
+def fetch_defender_events() -> list[dict]:
     # PowerShell command to get drivers and convert to JSON
     command: list[str] = [
         "powershell",
         "-NoProfile",
         "-Command",
-        "Get-CimInstance Win32_PnPSignedDriver | Select-Object * | ConvertTo-Json -Depth 3"
+        "Get-CimInstance Win32_PnPSignedDriver | Select-Object 'Description','Signer','DeviceID','DriverVersion','FriendlyName','IsSigned','PDO' | ConvertTo-Json -Depth 2"
     ]
     result = subprocess.run(command, capture_output=True, text=True, encoding="utf-8")
 
-    # JSON  to DataFrame
     try:
         driver_data = json.loads(result.stdout)
-        dfd: pd.DataFrame = pd.DataFrame(driver_data)
     except json.JSONDecodeError as e:
         print("JSON parse error:", e)
         print(result.stdout)
-        return pd.DataFrame()
-    # Fields to retain and optional renaming
-    keep: list[str] = [
-        'Description','ClassGuid','CompatID','DeviceClass','DeviceID','DeviceName',
-        'DriverDate','DriverName','DriverProviderName','DriverVersion','FriendlyName',
-        'HardWareID','InfName','IsSigned','Location','Manufacturer','PDO','Signer'
-    ]
-    dfd = dfd[[col for col in keep if col in dfd.columns]]
-    dfd = dfd.rename(columns={
+        return []
+
+    for driver in driver_data:
+        driver["event"] = "existing driver"
+        driver["sid"] = computer_sid
+        driver["timestamp"] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        driver["hostname"] = hostname
+        driver["ec2_instance_id"] = ec2_instance_id
+
+    column_names: dict = {
+        'timestamp': 'timestamp',
+        'hostname': 'hostname',
+        'event': 'event',
         'Description': 'desc',
-        'ClassGuid': 'class_guid',
-        'CompatID': 'compat_id',
-        'DeviceClass': 'device_class',
+        'Signer': 'signer',
         'DeviceID': 'device_id',
-        'DeviceName': 'device_name',
-        'DriverDate': 'driver_date',
-        'DriverName': 'driver_name',
-        'DriverProviderName': 'driver_provider',
         'DriverVersion': 'driver_version',
         'FriendlyName': 'friendly_name',
-        'HardWareID': 'hardware_id',
-        'InfName': 'inf_name',
         'IsSigned': 'is_signed',
-        'Location': 'location',
-        'Manufacturer': 'manufacturer',
         'PDO': 'pdo',
-        'Signer': 'signer'
-    })
+        'ec2_instance_id': 'ec2_instance_id',
+        'sid': 'sid'
+    }
+    driver_data = [{val: driver[key] for key, val in column_names.items()} for driver in driver_data]
+    return driver_data
 
-    dfd["event"] = "existing driver"
-    dfd["sid"] = computer_sid
-    dfd["timestamp"] = timestamp
-    dfd["hostname"] = hostname
-    dfd["ec2_instance_id"] = ec2_instance_id
-
-    final_order: list[str] = [
-        "timestamp", "hostname", "event",
-        "name", "desc", "signer","class_guid", "compat_id", "device_class", "device_id",  "device_name",
-        "driver_provider", "driver_version", "friendly_name", "hardware_id", "inf_name",
-        "is_signed", "location", "manufacturer", "pdo",
-        "sid", "ec2_instance_id",
-    ]
-    dfd = dfd[[col for col in final_order if col in dfd.columns]]
-    return dfd
+def log_existing_data(logger: LoggingModule) -> set:
+    prev_drivers: set = set()
+    driver_data: list[dict] = fetch_defender_events()
+    for data in driver_data:
+        prev_drivers.add((data['driver_version'], data['device_id'], data['pdo']))
+        logger.write_log(" | ".join([f"{key}: {data[key]}" for key in data]))
+    return prev_drivers
 
 def log_drivers(logger: LoggingModule) -> NoReturn:
     interval: float = attr.get_config_value('Windows', 'DriverInterval', 60.0, 'float')
-    logger.check_logging_interval()
-    prev_dfd: pd.DataFrame = fetch_defender_events()
-    lines = prev_dfd.apply(format_row_with_keys, axis=1)
-    for line in lines:
-        logger.write_log(line)
+    prev_drivers: set = log_existing_data(logger)
+
     while True:
         logger.check_logging_interval()
-        cur_dfd: pd.DataFrame = fetch_defender_events()
-        df_new: pd.DataFrame = pd.concat([cur_dfd, prev_dfd, prev_dfd]).drop_duplicates(keep=False)
-        df_new["event"] = "new driver found"
-        df_new["timestamp"] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        lines = df_new.apply(format_row_with_keys, axis=1)
-        for line in lines:
-            logger.write_log(line)
-        prev_dfd = cur_dfd
+        driver_data: list[dict] = fetch_defender_events()
+        for data in driver_data:
+            if (data['driver_version'], data['device_id'], data['pdo']) in prev_drivers:
+                continue
+            data["event"] = "new driver found"
+            prev_drivers.add((data['driver_version'], data['device_id'], data['pdo']))
+            logger.write_log(" | ".join([f"{key}: {data[key]}" for key in data]))
+
         logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                        f'hostname: {hostname} | source: defender | platform: windows | event: progress | '
-                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+                            f'hostname: {hostname} | source: defender | platform: windows | event: progress | '
+                            f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
         time.sleep(interval)
 
 def run() -> NoReturn:

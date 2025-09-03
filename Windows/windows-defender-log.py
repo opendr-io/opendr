@@ -1,19 +1,17 @@
 import subprocess
-import pandas as pd
 import re
 import os
 import time
-import common.attributes as attr
+from dateutil.parser import parse
 from datetime import datetime
 from common.logger import LoggingModule
+import common.attributes as attr
+from typing import NoReturn
 
-prev_records = {}
+hostname: str = attr.get_hostname()
+computer_sid: str = attr.get_computer_sid() or ''
 
-# output formatted lines
-def format_row_with_keys(row):
-    return " | ".join(f"{col}: {row[col]}" for col in row.index if pd.notna(row[col]))
-
-def fetch_defender_events(logger: LoggingModule) -> None:
+def fetch_defender_events() -> list[dict]:
     # PowerShell command to fetch Event ID 1116
     command = [
         "powershell.exe",
@@ -50,81 +48,70 @@ def fetch_defender_events(logger: LoggingModule) -> None:
                     last_key = list(record.keys())[-1]
                     record[last_key] += ' ' + line.strip()
 
-        key = (record.get('TimeCreated', ''), record.get('Id', ''), record.get('Name', ''))
-        if key not in prev_records:
+        if record:
             records.append(record)
-            prev_records[key] = record
 
     if not records:
-        return
-
-    logger.check_logging_interval()
-    dfwdf = pd.DataFrame(records)
-    dfwdf = dfwdf.rename(columns={
+        return []
+    
+    column_names: dict = {
         "TimeCreated": "timestamp",
-        "Id": "event_id",
-        "Message": "message"
-    })
-
-    dfwdf["timestamp"] = pd.to_datetime(dfwdf["timestamp"], errors="coerce", dayfirst=True)
-    # Drop rows where all fields except 'timestamp' are NaN
-    dfwdf = dfwdf[~dfwdf.drop(columns=['timestamp']).isna().all(axis=1)]
-    dfwdf = dfwdf.where(pd.notnull(dfwdf), None)
-    dfwdf = dfwdf.drop_duplicates()
-
-    if "Process Name" in dfwdf.columns:
-        idx = dfwdf.columns.get_loc("Process Name")
-        # Keep only columns up to and including "Process Name"
-        dfwdf = dfwdf.iloc[:, :idx + 1]
-    dfwdf = dfwdf.drop_duplicates() # remove duplicates
-
-    dfwdf = dfwdf.rename(columns={
-        "timestamp": "timestamp",
-        "message": "description",
-        "For more information please see the following": "references",
+        "event": "event",
+        "User": "username",
         "Name": "title",
-        "ID": "threat_id",
         "Severity": "severity",
         "Category": "category",
+        "Process Name": "executable",
         "Path": "file_path",
+        "Id": "event_id",
+        "ID": "threat_id",
         "Detection Origin": "origin",
         "Detection Type": "type",
         "Detection Source": "source",
-        "User": "username",
-        "Process Name": "executable"
-    })
-    dfwdf["event"] = "Windows defender"
-    desired_order = [
-        "timestamp",
-        "event",
-        "username",
-        "title",
-        "severity",
-        "category",
-        "executable",
-        "file_path",
-        "event_id", 
-        "threat_id",
-        "origin",
-        "type",
-        "source",
-        "description",
-        "references"
-    ]
+        "Message": "description",
+        "For more information please see the following": "references",
+        "sid": "sid"
+    }
+    
+    for record in records:
+        record['TimeCreated'] = parse(record['TimeCreated']) if record['TimeCreated'] else ''
+        record["event"] = "existing defender event"
+        record["sid"] = computer_sid
 
-    dfwdf = dfwdf[[col for col in desired_order if col in dfwdf.columns]]
-    dfwdf["sid"] = attr.get_computer_sid()
+    records = [{val: record[key] for key, val in column_names.items()} for record in records]
 
-    lines = dfwdf.apply(format_row_with_keys, axis=1)
-    for line in lines:
-        logger.write_log(line)
+    return records
 
-    logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                        f'hostname: {attr.get_hostname()} | source: defender | platform: windows | event: progress | '
+def log_existing_data(logger: LoggingModule) -> set:
+    prev_records: set = set()
+    record_data: list[dict] = fetch_defender_events()
+    for record in record_data:
+        if (record.get('timestamp', ''), record.get('event_id', ''), record.get('title', '')) in prev_records:
+            continue
+        prev_records.add((record.get('timestamp', ''), record.get('event_id', ''), record.get('title', '')))
+        logger.write_log(" | ".join([f"{key}: {record[key]}" for key in record]))
+    return prev_records
+
+def log_defender_events(logger: LoggingModule) -> NoReturn:
+    interval = attr.get_config_value('Windows', 'DefenderInterval', 60.0, 'float')
+    prev_records: set = log_existing_data(logger)
+
+    while True:
+        logger.check_logging_interval()
+        record_data: list[dict] = fetch_defender_events()
+        for record in record_data:
+            if (record.get('timestamp', ''), record.get('event_id', ''), record.get('title', '')) in prev_records:
+                continue
+            record["event"] = "new defender event"
+            logger.write_log(" | ".join([f"{key}: {record[key]}" for key in record]))
+            prev_records.add((record.get('timestamp', ''), record.get('event_id', ''), record.get('title', '')))
+
+        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                        f'hostname: {hostname} | source: defender | platform: windows | event: progress | '
                         f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+        time.sleep(interval)
 
 def run():
-    interval = attr.get_config_value('Windows', 'DefenderInterval', 60.0, 'float')
     log_directory = 'tmp-windows-defender' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
     ready_directory = 'ready'
     debug_generator_directory = 'debuggeneratorlogs'
@@ -133,8 +120,6 @@ def run():
     os.makedirs(ready_directory, exist_ok=True)
     print('windowsdefenderlog running')
     logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "DefenderMonitor", "defender")
-    while True:
-        fetch_defender_events(logger)
-        time.sleep(interval)
+    log_defender_events(logger)
 
 run()
