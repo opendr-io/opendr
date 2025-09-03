@@ -28,7 +28,7 @@ def dynamic_imp(name, class_name):
 os_mode: str = config.get('General', 'OperatingSystem', fallback='Windows')
 os_log: dict[str, list[str]] = {
     "Windows": ['process', 'network', 'software', 'user', 'service'],
-    # "Windows": ['process', 'network', 'software', 'user', 'endpoint', 'service', 'hotfix', 'driver',  'defender', 'autorun', 'tasks'],
+    # "Windows": ['process', 'network', 'software', 'user', 'endpoint', 'service', 'hotfix', 'driver', 'defender', 'autorun', 'tasks'],
     "Linux": ['process', 'network', 'software', 'user', 'endpoint', 'service', 'cronjob', 'kernel'],
     "MacOS": ['process', 'network', 'user', 'endpoint']
 }
@@ -53,11 +53,12 @@ def test_connection() -> None:
         print(e)
         sys.exit(1)
 
-def execute_inf_script(func) -> NoReturn:
+def execute_inf_script(class_obj) -> NoReturn:
     while not stop_event.is_set():
-        t = threading.Thread(target=func)
+        t = threading.Thread(target=class_obj.monitor_events)
         t.start()
         t.join()
+        time.sleep(class_obj.interval)
 
 def execute_script(func, i) -> NoReturn:
     if i:
@@ -73,15 +74,13 @@ def run() -> None:
     generators = [file_path + script + '-log' for script in logging_scripts]
     classes = [os_mode + script.capitalize() + 'Logger' for script in logging_scripts]
     for i in range(len(generators)):
-        test = dynamic_imp(generators[i], classes[i])
-        if int(test.interval) < 1:
-            schedule.every().day.do(execute_script, execute_inf_script, test.monitor_events).tag('inf-task')
+        class_obj = dynamic_imp(generators[i], classes[i])
+        if int(class_obj.interval) < 1:
+            execute_script(execute_inf_script, class_obj)
         else:
-            schedule.every(int(test.interval)).seconds.do(execute_script, test.monitor_events, None)
+            schedule.every(int(class_obj.interval)).seconds.do(execute_script, class_obj.monitor_events, None)
 
-    time.sleep(5)
-    schedule.run_all()
-    schedule.clear('inf-task')
+    time.sleep(1)
     try:
         while True:
             schedule.run_pending()
