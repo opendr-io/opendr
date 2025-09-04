@@ -27,8 +27,7 @@ def dynamic_imp(name, class_name):
 
 os_mode: str = config.get('General', 'OperatingSystem', fallback='Windows')
 os_log: dict[str, list[str]] = {
-    "Windows": ['process', 'network', 'software', 'user', 'service', 'hotfix', 'driver', 'defender', 'autorun', 'tasks'],
-    # "Windows": ['process', 'network', 'software', 'user', 'endpoint', 'service', 'hotfix', 'driver', 'defender', 'autorun', 'tasks'],
+    "Windows": ['process', 'network', 'software', 'user', 'endpoint', 'service', 'hotfix', 'driver', 'defender', 'autorun', 'tasks'],
     "Linux": ['process', 'network', 'software', 'user', 'endpoint', 'service', 'cronjob', 'kernel'],
     "MacOS": ['process', 'network', 'user', 'endpoint']
 }

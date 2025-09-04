@@ -88,3 +88,9 @@ class WindowsSoftwareLogger():
           self.logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
                           f'hostname: {self.hostname} | source: software | platform: windows | event: progress | '
                           f'message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}')
+
+if __name__ == '__main__':
+    service = WindowsSoftwareLogger()
+    while True:
+        service.monitor_events()
+        time.sleep(service.interval)

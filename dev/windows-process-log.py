@@ -120,3 +120,9 @@ class WindowsProcessLogger():
 
     # Update the previous process set
     self.previous_processes = current_processes
+
+if __name__ == '__main__':
+    process = WindowsProcessLogger()
+    while True:
+        process.monitor_events()
+        time.sleep(process.interval)

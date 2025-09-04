@@ -1,6 +1,7 @@
 import subprocess
 import re
 import os
+import time
 from dateutil.parser import parse
 from datetime import datetime
 from common.logger import LoggingModule
@@ -118,3 +119,9 @@ class WindowsDefenderLogger():
         self.logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
                         f'hostname: {self.hostname} | source: defender | platform: windows | event: progress | '
                         f'message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}')
+
+if __name__ == '__main__':
+    defender = WindowsDefenderLogger()
+    while True:
+        defender.monitor_events()
+        time.sleep(defender.interval)

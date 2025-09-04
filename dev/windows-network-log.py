@@ -107,3 +107,10 @@ class WindowsNetworkLogger():
                       f'message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}')
 
     self.previous_connections = current_connections.copy()
+
+if __name__ == '__main__':
+    network = WindowsNetworkLogger()
+    while True:
+        network.monitor_events()
+        time.sleep(network.interval)
+

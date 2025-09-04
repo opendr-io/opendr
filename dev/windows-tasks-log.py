@@ -6,7 +6,6 @@ import time
 from datetime import datetime
 import common.attributes as attr
 from common.logger import LoggingModule
-from typing import NoReturn
 
 class WindowsTasksLogger():
     def __init__(self):
@@ -87,3 +86,9 @@ class WindowsTasksLogger():
         self.logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
                         f'hostname: {self.hostname} | source: tasks | platform: windows | event: progress | '
                         f'message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}')
+
+if __name__ == '__main__':
+    tasks = WindowsTasksLogger()
+    while True:
+        tasks.monitor_events()
+        time.sleep(tasks.interval)

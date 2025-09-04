@@ -1,9 +1,10 @@
 import os
 import psutil
 from datetime import datetime
+import time
 import common.attributes as attr
 from common.logger import LoggingModule
-from typing import NoReturn
+
 
 class WindowsServiceLogger():
     def __init__(self):
@@ -63,3 +64,9 @@ class WindowsServiceLogger():
                 self.previous_services.add(str((info['pid'], info['name'])))
             except Exception as e:
                 print(e)
+
+if __name__ == '__main__':
+    service = WindowsServiceLogger()
+    while True:
+        service.monitor_events()
+        time.sleep(service.interval)

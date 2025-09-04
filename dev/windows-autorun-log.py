@@ -1,5 +1,6 @@
 import os
 import winreg
+import time
 from datetime import datetime
 import common.attributes as attr
 from common.logger import LoggingModule
@@ -121,3 +122,8 @@ class WindowsAutorunLogger():
                             f'hostname: {self.hostname} | source: autorun | platform: windows | event: progress | '
                             f'message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}')
 
+if __name__ == '__main__':
+    autorun = WindowsAutorunLogger()
+    while True:
+        autorun.monitor_events()
+        time.sleep(autorun.interval)

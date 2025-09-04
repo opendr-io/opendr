@@ -1,6 +1,7 @@
 import subprocess
 import json
 import os
+import time
 from datetime import datetime
 from dateutil.parser import parse
 import common.attributes as attr
@@ -84,3 +85,9 @@ class WindowsHotfixLogger():
         self.logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
                             f'hostname: {self.hostname} | source: hotfix | platform: windows | event: progress | '
                             f'message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}')
+
+if __name__ == '__main__':
+    hotfix = WindowsHotfixLogger()
+    while True:
+        hotfix.monitor_events()
+        time.sleep(hotfix.interval)

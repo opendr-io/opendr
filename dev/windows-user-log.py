@@ -1,5 +1,6 @@
 import os
 import psutil
+import time
 from datetime import datetime
 import common.attributes as attr
 from common.logger import LoggingModule
@@ -58,3 +59,9 @@ class WindowsUserLogger():
         self.logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
                                     f'hostname: {self.hostname} | source: user | platform: windows | event: progress | '
                                     f'message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}')
+
+if __name__ == '__main__':
+    user = WindowsUserLogger()
+    while True:
+        user.monitor_events()
+        time.sleep(user.interval)
