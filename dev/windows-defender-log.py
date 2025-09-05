@@ -7,12 +7,10 @@ from datetime import datetime
 from common.logger import LoggingModule
 import common.attributes as attr
 
-class WindowsDefenderLogger():
+class WindowsDefenderLogger(attr.LoggerParent):
     def __init__(self):
-        self.sid: str = attr.get_computer_sid()
-        self.hostname: str = attr.get_hostname()
+        super().__init__()
         self.interval: float = attr.get_config_value('Windows', 'DefenderInterval', 60.0, 'float')
-        self.logger = None
         self.prev_records: set = set()
         self.setup_logger()
         self.log_existing()

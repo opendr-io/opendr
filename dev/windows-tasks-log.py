@@ -7,11 +7,9 @@ from datetime import datetime
 import common.attributes as attr
 from common.logger import LoggingModule
 
-class WindowsTasksLogger():
+class WindowsTasksLogger(attr.LoggerParent):
     def __init__(self):
-        self.sid: str = attr.get_computer_sid() or ''
-        self.hostname: str = attr.get_hostname()
-        self.ec2_instance_id: str = attr.get_ec2_instance_id() or ''
+        super().__init__()
         self.interval: float = attr.get_config_value('Windows', 'TaskInterval', 60.0, 'float')
         self.logger = None
         self.prev_tasks: set = set()

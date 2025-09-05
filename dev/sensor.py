@@ -50,6 +50,8 @@ def test_connection() -> None:
             connection.close()
     except Exception as e:
         print(e)
+        stop_event.set()
+        schedule.clear()
         sys.exit(1)
 
 def execute_inf_script(class_obj) -> NoReturn:
@@ -70,14 +72,23 @@ def run() -> None:
     # path_sep = '\\' if os_mode == 'Windows' else '/'
     file_path = os_mode.lower() + '-'
     logging_scripts = log_profiles[config.get('General', 'LogProfile', fallback='basic')]
+    # generators = [os_mode + '.' + file_path + script + '-log' for script in logging_scripts]
     generators = [file_path + script + '-log' for script in logging_scripts]
     classes = [os_mode + script.capitalize() + 'Logger' for script in logging_scripts]
+
     for i in range(len(generators)):
         class_obj = dynamic_imp(generators[i], classes[i])
         if int(class_obj.interval) < 1:
             execute_script(execute_inf_script, class_obj)
         else:
             schedule.every(int(class_obj.interval)).seconds.do(execute_script, class_obj.monitor_events, None)
+    
+    # this section governs local vs database mode - default is local
+    if config.getboolean('General', 'RunDatabaseOperations', fallback=False):
+        class_obj = dynamic_imp('dboperations', 'DatabaseOperations')
+        schedule.every(class_obj.db_interval).seconds.do(execute_script, class_obj.monitor_directory, None)
+        schedule.every(class_obj.cleanup_interval).minutes.do(execute_script, class_obj.directory_cleanup, None)
+        test_connection()
 
     time.sleep(1)
     try:

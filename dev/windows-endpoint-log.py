@@ -4,13 +4,10 @@ import time
 import common.attributes as attr
 from common.logger import LoggingModule
 
-class WindowsEndpointLogger():
+class WindowsEndpointLogger(attr.LoggerParent):
   def __init__(self):
-    self.sid: str = attr.get_computer_sid()
-    self.hostname: str = attr.get_hostname()
-    self.ec2_instance_id: str = attr.get_ec2_instance_id() or ''
+    super().__init__()
     self.interval: float = attr.get_config_value('Windows', 'EndpointInterval', 60.0, 'float')
-    self.logger = None
     self.previous_info: set = set()
     self.setup_logger()
     self.log_existing()

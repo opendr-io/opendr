@@ -6,12 +6,10 @@ import common.attributes as attr
 from common.logger import LoggingModule
 
 
-class WindowsServiceLogger():
+class WindowsServiceLogger(attr.LoggerParent):
     def __init__(self):
-        self.sid: str = attr.get_computer_sid()
-        self.hostname: str = attr.get_hostname()
+        super().__init__()
         self.interval: float = attr.get_config_value('Windows', 'ServiceInterval', 60.0, 'float')
-        self.logger = None
         self.previous_services: set = set()
         self.setup_logger()
         self.log_existing()

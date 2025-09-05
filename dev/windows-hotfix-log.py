@@ -7,12 +7,10 @@ from dateutil.parser import parse
 import common.attributes as attr
 from common.logger import LoggingModule
 
-class WindowsHotfixLogger():
+class WindowsHotfixLogger(attr.LoggerParent):
     def __init__(self):
-        self.sid: str = attr.get_computer_sid()
-        self.hostname: str = attr.get_hostname()
+        super().__init__()
         self.interval: float = attr.get_config_value('Windows', 'HotfixInterval', 60.0, 'float')
-        self.logger = None
         self.prev_hotfixes: set = set()
         self.setup_logger()
         self.log_existing()

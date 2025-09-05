@@ -5,12 +5,10 @@ from datetime import datetime
 import common.attributes as attr
 from common.logger import LoggingModule
 
-class WindowsUserLogger():
+class WindowsUserLogger(attr.LoggerParent):
     def __init__(self):
-        self.sid: str = attr.get_computer_sid()
-        self.hostname: str = attr.get_hostname()
+        super().__init__()
         self.interval: float = attr.get_config_value('Windows', 'UserInterval', 1.0, 'float')
-        self.logger = None
         self.seen_users: set = set()
         self.setup_logger()
         self.log_existing()

@@ -5,13 +5,10 @@ import time
 import common.attributes as attr
 from common.logger import LoggingModule
 
-class WindowsSoftwareLogger():
+class WindowsSoftwareLogger(attr.LoggerParent):
   def __init__(self):
-    self.sid: str = attr.get_computer_sid()
-    self.hostname: str = attr.get_hostname()
-    self.instance_id: str = attr.get_ec2_instance_id()
+    super().__init__()
     self.interval: float = attr.get_config_value('Windows', 'SoftwareInterval', 60.0, 'float')
-    self.logger = None
     self.seen_software: set = set()
     self.setup_logger()
     self.log_existing()
@@ -61,7 +58,7 @@ class WindowsSoftwareLogger():
           f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
           f"hostname: {self.hostname} | event: existing software | "
           f"program: {name} | version: {version} | "
-          f"instanceid: {self.instance_id} | sid: {self.sid}"
+          f"instanceid: {self.ec2_instance_id} | sid: {self.sid}"
         )
         self.logger.write_log(log_entry)
         self.seen_software.add((name, version))
@@ -80,7 +77,7 @@ class WindowsSoftwareLogger():
           f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
           f"hostname: {self.hostname} | event: new software | "
           f"program: {name} | version: {version} | "
-          f"instanceid: {self.instance_id} | sid: {self.sid}"
+          f"instanceid: {self.ec2_instance_id} | sid: {self.sid}"
         )
         self.logger.write_log(log_entry)
         self.seen_software.add((name, version))
