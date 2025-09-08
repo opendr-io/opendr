@@ -37,7 +37,7 @@ log_profiles: dict[str, list[str]] = {
     "complete": os_log[os_mode],
     "custom": config.get(os_mode, 'Scripts', fallback='').split(', ')
 }
-augment_profiles: list[str] = ["network-aug", "alert-gen"]
+augment_profiles: dict = {"network-aug": "NetworkAug", "alert-gen": "AlertGen"}
 stop_event = threading.Event()
 
 def test_connection() -> None:
@@ -82,13 +82,18 @@ def run() -> None:
             execute_script(execute_inf_script, class_obj)
         else:
             schedule.every(int(class_obj.interval)).seconds.do(execute_script, class_obj.monitor_events, None)
-    
+
     # this section governs local vs database mode - default is local
     if config.getboolean('General', 'RunDatabaseOperations', fallback=False):
+        test_connection()
         class_obj = dynamic_imp('dboperations', 'DatabaseOperations')
         schedule.every(class_obj.db_interval).seconds.do(execute_script, class_obj.monitor_directory, None)
         schedule.every(class_obj.cleanup_interval).minutes.do(execute_script, class_obj.directory_cleanup, None)
-        test_connection()
+
+    if config.getboolean('General', 'RunAugmentOperations', fallback=False):
+        for script, name in augment_profiles.items():
+            class_obj = dynamic_imp(script, name)
+            schedule.every(int(class_obj.interval)).seconds.do(execute_script, class_obj.augment_events, None)
 
     time.sleep(1)
     try:
