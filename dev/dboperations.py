@@ -6,12 +6,12 @@ import pathlib
 from storedata import StoreData
 
 config = configparser.ConfigParser()
-config.read(pathlib.Path(__file__).parent.absolute() / "../dbconfig.ini")
+config.read(pathlib.Path(__file__).parent.absolute() / "../agentconfig.ini")
 
 class DatabaseOperations():
   def __init__(self):
-    self.db_interval: int = config.getint('Database', 'DatabaseInterval', fallback=30)
-    self.cleanup_interval: int = config.getint('Database', 'CleanupInterval', fallback=30)
+    self.db_interval: int = config.getint('General', 'DatabaseInterval', fallback=30)
+    self.cleanup_interval: int = config.getint('General', 'CleanupInterval', fallback=30)
     self.dir: str = 'ready'
     self.pat: str = '*.log'
     self.done_dir: str = 'done/ready'
@@ -33,7 +33,7 @@ class DatabaseOperations():
       current_files: set[Path] = set(path.glob(self.pat))
       new_files: set[Path] = current_files - self.processed_files
       if not new_files:
-        return            
+        return
       for new_file in new_files:
         fn = str(new_file)
         if ('process' in fn):
