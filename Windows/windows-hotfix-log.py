@@ -71,9 +71,9 @@ def fetch_hotfixes(logger: LoggingModule):
             prev_hotfixes.add((data['name'], data['description']))
             logger.write_log(" | ".join([f"{key}: {data[key]}" for key in data]))
 
-        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                            f'hostname: {hostname} | source: hotfix | platform: windows | event: progress | '
-                            f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+        logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                            f"hostname: {hostname} | source: hotfix | platform: windows | event: progress | "
+                            f"message: {logger.log_line_count} log lines written | value: {logger.log_line_count}")
         time.sleep(interval)
 
 def run():

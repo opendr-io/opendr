@@ -80,9 +80,9 @@ def log_drivers(logger: LoggingModule) -> NoReturn:
             prev_drivers.add((data['driver_version'], data['device_id'], data['pdo']))
             logger.write_log(" | ".join([f"{key}: {data[key]}" for key in data]))
 
-        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                            f'hostname: {hostname} | source: defender | platform: windows | event: progress | '
-                            f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+        logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                            f"hostname: {hostname} | source: defender | platform: windows | event: progress | "
+                            f"message: {logger.log_line_count} log lines written | value: {logger.log_line_count}")
         time.sleep(interval)
 
 def run() -> NoReturn:

@@ -73,9 +73,9 @@ def log_scheduled_tasks(logger: LoggingModule) -> NoReturn:
             logger.write_log(" | ".join([f"{key}: {data[key]}" for key in data]))
             prev_tasks.add((data['task_name'], data['task_to_run'], data['start_time']))
 
-        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                        f'hostname: {hostname} | source: tasks | platform: windows | event: progress | '
-                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+        logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                        f"hostname: {hostname} | source: tasks | platform: windows | event: progress | "
+                        f"message: {logger.log_line_count} log lines written | value: {logger.log_line_count}")
         time.sleep(interval)
 
 def run() -> NoReturn:
