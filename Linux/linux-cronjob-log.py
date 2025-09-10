@@ -53,9 +53,9 @@ def log_cron_jobs(log_directory: str, ready_directory: str) -> None:
         entry: str = f"timestamp: {timestamp} | hostname: {hostname} | source: user_crontab | {job}"
         logger.write_log(entry)
 
-    logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                        f'hostname: {hostname} | source: cronjob | platform: linux | event: progress | '
-                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+    logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                        f"hostname: {hostname} | source: cronjob | platform: linux | event: progress | "
+                        f"message: {logger.log_line_count} log lines written | value: {logger.log_line_count}")
     logger.clear_handlers()
 
 def run():

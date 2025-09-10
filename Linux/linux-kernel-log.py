@@ -79,9 +79,9 @@ def log_modules(log_directory: str, ready_directory: str) -> NoReturn:
                 log_line += f" | {key.lower().replace(' ', '_')}: {value}"
             logger.write_log(log_line)
             prev_modules.append(mod)
-        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                        f'hostname: {attr.get_hostname()} | source: kernel | platform: linux | event: progress | '
-                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+        logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                        f"hostname: {attr.get_hostname()} | source: kernel | platform: linux | event: progress | "
+                        f"message: {logger.log_line_count} log lines written | value: {logger.log_line_count}")
         time.sleep(interval)
 
 def run() -> NoReturn:

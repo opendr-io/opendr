@@ -62,9 +62,9 @@ def fetch_hotfixes(logger: LoggingModule):
     for line in lines:
         logger.write_log(line)
 
-    logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                        f'hostname: {attr.get_hostname()} | source: hotfix | platform: windows | event: progress | '
-                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+    logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                        f"hostname: {attr.get_hostname()} | source: hotfix | platform: windows | event: progress | "
+                        f"message: {logger.log_line_count} log lines written | value: {logger.log_line_count}")
     logger.clear_handlers()
 
 def run():

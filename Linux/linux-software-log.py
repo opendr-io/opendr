@@ -80,9 +80,9 @@ def log_data(log_directory: str, ready_directory: str) -> NoReturn:
                     f"name: {pkg['name']} | version: {pkg['version']} | architecture: {pkg['architecture']} | "
                     f"description: {pkg['description']} | uuid: {uuid}"
                     ))
-        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                        f'hostname: {hostname} | source: software | platform: linux | event: progress | '
-                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+        logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                        f"hostname: {hostname} | source: software | platform: linux | event: progress | "
+                        f"message: {logger.log_line_count} log lines written | value: {logger.log_line_count}")
         logger.clear_handlers()
         time.sleep(interval)
 
