@@ -115,9 +115,9 @@ class WindowsAutorunLogger(attr.LoggerParent):
             self.prev_autoruns.add((data['source'], data['entry'], data['path']))
             self.logger.write_log(" | ".join([f"{key}: {data[key]}" for key in data]))
 
-        self.logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                            f'hostname: {self.hostname} | source: autorun | platform: windows | event: progress | '
-                            f'message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}')
+        self.logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                            f"hostname: {self.hostname} | source: autorun | platform: windows | event: progress | "
+                            f"message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}")
 
 if __name__ == '__main__':
     autorun = WindowsAutorunLogger()

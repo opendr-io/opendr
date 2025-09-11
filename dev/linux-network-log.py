@@ -6,15 +6,16 @@ import logging
 import ipaddress
 import common.attributes as attr
 from common.logger import LoggingModule
+from typing import NoReturn
 
-class WindowsNetworkLogger(attr.LoggerParent):
+class LinuxNetworkLogger(attr.LoggerParent):
   def __init__(self):
     super().__init__()
-    self.interval: float = attr.get_config_value('Windows', 'NetworkInterval', 1.0, 'float')
+    self.interval: float = attr.get_config_value('Linux', 'NetworkInterval', 1.0, 'float')
     self.previous_connections: dict = {}
     self.setup_logger()
     self.log_existing()
-    print('WindowsNetworkLogger Initialization complete')
+    print('LinuxNetworkLogger Initialization complete')
 
   def setup_logger(self) -> None:
     log_directory: str = 'tmp-network' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
@@ -42,8 +43,8 @@ class WindowsNetworkLogger(attr.LoggerParent):
 
     self.logger.write_log(
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-        f"hostname: {self.hostname} |  username: {username}  | "
-        f"category: {event} | process: {process_name} | processid: {conn.pid} | "
+        f"hostname: {self.hostname} | username: {username} | "
+        f"category: {event} | name: {process_name} | processid: {conn.pid} | "
         f"sourceip: {conn.laddr[0]} | sourceport: {conn.laddr[1]} | "
         f"destinationip: {remote_ip} | destinationport: {remote_port} | "
         f"status: {conn.status} | sid: {self.sid}"
@@ -101,14 +102,13 @@ class WindowsNetworkLogger(attr.LoggerParent):
 
     if int(time.time()) % 10 == 0:
       self.logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-                      f"hostname: {self.hostname} | source: network | platform: windows | event: progress | "
+                      f"hostname: {self.hostname} | source: network | platform: linux | event: progress | "
                       f"message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}")
 
     self.previous_connections = current_connections.copy()
 
 if __name__ == '__main__':
-    network = WindowsNetworkLogger()
+    network = LinuxNetworkLogger()
     while True:
         network.monitor_events()
         time.sleep(network.interval)
-

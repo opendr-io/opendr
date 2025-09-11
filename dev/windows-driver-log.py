@@ -82,9 +82,9 @@ class WindowsDriverLogger(attr.LoggerParent):
             self.prev_drivers.add((data['driver_version'], data['device_id'], data['pdo']))
             self.logger.write_log(" | ".join([f"{key}: {data[key]}" for key in data]))
 
-        self.logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                            f'hostname: {self.hostname} | source: defender | platform: windows | event: progress | '
-                            f'message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}')
+        self.logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                            f"hostname: {self.hostname} | source: defender | platform: windows | event: progress | "
+                            f"message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}")
 
 if __name__ == '__main__':
     driver = WindowsDriverLogger()

@@ -5,14 +5,14 @@ from datetime import datetime
 import common.attributes as attr
 from common.logger import LoggingModule
 
-class WindowsProcessLogger(attr.LoggerParent):
+class MacOSProcessLogger(attr.LoggerParent):
   def __init__(self):
     super().__init__()
-    self.interval: float = attr.get_config_value('Windows', 'ProcessInterval', 1.0, 'float')
+    self.interval: float = attr.get_config_value('MacOS', 'ProcessInterval', 1.0, 'float')
     self.previous_processes: set[int] = set()
     self.setup_logger()
     self.log_existing()
-    print('WindowsProcessLogger Initialization complete')
+    print('MacOSProcessLogger Initialization complete')
 
   def setup_logger(self) -> None:
     log_directory: str = 'tmp-process' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
@@ -47,7 +47,7 @@ class WindowsProcessLogger(attr.LoggerParent):
         self.logger.write_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
             f"hostname: {self.hostname} | username: {user} | category: process_existing | "
             f"processid: {pid} | process: {proc_name} | parentprocessid: {parent_pid} | parentimage: {parent_name} | "
-            f"image: {exe} | commandline: {cmdline} | sid: {self.sid}")
+            f"image: {exe} | commandline: {cmdline} | uuid: {self.sid}")
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue
 
@@ -81,7 +81,7 @@ class WindowsProcessLogger(attr.LoggerParent):
         self.logger.write_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
           f"hostname: {self.hostname} | username: {user} | category: process_creation | "
           f"processid: {pid} | process: {proc_name} | parentprocessid: {parent_pid} | parentimage: {parent_name} | "
-          f"image: {exe} | commandline: {cmdline} | sid: {self.sid}")
+          f"image: {exe} | commandline: {cmdline} | uuid: {self.sid}")
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue
 
@@ -106,21 +106,21 @@ class WindowsProcessLogger(attr.LoggerParent):
         self.logger.write_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
           f"hostname: {self.hostname} | username: {user} | category: process_termination | "
           f"processid: {pid} | process: {proc_name} | parentprocessid: {parent_pid} | parentimage: {parent_name} | "
-          f"image: {exe} | commandline: {cmdline} | sid: {self.sid}")
+          f"image: {exe} | commandline: {cmdline} | uuid: {self.sid}")
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue
 
     # Print the current running total of log lines every 10 seconds
     if int(time.time()) % 10 == 0:
       self.logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-                            f"hostname: {self.hostname} | source: process | platform: windows | event: progress | "
+                            f"hostname: {self.hostname} | source: process | platform: macos | event: progress | "
                             f"message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}")
 
     # Update the previous process set
     self.previous_processes = current_processes
 
 if __name__ == '__main__':
-    process = WindowsProcessLogger()
+    process = MacOSProcessLogger()
     while True:
         process.monitor_events()
         time.sleep(process.interval)

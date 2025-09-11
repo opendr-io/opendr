@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import psycopg
 import configparser
 import pathlib
+import time
 import common.attributes as attr
 
 config = configparser.ConfigParser()
@@ -41,3 +42,9 @@ class NetworkAug():
                 continue
             dns_name, as_name = self.get_resolved_name(ip)
             self.enrich_network(ip, dns_name, as_name)
+
+if __name__ == '__main__':
+    aug = NetworkAug()
+    while True:
+        aug.augment_events()
+        time.sleep(aug.interval)

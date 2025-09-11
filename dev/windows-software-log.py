@@ -62,10 +62,6 @@ class WindowsSoftwareLogger(attr.LoggerParent):
         )
         self.logger.write_log(log_entry)
         self.seen_software.add((name, version))
-        if int(time.time()) % 10 == 0:
-          self.logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                          f'hostname: {self.hostname} | source: software | platform: windows | event: progress | '
-                          f'message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}')
 
   def monitor_events(self) -> None:
     """Logs installed software with system metadata."""
@@ -82,9 +78,9 @@ class WindowsSoftwareLogger(attr.LoggerParent):
         self.logger.write_log(log_entry)
         self.seen_software.add((name, version))
         if int(time.time()) % 10 == 0:
-          self.logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                          f'hostname: {self.hostname} | source: software | platform: windows | event: progress | '
-                          f'message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}')
+          self.logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                          f"hostname: {self.hostname} | source: software | platform: windows | event: progress | "
+                          f"message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}")
 
 if __name__ == '__main__':
     service = WindowsSoftwareLogger()

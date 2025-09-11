@@ -114,9 +114,9 @@ class WindowsDefenderLogger(attr.LoggerParent):
             self.logger.write_log(" | ".join([f"{key}: {record[key]}" for key in record]))
             self.prev_records.add((record.get('timestamp', ''), record.get('event_id', ''), record.get('title', '')))
 
-        self.logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                        f'hostname: {self.hostname} | source: defender | platform: windows | event: progress | '
-                        f'message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}')
+        self.logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                        f"hostname: {self.hostname} | source: defender | platform: windows | event: progress | "
+                        f"message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}")
 
 if __name__ == '__main__':
     defender = WindowsDefenderLogger()

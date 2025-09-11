@@ -1,5 +1,6 @@
 import re
 import csv
+import time
 from datetime import datetime, timedelta
 from win10toast import ToastNotifier
 from pathlib import Path
@@ -88,3 +89,9 @@ class AlertGen():
             print(f"{alerts_generated} alerts were generated during the time period ({self.search_interval.strftime(self.time_format)} - {datetime.now().strftime(self.time_format)}).")
         else:
             print(f"No suspicious activity detected ({self.search_interval.strftime(self.time_format)} - {datetime.now().strftime(self.time_format)}).")
+
+if __name__ == '__main__':
+    aug = AlertGen()
+    while True:
+        aug.augment_events()
+        time.sleep(aug.interval)

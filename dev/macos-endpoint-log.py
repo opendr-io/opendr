@@ -1,17 +1,17 @@
+import time
 from datetime import datetime
 import os
-import time
 import common.attributes as attr
 from common.logger import LoggingModule
 
-class WindowsEndpointLogger(attr.LoggerParent):
+class MacOSEndpointLogger(attr.LoggerParent):
   def __init__(self):
     super().__init__()
-    self.interval: float = attr.get_config_value('Windows', 'EndpointInterval', 60.0, 'float')
+    self.interval: float = attr.get_config_value('MacOS', 'EndpointInterval', 60.0, 'float')
     self.previous_info: set = set()
     self.setup_logger()
     self.log_existing()
-    print('WindowsEndpointLogger Initialization complete')
+    print('MacOSEndpointLogger Initialization complete')
 
   def setup_logger(self) -> None:
     log_directory: str = 'tmp-endpoint-info' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
@@ -40,16 +40,17 @@ class WindowsEndpointLogger(attr.LoggerParent):
       f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
       f"hostname: {self.hostname} | event: endpoint modified | "
       f"private_ips: {attr.get_private_ips()} | public_ip: {attr.get_public_ip()} | "
-      f"ec2_instance_id: {self.ec2_instance_id} | sid: {self.sid}"
+      f"ec2_instance_id: {self.ec2_instance_id} | uuid: {self.sid}"
     )
     self.logger.write_log(data)
     self.previous_info.add((self.hostname, ''.join(attr.get_private_ips()), attr.get_public_ip()))
     self.logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-                          f"hostname: {self.hostname} | source: endpoint | platform: windows | event: progress | "
+                          f"hostname: {self.hostname} | source: endpoint | platform: macos | event: progress | "
                           f"message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}")
 
 if __name__ == '__main__':
-    endpoint = WindowsEndpointLogger()
+    endpoint = MacOSEndpointLogger()
     while True:
         endpoint.monitor_events()
         time.sleep(endpoint.interval)
+
