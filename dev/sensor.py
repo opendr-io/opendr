@@ -6,7 +6,6 @@ from importlib import import_module
 import time
 import schedule
 import threading
-from typing import NoReturn
 
 config = configparser.ConfigParser()
 config.read(pathlib.Path(__file__).parent.absolute() / "../agentconfig.ini")
@@ -54,14 +53,14 @@ def test_connection() -> None:
         schedule.clear()
         sys.exit(1)
 
-def execute_inf_script(class_obj) -> NoReturn:
+def execute_inf_script(class_obj) -> None:
     while not stop_event.is_set():
         t = threading.Thread(target=class_obj.monitor_events)
         t.start()
         t.join()
         time.sleep(class_obj.interval)
 
-def execute_script(func, i) -> NoReturn:
+def execute_script(func, i) -> None:
     if i:
         t = threading.Thread(target=func, args=(i,))
     else:
