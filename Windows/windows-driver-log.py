@@ -13,6 +13,7 @@ from typing import NoReturn
 # most hardware device activations on a Windows PC
 # should be detected by this component.
 
+timestamp: str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 hostname: str = attr.get_hostname()
 computer_sid: str = attr.get_computer_sid() or ''
 ec2_instance_id: str = attr.get_ec2_instance_id() or ''
@@ -69,7 +70,7 @@ def fetch_defender_events() -> pd.DataFrame:
 
     dfd["event"] = "existing driver"
     dfd["sid"] = computer_sid
-    dfd["timestamp"] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    dfd["timestamp"] = timestamp
     dfd["hostname"] = hostname
     dfd["ec2_instance_id"] = ec2_instance_id
 
@@ -94,14 +95,15 @@ def log_drivers(logger: LoggingModule) -> NoReturn:
         logger.check_logging_interval()
         cur_dfd: pd.DataFrame = fetch_defender_events()
         df_new: pd.DataFrame = pd.concat([cur_dfd, prev_dfd, prev_dfd]).drop_duplicates(keep=False)
+        df_new["timestamp"] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         df_new["event"] = "new driver found"
         lines = df_new.apply(format_row_with_keys, axis=1)
         for line in lines:
             logger.write_log(line)
         prev_dfd = cur_dfd
-        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                        f'hostname: {hostname} | source: defender | platform: windows | event: progress | '
-                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+        logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                        f"hostname: {hostname} | source: defender | platform: windows | event: progress | "
+                        f"message: {logger.log_line_count} log lines written | value: {logger.log_line_count}")
         time.sleep(interval)
 
 def run() -> NoReturn:

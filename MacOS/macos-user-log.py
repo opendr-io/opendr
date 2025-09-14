@@ -18,7 +18,7 @@ def log_existing_users(logger: LoggingModule) -> set:
         logger.write_log(
             f"timestamp: {login_time} | "
             f"hostname: {hostname} | "
-            f"event: existing user | username: {user.name} | "
+            f"category: user_existing | username: {user.name} | "
             f"sourceip: {user.host or 'n/a'} | "
             f"uuid: {uuid}"
         )
@@ -40,14 +40,14 @@ def monitor_logged_in_users(logger: LoggingModule, interval: float) -> NoReturn:
                 logger.write_log(
                     f"timestamp: {login_time} | "
                     f"hostname: {hostname} | "
-                    f"event: new user detected | username: {user.name} | "
+                    f"category: new_user_detected | username: {user.name} | "
                     f"sourceip: {user.host or 'n/a'} | "
                     f"uuid: {uuid}"
                 )
                 seen_users.add(user_entry)
-        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                        f'hostname: {hostname} | source: user | platform: macos | event: progress | '
-                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+        logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                        f"hostname: {hostname} | source: user | platform: macos | event: progress | "
+                        f"message: {logger.log_line_count} log lines written | value: {logger.log_line_count}")
         time.sleep(interval)
 
 def run() -> NoReturn:

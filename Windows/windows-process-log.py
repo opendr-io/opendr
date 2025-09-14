@@ -31,9 +31,9 @@ def log_existing_processes(logger: LoggingModule) -> None:
           parent_name = parent.name()
 
       logger.write_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-          f"hostname: {hostname} | username: {user} | event: existing process | "
-          f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
-          f"exe: {exe} | cmdline: {cmdline} | sid: {sid}")
+          f"hostname: {hostname} | username: {user} | category: process_existing | "
+          f"processid: {pid} | process: {proc_name} | parentprocessid: {parent_pid} | parentimage: {parent_name} | "
+          f"image: {exe} | commandline: {cmdline} | sid: {sid}")
     except (psutil.NoSuchProcess, psutil.AccessDenied):
       continue  # Ignore processes that vanish before logging
 
@@ -71,9 +71,9 @@ def monitor_process_events(logger: LoggingModule, interval: float) -> NoReturn:
             parent_name: str = parent.name()
 
         logger.write_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-          f"hostname: {hostname} | username: {user} | event: process created | "
-          f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
-          f"exe: {exe} | cmdline: {cmdline} | sid: {sid}")
+          f"hostname: {hostname} | username: {user} | category: process_creation | "
+          f"processid: {pid} | process: {proc_name} | parentprocessid: {parent_pid} | parentimage: {parent_name} | "
+          f"image: {exe} | commandline: {cmdline} | sid: {sid}")
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue
 
@@ -96,20 +96,20 @@ def monitor_process_events(logger: LoggingModule, interval: float) -> NoReturn:
             parent_name: str = parent.name()
 
         logger.write_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-          f"hostname: {hostname} | username: {user} | event: process terminated | "
-          f"pid: {pid} | name: {proc_name} | ppid: {parent_pid} | parent: {parent_name} | "
-          f"exe: {exe} | cmdline: {cmdline} | sid: {sid}")
+          f"hostname: {hostname} | username: {user} | category: process_termination | "
+          f"processid: {pid} | process: {proc_name} | parentprocessid: {parent_pid} | parentimage: {parent_name} | "
+          f"image: {exe} | commandline: {cmdline} | sid: {sid}")
       except (psutil.NoSuchProcess, psutil.AccessDenied):
         continue
 
     # Print the current running total of log lines every 10 seconds
     if int(time.time()) % 10 == 0:
-      logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                            f'hostname: {hostname} | source: process | platform: windows | event: progress | '
-                            f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+      logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                            f"hostname: {hostname} | source: process | platform: windows | event: progress | "
+                            f"message: {logger.log_line_count} log lines written | value: {logger.log_line_count}")
 
     # Update the previous process set
-    previous_processes = current_processes
+    previous_processes = current_processes.copy()
     time.sleep(interval)
 
 def run() -> NoReturn:

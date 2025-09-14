@@ -29,14 +29,14 @@ def log_connection(logger: LoggingModule, event: str, conn) -> None:
 
     logger.write_log(
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-        f"hostname: {hostname} |  username: {username}  | "
-        f"event: {event} | name: {process_name} | pid: {conn.pid} | "
+        f"hostname: {hostname} | username: {username} | "
+        f"category: {event} | process: {process_name} | processid: {conn.pid} | "
         f"sourceip: {conn.laddr[0]} | sourceport: {conn.laddr[1]} | "
-        f"destip: {remote_ip} | destport: {remote_port} | "
+        f"destinationip: {remote_ip} | destinationport: {remote_port} | "
         f"status: {conn.status} | sid: {sid}"
     )
 
-def log_initial_connections(logger: LoggingModule) -> dict:
+def log_initial_connections(logger: LoggingModule) -> set:
   """Log all currently active connections before starting real-time monitoring."""
   logger.check_logging_interval()
 
@@ -46,18 +46,16 @@ def log_initial_connections(logger: LoggingModule) -> dict:
     logging.error(f"Error retrieving existing network connections: {e}")
     return {}
 
-  initial_connections = {}
+  initial_connections = set()
 
   for conn in connections:
     if conn.laddr and conn.laddr[0] in ("127.0.0.1", "::1", "::", "0.0.0.0", "::127.0.0.1"):
       continue
     if conn.raddr and ipaddress.ip_address(conn.raddr[0]).is_private:
       continue
-
-    key = (conn.pid, conn.laddr, conn.raddr, conn.status)
-    initial_connections[key] = conn
     
-    log_connection(logger, "existing connection", conn)
+    initial_connections.add((conn.pid, conn.laddr, conn.raddr, conn.status))
+    log_connection(logger, "network_existing", conn)
   return initial_connections  # Return initial snapshot for comparison in monitoring
 
 def monitor_network_connections(logger: LoggingModule, interval: float) -> NoReturn:
@@ -67,7 +65,7 @@ def monitor_network_connections(logger: LoggingModule, interval: float) -> NoRet
   while True:
     logger.check_logging_interval()
 
-    current_connections = {}
+    current_connections = set()
     try:
       connections = psutil.net_connections(kind='inet')
     except Exception as e:
@@ -81,22 +79,21 @@ def monitor_network_connections(logger: LoggingModule, interval: float) -> NoRet
       if conn.raddr and ipaddress.ip_address(conn.raddr[0]).is_private:
         continue
 
-      key = (conn.pid, conn.laddr, conn.raddr, conn.status)
-      current_connections[key] = conn
+      current_connections.add((conn.pid, conn.laddr, conn.raddr, conn.status))
 
-    created_keys = set(current_connections.keys()) - set(previous_connections.keys())
-    terminated_keys = set(previous_connections.keys()) - set(current_connections.keys())
+    created_keys = current_connections - previous_connections
+    terminated_keys = previous_connections - current_connections
 
     for key in created_keys:
-      log_connection(logger, "connection created", current_connections[key])
+      log_connection(logger, "network_connection", current_connections[key])
 
     for key in terminated_keys:
-      log_connection(logger, "connection terminated", previous_connections[key])
+      log_connection(logger, "network_termination", previous_connections[key])
 
     if int(time.time()) % 10 == 0:
-      logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                      f'hostname: {hostname} | source: network | platform: windows | event: progress | '
-                      f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+      logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                      f"hostname: {hostname} | source: network | platform: windows | event: progress | "
+                      f"message: {logger.log_line_count} log lines written | value: {logger.log_line_count}")
 
     previous_connections = current_connections.copy()
     time.sleep(interval)
