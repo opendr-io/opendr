@@ -67,23 +67,37 @@ def get_installed_packages():
     except Exception as e:
         print(f"Failed to retrieve packages: {str(e)}")
         return []
+    
+def log_initial_software(logger: LoggingModule) -> set:
+    previous_software = set()
+    packages = get_installed_packages()
+    for pkg in packages:
+        logger.write_log((
+                f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | hostname: {hostname} | event: existing software | "
+                f"name: {pkg['name']} | version: {pkg['version']} | architecture: {pkg['architecture']} | "
+                f"description: {pkg['description']} | uuid: {uuid}"
+                ))
+        previous_software.add((pkg['name'], pkg['version']))
+    return previous_software
 
-def log_data(log_directory: str, ready_directory: str) -> NoReturn:
+def log_data(logger: LoggingModule) -> NoReturn:
     interval: float = attr.get_config_value('Linux', 'SoftwareInterval', 43200.0, 'float')
-    logger: LoggingModule = LoggingModule(log_directory, ready_directory, "SoftwareMonitor", "installed_software")
+    seen_software: set = log_initial_software(logger)
     while True:
         logger.check_logging_interval()
         packages = get_installed_packages()
         for pkg in packages:
+            if (pkg['name'], pkg['version']) in seen_software:
+                continue
             logger.write_log((
-                    f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | hostname: {hostname} | "
+                    f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | hostname: {hostname} | event: new software | "
                     f"name: {pkg['name']} | version: {pkg['version']} | architecture: {pkg['architecture']} | "
                     f"description: {pkg['description']} | uuid: {uuid}"
                     ))
+            seen_software.add((pkg['name'], pkg['version']))
         logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
                         f'hostname: {hostname} | source: software | platform: linux | event: progress | '
                         f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
-        logger.clear_handlers()
         time.sleep(interval)
 
 def run() -> NoReturn:
@@ -93,6 +107,7 @@ def run() -> NoReturn:
     os.makedirs(debug_generator_directory, exist_ok=True)
     os.makedirs(log_directory, exist_ok=True)
     os.makedirs(ready_directory, exist_ok=True)
-    log_data(log_directory, ready_directory)
+    logger: LoggingModule = LoggingModule(log_directory, ready_directory, "SoftwareMonitor", "installed_software")
+    log_data(logger)
 
 run()
