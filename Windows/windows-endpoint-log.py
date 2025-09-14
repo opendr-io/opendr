@@ -5,23 +5,42 @@ from typing import NoReturn
 import common.attributes as attr
 from common.logger import LoggingModule
 
+hostname = attr.get_hostname()
+sid = attr.get_computer_sid() or ''
+ec2_instance_id = attr.get_ec2_instance_id() or ''
+
+def log_existing(logger: LoggingModule) -> set:
+  previous_info: set = set()
+  data: str = (
+      f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+      f"hostname: {hostname} | event: endpoint identified | "
+      f"private_ips: {attr.get_private_ips()} | public_ip: {attr.get_public_ip()} | "
+      f"ec2_instance_id: {ec2_instance_id} | sid: {sid}"
+    )
+  logger.write_log(data)
+  previous_info.add((hostname, ''.join(attr.get_private_ips()), attr.get_public_ip()))
+  return previous_info
+
 def log_data(logger: LoggingModule) -> NoReturn:
-  interval = attr.get_config_value('Windows', 'EndpointInterval', 43200.0, 'float')
+  interval: float = attr.get_config_value('Windows', 'EndpointInterval', 43200.0, 'float')
+  previous_info: set = log_existing(logger)
   while True:
     logger.check_logging_interval()
-    # Configure logging for the new file
-    data = (
-        f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-        f"hostname: {attr.get_hostname()} | private_ips: {attr.get_private_ips()} | public_ip: {attr.get_public_ip()} | "
-        f"sid: {attr.get_computer_sid() or ''} | ec2_instance_id: {attr.get_ec2_instance_id() or ''}"
-      )
-    # Log to the newly created file
+    if (hostname, ''.join(attr.get_private_ips()), attr.get_public_ip()) in previous_info:
+      time.sleep(interval)
+      continue
+    data: str = (
+      f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+      f"hostname: {hostname} | event: endpoint modified | "
+      f"private_ips: {attr.get_private_ips()} | public_ip: {attr.get_public_ip()} | "
+      f"ec2_instance_id: {ec2_instance_id} | sid: {sid}"
+    )
     logger.write_log(data)
+    previous_info.add((hostname, ''.join(attr.get_private_ips()), attr.get_public_ip()))
     logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                          f'hostname: {attr.get_hostname()} | source: endpoint | platform: windows | event: progress | '
+                          f'hostname: {hostname} | source: endpoint | platform: windows | event: progress | '
                           f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
-    logger.clear_handlers()
-    time.sleep(interval)  # Log every 12 hours - or choose an interval
+    time.sleep(interval)
 
 def run() -> NoReturn:
   log_directory: str = 'tmp-endpoint-info' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
