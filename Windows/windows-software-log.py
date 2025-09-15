@@ -48,9 +48,9 @@ def log_installed_software(logger: LoggingModule) -> None:
       )
       logger.write_log(log_entry)
       if int(time.time()) % 10 == 0:
-        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                        f'hostname: {hostname} | source: software | platform: windows | event: progress | '
-                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+        logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                        f"hostname: {hostname} | source: software | platform: windows | event: progress | "
+                        f"message: {logger.log_line_count} log lines written | value: {logger.log_line_count}")
 
   logger.clear_handlers()
 
