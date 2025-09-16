@@ -8,7 +8,7 @@ from common.logger import LoggingModule
 class MacOSProcessLogger(attr.LoggerParent):
   def __init__(self):
     super().__init__()
-    self.interval: float = attr.get_config_value('MacOS', 'ProcessInterval', 1.0, 'float')
+    self.interval: float = attr.get_config_value('MacOS', 'ProcessInterval', 0.1, 'float')
     self.previous_processes: set[int] = set()
     self.setup_logger()
     self.log_existing()

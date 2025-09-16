@@ -11,7 +11,7 @@ from common.logger import LoggingModule
 class MacOSNetworkLogger(attr.LoggerParent):
   def __init__(self):
     super().__init__()
-    self.interval: float = attr.get_config_value('MacOS', 'NetworkInterval', 1.0, 'float')
+    self.interval: float = attr.get_config_value('MacOS', 'NetworkInterval', 0.1, 'float')
     self.previous_connections: dict = {}
     self.setup_logger()
     self.log_existing()

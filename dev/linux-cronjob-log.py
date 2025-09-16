@@ -9,7 +9,7 @@ from common.logger import LoggingModule
 class LinuxCronjobLogger(attr.LoggerParent):
     def __init__(self):
         super().__init__()
-        self.interval: float = attr.get_config_value('Linux', 'CronLogInterval', 43200.0, 'float')
+        self.interval: float = attr.get_config_value('Linux', 'CronLogInterval', 60.0, 'float')
         self.previous_jobs: set = set()
         self.cron_files: list[str] = ['/etc/crontab'] + [
             os.path.join('/etc/cron.d', f)
