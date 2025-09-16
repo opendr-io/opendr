@@ -24,11 +24,11 @@ The Windows section configures Windows-specific monitoring:
 - SoftwareInterval: Defines software inventory logging interval (default 43200 seconds)
 - UserInterval: Sets user info logging frequency (default 1 second)
 - ServiceInterval: Controls service logging interval (default 60 seconds)
-- HotfixInterval: Sets hotfix logging frequency (default 43200 seconds)
+- HotfixInterval: Sets hotfix logging frequency (default 60 seconds)
 - DefenderInterval: Sets defender info logging frequency (default 60 seconds)
-- AutorunInterval: Sets autorun logging frequency (default 43200 seconds)
-- DriverInterval: Sets windows driver logging frequency (default 43200 seconds)
-- TaskInterval: Sets windows task logging frequency (default 43200 seconds)
+- AutorunInterval: Sets autorun logging frequency (default 60 seconds)
+- DriverInterval: Sets windows driver logging frequency (default 60 seconds)
+- TaskInterval: Sets windows task logging frequency (default 60 seconds)
 
 The Linux section configures Linux-specific monitoring:
 - Scripts: Lists all Linux monitoring scripts to be executed by the custom log profile
@@ -36,7 +36,7 @@ The Linux section configures Linux-specific monitoring:
 - NetworkInterval: Controls network logging frequency (default 0.1 seconds)
 - ProcessInterval: Sets process logging frequency (default 0.1 seconds)
 - SoftwareInterval: Defines software inventory logging interval (default 43200 seconds)
-- ServiceInterval: Controls service logging interval (default 43200 seconds)
+- ServiceInterval: Controls service logging interval (default 60 seconds)
 - CronLogInterval: Controls cron job logging interval (default 43200 seconds)
 - KernelInterval: Controls linux kernel logging interval (default 60 seconds)
 - UserInterval: Sets user info logging frequency (default 1 second)
