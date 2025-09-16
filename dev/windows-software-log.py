@@ -1,0 +1,89 @@
+import os
+import winreg
+from datetime import datetime
+import time
+import common.attributes as attr
+from common.logger import LoggingModule
+
+class WindowsSoftwareLogger(attr.LoggerParent):
+  def __init__(self):
+    super().__init__()
+    self.interval: float = attr.get_config_value('Windows', 'SoftwareInterval', 60.0, 'float')
+    self.seen_software: set = set()
+    self.setup_logger()
+    self.log_existing()
+    print('WindowsSoftwareLogger Initialization complete')
+
+  def setup_logger(self) -> None:
+    log_directory: str = 'tmp-software-inventory' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
+    ready_directory: str = 'ready'
+    debug_generator_directory: str = 'debuggeneratorlogs'
+    os.makedirs(debug_generator_directory, exist_ok=True)
+    os.makedirs(log_directory, exist_ok=True)
+    os.makedirs(ready_directory, exist_ok=True)
+    self.logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "SoftwareMonitor", "installed_software")
+
+  @staticmethod
+  def get_installed_software() -> list[tuple]:
+    """Retrieve installed software from Windows registry."""
+    software_list: list[tuple] = []
+    registry_paths: list[str] = [
+        r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+        r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+    ]
+    for path in registry_paths:
+      try:
+        reg_key: winreg.HKEYType = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path)
+        for i in range(0, winreg.QueryInfoKey(reg_key)[0]):
+          sub_key_name: str = winreg.EnumKey(reg_key, i)
+          sub_key: winreg.HKEYType = winreg.OpenKey(reg_key, sub_key_name)
+          try:
+            name = winreg.QueryValueEx(sub_key, "DisplayName")[0]
+            version = winreg.QueryValueEx(sub_key, "DisplayVersion")[0]
+            software_list.append((name, version))
+          except FileNotFoundError:
+            continue
+          finally:
+            sub_key.Close()
+        reg_key.Close()
+      except FileNotFoundError:
+        continue
+    return software_list
+
+  def log_existing(self) -> None:
+    """Logs installed software with system metadata."""
+    self.logger.check_logging_interval()
+    for name, version in self.get_installed_software():
+        log_entry = (
+          f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+          f"hostname: {self.hostname} | event: existing software | "
+          f"program: {name} | version: {version} | "
+          f"instanceid: {self.ec2_instance_id} | sid: {self.sid}"
+        )
+        self.logger.write_log(log_entry)
+        self.seen_software.add((name, version))
+
+  def monitor_events(self) -> None:
+    """Logs installed software with system metadata."""
+    self.logger.check_logging_interval()
+    for name, version in self.get_installed_software():
+        if (name, version) in self.seen_software:
+          continue
+        log_entry = (
+          f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+          f"hostname: {self.hostname} | event: new software | "
+          f"program: {name} | version: {version} | "
+          f"instanceid: {self.ec2_instance_id} | sid: {self.sid}"
+        )
+        self.logger.write_log(log_entry)
+        self.seen_software.add((name, version))
+        if int(time.time()) % 10 == 0:
+          self.logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                          f"hostname: {self.hostname} | source: software | platform: windows | event: progress | "
+                          f"message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}")
+
+if __name__ == '__main__':
+    service = WindowsSoftwareLogger()
+    while True:
+        service.monitor_events()
+        time.sleep(service.interval)
