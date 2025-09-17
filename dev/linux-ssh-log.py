@@ -40,7 +40,7 @@ class LinuxSshLogger(attr.LoggerParent):
     def log_existing(self) -> None:
         timestamp: str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         for key in self.get_ssh_keys():
-            entry: str = f"timestamp: {timestamp} | hostname: {self.hostname} | source: user_sshkey | filepath: {key}"
+            entry: str = f"timestamp: {timestamp} | hostname: {self.hostname} | source: user_sshkey | event: existing ssh key | filepath: {key}"
             self.logger.write_log(entry)
             self.previous_keys.add(key)
     
@@ -49,7 +49,7 @@ class LinuxSshLogger(attr.LoggerParent):
         for key in self.get_ssh_keys():
             if key in self.previous_keys:
                 continue
-            entry: str = f"timestamp: {timestamp} | hostname: {self.hostname} | source: user_sshkey | filepath: {key}"
+            entry: str = f"timestamp: {timestamp} | hostname: {self.hostname} | source: user_sshkey | event: new ssh key | filepath: {key}"
             self.logger.write_log(entry)
             self.previous_keys.add(key)
         self.logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
