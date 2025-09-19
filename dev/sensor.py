@@ -11,6 +11,7 @@ config = configparser.ConfigParser()
 config.read(pathlib.Path(__file__).parent.absolute() / "../agentconfig.ini")
 config.read(pathlib.Path(__file__).parent.absolute() / "../dbconfig.ini")
 
+
 def dynamic_imp(name, class_name):
     try:
         imp_module = import_module(name)
@@ -24,27 +25,57 @@ def dynamic_imp(name, class_name):
         return None
     return imp_class()
 
-os_mode: str = config.get('General', 'OperatingSystem', fallback='Windows')
+
+os_mode: str = config.get("General", "OperatingSystem", fallback="Windows")
 os_log: dict[str, list[str]] = {
-    "Windows": ['process', 'network', 'software', 'user', 'endpoint', 'service', 'hotfix', 'driver', 'defender', 'autorun', 'tasks', 'usb'],
-    "Linux": ['process', 'network', 'software', 'user', 'endpoint', 'service', 'cronjob', 'kernel', 'ssh'],
-    "MacOS": ['process', 'network', 'user', 'endpoint']
+    "Windows": [
+        "process",
+        "network",
+        "software",
+        "user",
+        "endpoint",
+        "service",
+        "hotfix",
+        "driver",
+        "defender",
+        "autorun",
+        "tasks",
+        "usb",
+    ],
+    "Linux": [
+        "process",
+        "network",
+        "software",
+        "user",
+        "endpoint",
+        "service",
+        "cronjob",
+        "kernel",
+        "ssh",
+    ],
+    "MacOS": ["process", "network", "user", "endpoint"],
 }
 log_profiles: dict[str, list[str]] = {
     "basic": os_log[os_mode][:3],
     "advanced": os_log[os_mode][:6],
     "complete": os_log[os_mode],
-    "custom": config.get(os_mode, 'Scripts', fallback='').split(', ')
+    "custom": config.get(os_mode, "Scripts", fallback="").split(", "),
 }
 augment_profiles: dict = {"network-aug": "NetworkAug", "alert-gen": "AlertGen"}
 stop_event = threading.Event()
 
+
 def test_connection() -> None:
     try:
-        with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'),
-                        dbname=config.get('Database', 'DatabaseName', fallback='opendr'),
-                        user=config.get('Database', 'RootDatabaseUserName', fallback='postgres'), password=config.get('Database', 'RootDatabasePassword'),
-                        sslmode=config.get('Database', 'SSLMode'), sslrootcert=config.get('Database', 'SSLRootCert')) as connection:
+        with psycopg.connect(
+            host=config.get("Database", "HostName"),
+            port=config.get("Database", "PortNumber", fallback="4000"),
+            dbname=config.get("Database", "DatabaseName", fallback="opendr"),
+            user=config.get("Database", "RootDatabaseUserName", fallback="postgres"),
+            password=config.get("Database", "RootDatabasePassword"),
+            sslmode=config.get("Database", "SSLMode"),
+            sslrootcert=config.get("Database", "SSLRootCert"),
+        ) as connection:
             _ = connection.cursor()
             connection.close()
     except Exception as e:
@@ -53,12 +84,14 @@ def test_connection() -> None:
         schedule.clear()
         sys.exit(1)
 
+
 def execute_inf_script(class_obj) -> None:
     while not stop_event.is_set():
         t = threading.Thread(target=class_obj.monitor_events)
         t.start()
         t.join()
         time.sleep(class_obj.interval)
+
 
 def execute_script(func, i) -> None:
     if i:
@@ -67,32 +100,43 @@ def execute_script(func, i) -> None:
         t = threading.Thread(target=func)
     t.start()
 
+
 def run() -> None:
     # path_sep = '\\' if os_mode == 'Windows' else '/'
-    file_path = os_mode.lower() + '-'
-    logging_scripts = log_profiles[config.get('General', 'LogProfile', fallback='basic')]
+    file_path = os_mode.lower() + "-"
+    logging_scripts = log_profiles[
+        config.get("General", "LogProfile", fallback="basic")
+    ]
     # generators = [os_mode + '.' + file_path + script + '-log' for script in logging_scripts]
-    generators = [file_path + script + '-log' for script in logging_scripts]
-    classes = [os_mode + script.capitalize() + 'Logger' for script in logging_scripts]
+    generators = [file_path + script + "-log" for script in logging_scripts]
+    classes = [os_mode + script.capitalize() + "Logger" for script in logging_scripts]
 
     for i in range(len(generators)):
         class_obj = dynamic_imp(generators[i], classes[i])
         if int(class_obj.interval) < 1:
             execute_script(execute_inf_script, class_obj)
         else:
-            schedule.every(int(class_obj.interval)).seconds.do(execute_script, class_obj.monitor_events, None)
+            schedule.every(int(class_obj.interval)).seconds.do(
+                execute_script, class_obj.monitor_events, None
+            )
 
     # this section governs local vs database mode - default is local
-    if config.getboolean('General', 'RunDatabaseOperations', fallback=False):
+    if config.getboolean("General", "RunDatabaseOperations", fallback=False):
         test_connection()
-        class_obj = dynamic_imp('dboperations', 'DatabaseOperations')
-        schedule.every(class_obj.db_interval).seconds.do(execute_script, class_obj.monitor_directory, None)
-        schedule.every(class_obj.cleanup_interval).minutes.do(execute_script, class_obj.directory_cleanup, None)
+        class_obj = dynamic_imp("dboperations", "DatabaseOperations")
+        schedule.every(class_obj.db_interval).seconds.do(
+            execute_script, class_obj.monitor_directory, None
+        )
+        schedule.every(class_obj.cleanup_interval).minutes.do(
+            execute_script, class_obj.directory_cleanup, None
+        )
 
-    if config.getboolean('General', 'RunAugmentOperations', fallback=False):
+    if config.getboolean("General", "RunAugmentOperations", fallback=False):
         for script, name in augment_profiles.items():
             class_obj = dynamic_imp(script, name)
-            schedule.every(int(class_obj.interval)).seconds.do(execute_script, class_obj.augment_events, None)
+            schedule.every(int(class_obj.interval)).seconds.do(
+                execute_script, class_obj.augment_events, None
+            )
 
     time.sleep(1)
     try:
@@ -102,5 +146,6 @@ def run() -> None:
     except KeyboardInterrupt:
         stop_event.set()
         schedule.clear()
+
 
 run()

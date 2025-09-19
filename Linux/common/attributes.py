@@ -2,7 +2,6 @@ import socket
 import requests
 import psutil
 #import win32security
-import os
 import configparser
 import pathlib
 import subprocess

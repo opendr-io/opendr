@@ -1,5 +1,4 @@
 import socket
-import socket
 import concurrent.futures
 from ipwhois import IPWhois
 from ipwhois.exceptions import IPDefinedError

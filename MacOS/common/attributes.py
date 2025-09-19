@@ -2,7 +2,6 @@ import socket
 import requests
 import psutil
 import subprocess
-import os
 import configparser
 import pathlib
 
