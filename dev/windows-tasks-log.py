@@ -19,6 +19,10 @@ class WindowsTasksLogger(attr.LoggerParent):
         self.setup_logger()
         self.log_existing()
         print("WindowsTasksLogger Initialization complete")
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: tasks | platform: windows | event: start "
+        )
 
     def setup_logger(self) -> None:
         log_directory: str = (
@@ -34,6 +38,13 @@ class WindowsTasksLogger(attr.LoggerParent):
         self.logger: LoggingModule = LoggingModule(
             log_directory, ready_directory, "TaskMonitor", "scheduled_task"
         )
+
+    def stop_logger(self) -> None:
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: tasks | platform: windows | event: stop "
+        )
+        self.logger.clear_handlers()
 
     def fetch_scheduled_tasks(self) -> list[dict]:
         # Run schtasks with verbose CSV output

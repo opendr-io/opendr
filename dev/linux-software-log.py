@@ -17,6 +17,10 @@ class LinuxSoftwareLogger(attr.LoggerParent):
         self.setup_logger()
         self.log_existing()
         print("LinuxSoftwareLogger Initialization complete")
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: software | platform: linux | event: start "
+        )
 
     def setup_logger(self) -> None:
         log_directory: str = (
@@ -32,6 +36,13 @@ class LinuxSoftwareLogger(attr.LoggerParent):
         self.logger: LoggingModule = LoggingModule(
             log_directory, ready_directory, "SoftwareMonitor", "installed_software"
         )
+
+    def stop_logger(self) -> None:
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: software | platform: linux | event: stop "
+        )
+        self.logger.clear_handlers()
 
     @staticmethod
     def get_rpm_packages() -> list[dict]:

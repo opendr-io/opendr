@@ -22,6 +22,10 @@ class WindowsUsbLogger(attr.LoggerParent):
         self.setup_logger()
         self.log_existing()
         print("WindowsUsbLogger Initialization complete")
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: usb | platform: windows | event: start "
+        )
 
     def setup_logger(self) -> None:
         log_directory: str = (
@@ -37,6 +41,13 @@ class WindowsUsbLogger(attr.LoggerParent):
         self.logger: LoggingModule = LoggingModule(
             log_directory, ready_directory, "USBMonitor", "usb"
         )
+
+    def stop_logger(self) -> None:
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: usb | platform: windows | event: stop "
+        )
+        self.logger.clear_handlers()
 
     class USBFileLogger(FileSystemEventHandler, attr.LoggerParent):
         def __init__(self, logger):

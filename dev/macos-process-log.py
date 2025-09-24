@@ -16,6 +16,10 @@ class MacOSProcessLogger(attr.LoggerParent):
         self.setup_logger()
         self.log_existing()
         print("MacOSProcessLogger Initialization complete")
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: process | platform: macos | event: start "
+        )
 
     def setup_logger(self) -> None:
         log_directory: str = (
@@ -31,6 +35,13 @@ class MacOSProcessLogger(attr.LoggerParent):
         self.logger: LoggingModule = LoggingModule(
             log_directory, ready_directory, "ProcessMonitor", "process"
         )
+
+    def stop_logger(self) -> None:
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: process | platform: macos | event: stop "
+        )
+        self.logger.clear_handlers()
 
     def log_existing(self) -> None:
         """Logs all currently running processes at script startup."""

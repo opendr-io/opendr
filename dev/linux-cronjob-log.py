@@ -21,6 +21,10 @@ class LinuxCronjobLogger(attr.LoggerParent):
         self.setup_logger()
         self.log_existing()
         print("LinuxCronjobLogger Initialization complete")
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: cronjob | platform: linux | event: start "
+        )
 
     def setup_logger(self) -> None:
         log_directory: str = (
@@ -36,6 +40,13 @@ class LinuxCronjobLogger(attr.LoggerParent):
         self.logger: LoggingModule = LoggingModule(
             log_directory, ready_directory, "CronJobMonitor", "cronjob"
         )
+
+    def stop_logger(self) -> None:
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: cronjob | platform: linux | event: stop "
+        )
+        self.logger.clear_handlers()
 
     @staticmethod
     def get_crontab_jobs(filepath: str) -> list:

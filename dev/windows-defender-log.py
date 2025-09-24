@@ -18,6 +18,10 @@ class WindowsDefenderLogger(attr.LoggerParent):
         self.setup_logger()
         self.log_existing()
         print("WindowsDefenderLogger Initialization complete")
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: defender | platform: windows | event: start "
+        )
 
     def setup_logger(self) -> None:
         log_directory: str = (
@@ -33,6 +37,13 @@ class WindowsDefenderLogger(attr.LoggerParent):
         self.logger: LoggingModule = LoggingModule(
             log_directory, ready_directory, "DefenderMonitor", "defender"
         )
+
+    def stop_logger(self) -> None:
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: defender | platform: windows | event: stop "
+        )
+        self.logger.clear_handlers()
 
     def fetch_defender_events(self) -> list[dict]:
         # PowerShell command to fetch Event ID 1116

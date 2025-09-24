@@ -196,6 +196,9 @@ class LoggerParent:
     def setup_logger(self) -> None:
         print("setup_logger not created")
 
+    def stop_logger(self) -> None:
+        print("stop_logger not created")
+
     def log_existing(self) -> None:
         print("log_existing not created")
 

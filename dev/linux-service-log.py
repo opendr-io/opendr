@@ -15,6 +15,10 @@ class LinuxServiceLogger(attr.LoggerParent):
         self.setup_logger()
         self.log_existing()
         print("LinuxServiceLogger Initialization complete")
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: service | platform: linux | event: start "
+        )
 
     def setup_logger(self) -> None:
         log_directory: str = (
@@ -30,6 +34,13 @@ class LinuxServiceLogger(attr.LoggerParent):
         self.logger: LoggingModule = LoggingModule(
             log_directory, ready_directory, "ServiceMonitor", "services"
         )
+
+    def stop_logger(self) -> None:
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: service | platform: linux | event: stop "
+        )
+        self.logger.clear_handlers()
 
     def log_existing(self) -> None:
         services: list[dict] = attr.get_all_service_statuses()

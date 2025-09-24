@@ -86,16 +86,28 @@ def test_connection() -> None:
 
 
 def execute_inf_script(class_obj) -> None:
-    while not stop_event.is_set():
-        t = threading.Thread(target=class_obj.monitor_events)
-        t.start()
-        t.join()
-        time.sleep(class_obj.interval)
+    try:
+        while not stop_event.is_set():
+            t = threading.Thread(target=class_obj.monitor_events)
+            t.start()
+            t.join()
+            time.sleep(class_obj.interval)
+    except Exception as e:
+        print(e)
+    finally:
+        print(f'stop logger event for class {type(class_obj).__name__}')
+        class_obj.stop_logger()
 
 
-def execute_script(func, i) -> None:
-    if i:
-        t = threading.Thread(target=func, args=(i,))
+def execute_script(func, class_obj, inf=False) -> None:
+    if stop_event.is_set():
+        if class_obj:
+            print(f'stop logger event for class {type(class_obj).__name__}')
+            class_obj.stop_logger()
+        return
+
+    if inf:
+        t = threading.Thread(target=func, args=(class_obj,))
     else:
         t = threading.Thread(target=func)
     t.start()
@@ -112,30 +124,30 @@ def run() -> None:
     classes = [os_mode + script.capitalize() + "Logger" for script in logging_scripts]
 
     for i in range(len(generators)):
-        class_obj = dynamic_imp(generators[i], classes[i])
-        if int(class_obj.interval) < 1:
-            execute_script(execute_inf_script, class_obj)
+        log_op = dynamic_imp(generators[i], classes[i])
+        if int(log_op.interval) < 1:
+            execute_script(execute_inf_script, log_op, True)
         else:
-            schedule.every(int(class_obj.interval)).seconds.do(
-                execute_script, class_obj.monitor_events, None
+            schedule.every(int(log_op.interval)).seconds.do(
+                execute_script, log_op.monitor_events, log_op
             )
 
     # this section governs local vs database mode - default is local
     if config.getboolean("General", "RunDatabaseOperations", fallback=False):
         test_connection()
-        class_obj = dynamic_imp("dboperations", "DatabaseOperations")
-        schedule.every(class_obj.db_interval).seconds.do(
-            execute_script, class_obj.monitor_directory, None
+        db_op = dynamic_imp("dboperations", "DatabaseOperations")
+        schedule.every(db_op.db_interval).seconds.do(
+            execute_script, db_op.monitor_directory, None
         )
-        schedule.every(class_obj.cleanup_interval).minutes.do(
-            execute_script, class_obj.directory_cleanup, None
+        schedule.every(db_op.cleanup_interval).minutes.do(
+            execute_script, db_op.directory_cleanup, None
         )
 
     if config.getboolean("General", "RunAugmentOperations", fallback=False):
         for script, name in augment_profiles.items():
-            class_obj = dynamic_imp(script, name)
-            schedule.every(int(class_obj.interval)).seconds.do(
-                execute_script, class_obj.augment_events, None
+            aug_op = dynamic_imp(script, name)
+            schedule.every(int(aug_op.interval)).seconds.do(
+                execute_script, aug_op.augment_events, None
             )
 
     time.sleep(1)
@@ -145,7 +157,10 @@ def run() -> None:
             time.sleep(1)
     except KeyboardInterrupt:
         stop_event.set()
+        schedule.run_all()
         schedule.clear()
-
+        if config.getboolean("General", "RunDatabaseOperations", fallback=False):
+            time.sleep(2)
+            db_op.monitor_directory()
 
 run()
