@@ -119,6 +119,7 @@ def run() -> None:
     logging_scripts = log_profiles[
         config.get("General", "LogProfile", fallback="basic")
     ]
+    logging_scripts.extend(['system'])
     # generators = [os_mode + '.' + file_path + script + '-log' for script in logging_scripts]
     generators = [file_path + script + "-log" for script in logging_scripts]
     classes = [os_mode + script.capitalize() + "Logger" for script in logging_scripts]
@@ -160,7 +161,7 @@ def run() -> None:
         schedule.run_all()
         schedule.clear()
         if config.getboolean("General", "RunDatabaseOperations", fallback=False):
-            time.sleep(2)
+            time.sleep(1)
             db_op.monitor_directory()
 
 run()

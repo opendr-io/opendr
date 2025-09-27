@@ -59,7 +59,7 @@ class MacOSUserLogger(attr.LoggerParent):
                 f"timestamp: {login_time} | "
                 f"hostname: {self.hostname} | "
                 f"category: user_existing | username: {user.name} | "
-                f"sourceip: {user.host or 'n/a'} | "
+                f"sourceip: {user.host or 'n/a'} | last_login: {datetime.fromtimestamp(user.started).strftime('%Y-%m-%d %H:%M:%S')} | "
                 f"uuid: {self.sid}"
             )
             self.seen_users.add(user_entry)
@@ -84,7 +84,7 @@ class MacOSUserLogger(attr.LoggerParent):
                 f"timestamp: {login_time} | "
                 f"hostname: {self.hostname} | "
                 f"category: new_user_detected | username: {user.name} | "
-                f"sourceip: {user.host or 'n/a'} | "
+                f"sourceip: {user.host or 'n/a'} | last_login: {datetime.fromtimestamp(user.started).strftime('%Y-%m-%d %H:%M:%S')} | "
                 f"uuid: {self.sid}"
             )
             self.seen_users.add(user_entry)
