@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 import psycopg
 import configparser
-import pathlib
+from pathlib import Path
 import time
 import common.attributes as attr
 
 config = configparser.ConfigParser()
-config.read(pathlib.Path(__file__).parent.absolute() / "../dbconfig.ini")
+config.read(Path(__file__).parent.absolute() / "../dbconfig.ini")
 
 
 class NetworkAug:

@@ -47,7 +47,7 @@ class WindowsServiceLogger(attr.LoggerParent):
         for service in psutil.win_service_iter():
             try:
                 info = service.as_dict()
-                if str((info["pid"], info["name"])) in self.previous_services:
+                if str((info["name"], info["binpath"])) in self.previous_services:
                     continue
                 service_info = (
                     f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
@@ -57,7 +57,7 @@ class WindowsServiceLogger(attr.LoggerParent):
                     f"executable: {info['binpath']} | sid: {self.sid}"
                 )
                 self.logger.write_log(service_info)
-                self.previous_services.add(str((info["pid"], info["name"])))
+                self.previous_services.add(str((info["name"], info["binpath"])))
             except Exception as e:
                 print(e)
 
@@ -68,7 +68,7 @@ class WindowsServiceLogger(attr.LoggerParent):
         for service in psutil.win_service_iter():
             try:
                 info = service.as_dict()
-                if str((info["pid"], info["name"])) in self.previous_services:
+                if str((info["name"], info["binpath"])) in self.previous_services:
                     continue
                 service_info = (
                     f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
@@ -78,7 +78,7 @@ class WindowsServiceLogger(attr.LoggerParent):
                     f"executable: {info['binpath']} | sid: {self.sid}"
                 )
                 self.logger.write_log(service_info)
-                self.previous_services.add(str((info["pid"], info["name"])))
+                self.previous_services.add(str((info["name"], info["binpath"])))
             except Exception as e:
                 print(e)
 
