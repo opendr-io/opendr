@@ -8,7 +8,6 @@ import subprocess
 import psycopg
 from sigma.collection import SigmaCollection
 from sigma.rule import SigmaDetection, SigmaDetectionItem, SigmaRuleBase
-# from sigma.types import SigmaString, SigmaNumber, SigmaCIDRExpression, SigmaNull, SigmaRegularExpression
 from sigma.backends.sqlite import sqlite
 from sigma.processing.resolver import ProcessingPipelineResolver
 
@@ -97,11 +96,14 @@ def translate_sigma_to_sql(sigma_rule: SigmaRuleBase, type: str, initial_query: 
         elif field not in options:
             return ''
         res_query = res_query.replace(item.field, field)
+    
+    ind = res_query.index('WHERE')
+    res_query = res_query[:ind+5] + f" timestamp >= '{search_interval}' AND timestamp < '{now}' AND" + res_query[ind+5:]
     return res_query
 
 def send_notification(title, message) -> None:
     if os_mode == 'Windows':
-        toaster.show_toast(title, message, duration=15)  # toast for 15 seconds
+        toaster.show_toast(title, message, duration=15, threaded=True)  # toast for 15 seconds
 
 def run() -> None:
     clone_or_update_repo()
