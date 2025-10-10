@@ -7,7 +7,7 @@
         "ALTER TABLE systemevents ADD exe text;",
         "ALTER TABLE systemevents ADD cmdline text;"
         ],
-    "August-25": [
+    "Aug-25": [
         "ALTER TABLE systemevents RENAME COLUMN timestmp TO timestamp;",
         "ALTER TABLE systemevents RENAME COLUMN event TO category;",
         "ALTER TABLE systemevents RENAME COLUMN pid TO processid;",
@@ -29,5 +29,15 @@
         "ALTER TABLE applications ADD vendor text;",
         "ALTER TABLE applications ADD version text;",
         "CREATE TABLE IF NOT EXISTS systemlog (id serial PRIMARY KEY, timestamp text, event text, hostname text, source text, platform text, message text, value text)"
-        ]
+        ],
+    "Sept-25": [
+        "ALTER TABLE applications ALTER COLUMN timestamp TYPE timestamptz;",
+        "ALTER TABLE endpointinfo ALTER COLUMN timestamp TYPE timestamptz;",
+        "ALTER TABLE systemevents ALTER COLUMN timestamp TYPE timestamptz;",
+        "ALTER TABLE systemalerts ALTER COLUMN timestamp TYPE timestamptz;",
+        "ALTER TABLE systemlog ALTER COLUMN timestamp TYPE timestamptz;",
+        "ALTER TABLE systemevents ALTER COLUMN parentprocessid TYPE integer;",
+        "ALTER TABLE systemevents ALTER COLUMN sourceport TYPE integer;",
+        "ALTER TABLE systemevents ALTER COLUMN destinationport TYPE integer;"
+    ]
 }

@@ -33,9 +33,8 @@ class StoreData:
             continue
           data = self.find_pattern(line)
           final_params = [data.get('timestamp'),  data.get('category'), data.get('processid'), data.get('process'), 
-                          data.get('hostname'), data.get('parentprocessid'), data.get('parentimage'), data.get('username')]
-          final_params[9:9] = [''] * 8
-          final_params.extend([ data.get('image'),  data.get('commandline'), data.get('sid') or data.get('uuid')])
+                          data.get('hostname'), data.get('parentprocessid') if data.get('parentprocessid') != 'N/A' else None, data.get('parentimage'), data.get('username'),
+                          '', '', '', None, '', None, '', '', data.get('image'),  data.get('commandline'), data.get('sid') or data.get('uuid')]
           fillers = ("%s," * 19)[:-1]
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
           connection.execute(sqlInsertStatement, final_params)
@@ -50,8 +49,9 @@ class StoreData:
           if(not line):
             continue
           data = self.find_pattern(line)
-          final_params = [data.get('timestamp'),  data.get('category'), data.get('processid'), data.get('process'), data.get('hostname'), '', '', data.get('username'), '', '',
-          data.get('sourceip'), data.get('sourceport'), data.get('destinationip'), data.get('destinationport'), '', data.get('status'), '', '', data.get('sid') or data.get('uuid')]
+          final_params = [data.get('timestamp'),  data.get('category'), data.get('processid'), data.get('process'), data.get('hostname'), None, '', data.get('username'), 
+                          '', '', data.get('sourceip'), data.get('sourceport') if data.get('sourceport') != 'N/A' else None, data.get('destinationip'), 
+                          data.get('destinationport') if data.get('destinationport') != 'N/A' else None, '', data.get('status'), '', '', data.get('sid') or data.get('uuid')]
           fillers = ("%s," * 19)[:-1]
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
           connection.execute(sqlInsertStatement, final_params)
@@ -90,7 +90,7 @@ class StoreData:
           connection.commit()
 
   def store_endpoint_info(self, filename: str) -> None:
-    table: str = 'endpointinfo(timestmp, event, hostname, ec2instanceid, privateips, publicip, username, onterminal, fromhostname, logintime, sid)'
+    table: str = 'endpointinfo(timestamp, event, hostname, ec2instanceid, privateips, publicip, username, onterminal, fromhostname, logintime, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
         lines: list[str] = file.readlines()
@@ -113,8 +113,8 @@ class StoreData:
           if(not line):
             continue
           data = self.find_pattern(line)
-          final_params = [data.get('timestamp'), data.get('category'), 0, '', data.get('hostname'), '', '',
-                          data.get('username'), '', '', data.get('sourceip'), '', '', '', '', '', '', '', data.get('sid') or data.get('uuid')]
+          final_params = [data.get('timestamp'), data.get('category'), None, '', data.get('hostname'), None, '',
+                          data.get('username'), '', '', data.get('sourceip'), None, '', None, '', '', '', '', data.get('sid') or data.get('uuid')]
           fillers = ("%s," * 19)[:-1]
           sqlInsertStatement = 'INSERT INTO ' + table + ' VALUES('+fillers+')'
           connection.execute(sqlInsertStatement, final_params)
@@ -137,7 +137,7 @@ class StoreData:
           connection.commit()
 
   def store_defender_info(self, filename: str) -> None:
-    table = 'systemalerts(timestmp, event, username, title, severity, category, executable, filepath, eventid, threatid, origin, type, source, description, reference, sid)'
+    table = 'systemalerts(timestamp, event, username, title, severity, category, executable, filepath, eventid, threatid, origin, type, source, description, reference, sid)'
     with psycopg.connect(host=self.host, port=self.port, dbname=self.db, user=self.user, password=self.password, sslmode=self.sslmode, sslrootcert=self.sslrootcert) as connection:
       with open(filename, 'r') as file:
         lines = file.readlines()

@@ -21,9 +21,9 @@ def setup_postgres_tables() -> None:
                       user=config.get('Database', 'RootDatabaseUserName', fallback='postgres'), password=config.get('Database', 'RootDatabasePassword')) as connection:
     with connection.cursor() as cursor:
       cursor.execute("""
-        CREATE TABLE applications (
+        CREATE TABLE IF NOT EXISTS applications (
           id serial PRIMARY KEY, 
-          timestamp text, 
+          timestamp timestamptz, 
           hostname text, 
           event text, 
           ec2_instance_id text, 
@@ -40,9 +40,9 @@ def setup_postgres_tables() -> None:
           guid text
         )""")
       cursor.execute("""
-          CREATE TABLE endpointinfo (
+          CREATE TABLE IF NOT EXISTS endpointinfo (
             id serial PRIMARY KEY, 
-            timestmp text, 
+            timestamp timestamptz, 
             hostname text,  
             ec2instanceid text, 
             privateips text, 
@@ -55,22 +55,22 @@ def setup_postgres_tables() -> None:
             sid text
           )""")
       cursor.execute("""
-          CREATE TABLE systemevents (
+          CREATE TABLE IF NOT EXISTS systemevents (
             id serial PRIMARY KEY, 
-            timestamp text, 
+            timestamp timestamptz, 
             category text, 
             processid integer, 
             process text, 
             hostname text, 
-            parentprocessid text,
+            parentprocessid integer,
             parentimage text, 
             username text, 
             dnsname text, 
             dnsdate text, 
             sourceip text, 
-            sourceport text, 
+            sourceport integer, 
             destinationip text, 
-            destinationport text, 
+            destinationport integer, 
             asname text, 
             status text, 
             image text, 
@@ -78,9 +78,9 @@ def setup_postgres_tables() -> None:
             sid text
           )""")
       cursor.execute("""
-          CREATE TABLE systemalerts (
+          CREATE TABLE IF NOT EXISTS systemalerts (
             id serial PRIMARY KEY, 
-            timestmp text, 
+            timestamp timestamptz, 
             event text, 
             username text, 
             title text, 
@@ -100,7 +100,7 @@ def setup_postgres_tables() -> None:
       cursor.execute("""
           CREATE TABLE IF NOT EXISTS systemlog (
             id serial PRIMARY KEY, 
-            timestamp text, 
+            timestamp timestamptz, 
             event text, 
             hostname text, 
             source text, 
