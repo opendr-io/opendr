@@ -106,6 +106,7 @@ def send_notification(title, message) -> None:
         toaster.show_toast(title, message, duration=15, threaded=True)  # toast for 15 seconds
 
 def run() -> None:
+    subprocess.run(['sigma', 'plugin', 'install', 'sqlite'])
     clone_or_update_repo()
     rule_collection = create_sigma_collection_from_repo()
     piperesolver = ProcessingPipelineResolver()
