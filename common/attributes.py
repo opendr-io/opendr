@@ -2,8 +2,9 @@ import socket
 import requests
 import subprocess
 import psutil
-import win32security
 import os
+if os.name == 'nt':
+    import win32security
 import configparser
 import pathlib
 import concurrent.futures
@@ -11,7 +12,7 @@ from ipwhois import IPWhois
 from ipwhois.exceptions import IPDefinedError
 
 config = configparser.ConfigParser()
-config.read(pathlib.Path(__file__).parent.absolute() / "../../agentconfig.ini")
+config.read(pathlib.Path(__file__).parent.absolute() / "../agentconfig.ini")
 
 
 def get_hostname() -> str:

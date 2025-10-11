@@ -6,111 +6,141 @@ import logging
 import ipaddress
 import common.attributes as attr
 from common.logger import LoggingModule
-from typing import NoReturn
 
-# Retrieve system details once
-sid: str = attr.get_computer_sid()
-hostname: str = attr.get_hostname()
 
-def log_connection(logger: LoggingModule, event: str, conn) -> None:
-    """Logs a network connection event (created/terminated/existing)."""
-    process_name: str = attr.get_process_name(conn.pid)
+class WindowsNetworkLogger(attr.LoggerParent):
+    def __init__(self):
+        super().__init__()
+        self.interval: float = attr.get_config_value(
+            "Windows", "NetworkInterval", 0.1, "float"
+        )
+        self.previous_connections: dict = {}
+        self.setup_logger()
+        self.log_existing()
+        print("WindowsNetworkLogger Initialization complete")
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: network | platform: windows | event: start "
+        )
 
-    # Get remote address
-    remote_ip = conn.raddr[0] if conn.raddr else "N/A"
-    remote_port = conn.raddr[1] if conn.raddr else "N/A"
+    def setup_logger(self) -> None:
+        log_directory: str = (
+            "tmp-network"
+            if attr.get_config_value("General", "RunDatabaseOperations", False, "bool")
+            else "tmp"
+        )
+        ready_directory: str = "ready"
+        debug_generator_directory: str = "debuggeneratorlogs"
+        os.makedirs(debug_generator_directory, exist_ok=True)
+        os.makedirs(log_directory, exist_ok=True)
+        os.makedirs(ready_directory, exist_ok=True)
+        self.logger: LoggingModule = LoggingModule(
+            log_directory, ready_directory, "NetworkMonitor", "network"
+        )
 
-    # Get username if possible
-    username: str
-    try:
-        username = psutil.Process(conn.pid).username()
-    except (psutil.NoSuchProcess, psutil.AccessDenied):
-        username = "N/A"
+    def stop_logger(self) -> None:
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: network | platform: windows | event: stop "
+        )
+        self.logger.clear_handlers()
 
-    logger.write_log(
-        f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-        f"hostname: {hostname} |  username: {username}  | "
-        f"event: {event} | name: {process_name} | pid: {conn.pid} | "
-        f"sourceip: {conn.laddr[0]} | sourceport: {conn.laddr[1]} | "
-        f"destip: {remote_ip} | destport: {remote_port} | "
-        f"status: {conn.status} | sid: {sid}"
-    )
+    def log_connection(self, event: str, conn) -> None:
+        """Logs a network connection event (created/terminated/existing)."""
+        process_name: str = attr.get_process_name(conn.pid)
 
-def log_initial_connections(logger: LoggingModule) -> dict:
-  """Log all currently active connections before starting real-time monitoring."""
-  logger.check_logging_interval()
+        # Get remote address
+        remote_ip = conn.raddr[0] if conn.raddr else "N/A"
+        remote_port = conn.raddr[1] if conn.raddr else "N/A"
 
-  try:
-    connections = psutil.net_connections(kind='inet')
-  except Exception as e:
-    logging.error(f"Error retrieving existing network connections: {e}")
-    return {}
+        # Get username if possible
+        username: str
+        try:
+            username = psutil.Process(conn.pid).username()
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            username = "N/A"
 
-  initial_connections = {}
+        self.logger.write_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} |  username: {username}  | "
+            f"category: {event} | process: {process_name} | processid: {conn.pid} | "
+            f"sourceip: {conn.laddr[0]} | sourceport: {conn.laddr[1]} | "
+            f"destinationip: {remote_ip} | destinationport: {remote_port} | "
+            f"status: {conn.status} | sid: {self.sid}"
+        )
 
-  for conn in connections:
-    if conn.laddr and conn.laddr[0] in ("127.0.0.1", "::1", "::", "0.0.0.0", "::127.0.0.1"):
-      continue
-    if conn.raddr and ipaddress.ip_address(conn.raddr[0]).is_private:
-      continue
+    def log_existing(self) -> None:
+        """Log all currently active connections before starting real-time monitoring."""
+        self.logger.check_logging_interval()
 
-    key = (conn.pid, conn.laddr, conn.raddr, conn.status)
-    initial_connections[key] = conn
-    
-    log_connection(logger, "existing connection", conn)
-  return initial_connections  # Return initial snapshot for comparison in monitoring
+        try:
+            connections = psutil.net_connections(kind="inet")
+        except Exception as e:
+            logging.error(f"Error retrieving existing network connections: {e}")
+            return {}
 
-def monitor_network_connections(logger: LoggingModule, interval: float) -> NoReturn:
-  """Continuously monitor new and terminated connections, rotating logs every minute."""
-  previous_connections = log_initial_connections(logger)  # Log all existing connections first
-  
-  while True:
-    logger.check_logging_interval()
+        for conn in connections:
+            if conn.laddr and conn.laddr[0] in (
+                "127.0.0.1",
+                "::1",
+                "::",
+                "0.0.0.0",
+                "::127.0.0.1",
+            ):
+                continue
+            if conn.raddr and ipaddress.ip_address(conn.raddr[0]).is_private:
+                continue
 
-    current_connections = {}
-    try:
-      connections = psutil.net_connections(kind='inet')
-    except Exception as e:
-      logging.error(f"Error retrieving network connections: {e}")
-      time.sleep(interval)
-      continue
+            key = (conn.pid, conn.laddr, conn.raddr, conn.status)
+            self.previous_connections[key] = conn
 
-    for conn in connections:
-      if conn.laddr and conn.laddr[0] in ("127.0.0.1", "::1", "::", "0.0.0.0"):
-        continue
-      if conn.raddr and ipaddress.ip_address(conn.raddr[0]).is_private:
-        continue
+            self.log_connection("network_existing", conn)
 
-      key = (conn.pid, conn.laddr, conn.raddr, conn.status)
-      current_connections[key] = conn
+    def monitor_events(self) -> None:
+        """Continuously monitor new and terminated connections, rotating logs every minute."""
+        self.logger.check_logging_interval()
 
-    created_keys = set(current_connections.keys()) - set(previous_connections.keys())
-    terminated_keys = set(previous_connections.keys()) - set(current_connections.keys())
+        current_connections = {}
+        try:
+            connections = psutil.net_connections(kind="inet")
+        except Exception as e:
+            logging.error(f"Error retrieving network connections: {e}")
+            return
 
-    for key in created_keys:
-      log_connection(logger, "connection created", current_connections[key])
+        for conn in connections:
+            if conn.laddr and conn.laddr[0] in ("127.0.0.1", "::1", "::", "0.0.0.0"):
+                continue
+            if conn.raddr and ipaddress.ip_address(conn.raddr[0]).is_private:
+                continue
 
-    for key in terminated_keys:
-      log_connection(logger, "connection terminated", previous_connections[key])
+            key = (conn.pid, conn.laddr, conn.raddr, conn.status)
+            current_connections[key] = conn
 
-    if int(time.time()) % 10 == 0:
-      logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-                      f"hostname: {hostname} | source: network | platform: windows | event: progress | "
-                      f"message: {logger.log_line_count} log lines written | value: {logger.log_line_count}")
+        created_keys = set(current_connections.keys()) - set(
+            self.previous_connections.keys()
+        )
+        terminated_keys = set(self.previous_connections.keys()) - set(
+            current_connections.keys()
+        )
 
-    previous_connections = current_connections.copy()
-    time.sleep(interval)
+        for key in created_keys:
+            self.log_connection("network_connection", current_connections[key])
 
-def run() -> NoReturn:
-  log_directory: str = 'tmp-network' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
-  ready_directory: str = 'ready'
-  debug_generator_directory: str = 'debuggeneratorlogs'
-  os.makedirs(log_directory, exist_ok=True)
-  os.makedirs(ready_directory, exist_ok=True)
-  os.makedirs(debug_generator_directory, exist_ok=True)
+        for key in terminated_keys:
+            self.log_connection("network_termination", self.previous_connections[key])
 
-  interval = attr.get_config_value('Windows', 'NetworkInterval', 0.1, 'float')
-  logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "NetworkMonitor", "network")
-  monitor_network_connections(logger, interval)
+        if int(time.time()) % 10 == 0:
+            self.logger.write_debug_log(
+                f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                f"hostname: {self.hostname} | source: network | platform: windows | event: progress | "
+                f"message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}"
+            )
 
-run()
+        self.previous_connections = current_connections.copy()
+
+
+if __name__ == "__main__":
+    network = WindowsNetworkLogger()
+    while True:
+        network.monitor_events()
+        time.sleep(network.interval)

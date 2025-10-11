@@ -2,63 +2,101 @@ import os
 import psutil
 import time
 from datetime import datetime
-from typing import NoReturn
 import common.attributes as attr
 from common.logger import LoggingModule
 
-hostname: str = attr.get_hostname()
-uuid = attr.get_system_uuid()
 
-def log_existing_users(logger: LoggingModule) -> set:
-    previous_users = set()
-    users = psutil.users()
-    for user in users:
-        login_time = datetime.fromtimestamp(user.started).strftime("%Y-%m-%d %H:%M:%S")
-        user_entry = (user.name, user.terminal or "N/A", user.host or "N/A", login_time)
-        logger.write_log(
-            f"timestamp: {login_time} | "
-            f"hostname: {hostname} | "
-            f"event: existing user | username: {user.name} | "
-            f"sourceip: {user.host or 'n/a'} | "
-            f"uuid: {uuid}"
+class MacOSUserLogger(attr.LoggerParent):
+    def __init__(self):
+        super().__init__()
+        self.interval: float = attr.get_config_value(
+            "MacOS", "UserInterval", 1.0, "float"
         )
-        previous_users.add(user_entry)
-    return previous_users
+        self.seen_users: set = set()
+        self.setup_logger()
+        self.log_existing()
+        print("MacOSUserLogger Initialization complete")
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: user | platform: macos | event: start "
+        )
 
-def monitor_logged_in_users(logger: LoggingModule, interval: float) -> NoReturn:
-    """Monitor and log new user logins only."""
-    seen_users: set = log_existing_users(logger)
-    
-    while True:
-        logger.check_logging_interval()
+    def setup_logger(self) -> None:
+        log_directory: str = (
+            "tmp-user-info"
+            if attr.get_config_value("General", "RunDatabaseOperations", False, "bool")
+            else "tmp"
+        )
+        ready_directory: str = "ready"
+        debug_generator_directory: str = "debuggeneratorlogs"
+        os.makedirs(debug_generator_directory, exist_ok=True)
+        os.makedirs(log_directory, exist_ok=True)
+        os.makedirs(ready_directory, exist_ok=True)
+        self.logger: LoggingModule = LoggingModule(
+            log_directory, ready_directory, "UserMonitor", "user"
+        )
+
+    def stop_logger(self) -> None:
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: user | platform: macos | event: stop "
+        )
+        self.logger.clear_handlers()
+
+    def log_existing(self) -> None:
         users = psutil.users()
         for user in users:
-            login_time = datetime.fromtimestamp(user.started).strftime("%Y-%m-%d %H:%M:%S")
-            user_entry = (user.name, user.terminal or "N/A", user.host or "N/A", login_time)
-            
-            if user_entry not in seen_users:
-                logger.write_log(
-                    f"timestamp: {login_time} | "
-                    f"hostname: {hostname} | "
-                    f"event: new user detected | username: {user.name} | "
-                    f"sourceip: {user.host or 'n/a'} | "
-                    f"uuid: {uuid}"
-                )
-                seen_users.add(user_entry)
-        logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                        f'hostname: {hostname} | source: user | platform: macos | event: progress | '
-                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
-        time.sleep(interval)
+            login_time = datetime.fromtimestamp(user.started).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
+            user_entry = (
+                user.name,
+                user.terminal or "N/A",
+                user.host or "N/A",
+                login_time,
+            )
+            self.logger.write_log(
+                f"timestamp: {login_time} | "
+                f"hostname: {self.hostname} | "
+                f"category: user_existing | username: {user.name} | "
+                f"sourceip: {user.host or 'n/a'} | last_login: {datetime.fromtimestamp(user.started).strftime('%Y-%m-%d %H:%M:%S')} | "
+                f"uuid: {self.sid}"
+            )
+            self.seen_users.add(user_entry)
 
-def run() -> NoReturn:
-    interval: float = attr.get_config_value('MacOS', 'UserInterval', 1.0, 'float')
-    log_directory: str = 'tmp-user-info' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
-    ready_directory: str = 'ready'
-    debug_generator_directory: str = 'debuggeneratorlogs'
-    os.makedirs(debug_generator_directory, exist_ok=True)
-    os.makedirs(log_directory, exist_ok=True)
-    os.makedirs(ready_directory, exist_ok=True)
-    logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "UserMonitor", "user")
-    monitor_logged_in_users(logger, interval)
+    def monitor_events(self) -> None:
+        """Monitor and log new user logins only."""
+        self.logger.check_logging_interval()
+        users = psutil.users()
+        for user in users:
+            login_time = datetime.fromtimestamp(user.started).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
+            user_entry = (
+                user.name,
+                user.terminal or "N/A",
+                user.host or "N/A",
+                login_time,
+            )
+            if user_entry in self.seen_users:
+                continue
+            self.logger.write_log(
+                f"timestamp: {login_time} | "
+                f"hostname: {self.hostname} | "
+                f"category: new_user_detected | username: {user.name} | "
+                f"sourceip: {user.host or 'n/a'} | last_login: {datetime.fromtimestamp(user.started).strftime('%Y-%m-%d %H:%M:%S')} | "
+                f"uuid: {self.sid}"
+            )
+            self.seen_users.add(user_entry)
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: user | platform: macos | event: progress | "
+            f"message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}"
+        )
 
-run()
+
+if __name__ == "__main__":
+    user = MacOSUserLogger()
+    while True:
+        user.monitor_events()
+        time.sleep(user.interval)

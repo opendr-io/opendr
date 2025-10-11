@@ -1,68 +1,167 @@
-import subprocess
-import concurrent.futures
 import psycopg
 import sys
 import configparser
 import pathlib
+from importlib import import_module
+import time
+import schedule
+import threading
 
 config = configparser.ConfigParser()
 config.read(pathlib.Path(__file__).parent.absolute() / "agentconfig.ini")
 config.read(pathlib.Path(__file__).parent.absolute() / "dbconfig.ini")
 
-os_mode: str = config.get('General', 'OperatingSystem', fallback='Windows')
+
+def dynamic_imp(name, class_name):
+    try:
+        imp_module = import_module(name)
+    except Exception as e:
+        print(e)
+        return None
+    try:
+        imp_class = getattr(imp_module, class_name)
+    except Exception as e:
+        print(e)
+        return None
+    return imp_class()
+
+
+os_mode: str = config.get("General", "OperatingSystem", fallback="Windows")
 os_log: dict[str, list[str]] = {
-  "Windows": ['process', 'network', 'software', 'user', 'endpoint', 'service', 'hotfix', 'driver',  'defender', 'autorun', 'tasks'],
-  "Linux": ['process', 'network', 'software', 'user', 'endpoint', 'service', 'cronjob', 'kernel', 'ssh'],
-  "MacOS": ['process', 'network', 'user', 'endpoint']
+    "Windows": [
+        "process",
+        "network",
+        "software",
+        "user",
+        "endpoint",
+        "service",
+        "hotfix",
+        "driver",
+        "defender",
+        "autorun",
+        "tasks",
+        "usb",
+    ],
+    "Linux": [
+        "process",
+        "network",
+        "software",
+        "user",
+        "endpoint",
+        "service",
+        "cronjob",
+        "kernel",
+        "ssh",
+    ],
+    "MacOS": ["process", "network", "user", "endpoint"],
 }
 log_profiles: dict[str, list[str]] = {
-  "basic": os_log[os_mode][:3],
-  "advanced": os_log[os_mode][:6],
-  "complete": os_log[os_mode],
-  "custom": config.get(os_mode, 'Scripts', fallback='').split(', ')
+    "basic": os_log[os_mode][:3],
+    "advanced": os_log[os_mode][:6],
+    "complete": os_log[os_mode],
+    "custom": config.get(os_mode, "Scripts", fallback="").split(", "),
 }
-augment_profiles: list[str] = ["network-aug", "alert-gen"]
+augment_profiles: dict = {"network-aug": "NetworkAug", "alert-gen": "AlertGen"}
+stop_event = threading.Event()
+
 
 def test_connection() -> None:
-  try:
-    with psycopg.connect(host=config.get('Database', 'HostName'), port=config.get('Database', 'PortNumber', fallback='4000'),
-                        dbname=config.get('Database', 'DatabaseName', fallback='opendr'),
-                        user=config.get('Database', 'RootDatabaseUserName', fallback='postgres'), password=config.get('Database', 'RootDatabasePassword'),
-                        sslmode=config.get('Database', 'SSLMode'), sslrootcert=config.get('Database', 'SSLRootCert')) as connection:
-        _ = connection.cursor()
-        connection.close()
-  except Exception as e:
-    print(e)
-    sys.exit(1)
+    try:
+        with psycopg.connect(
+            host=config.get("Database", "HostName"),
+            port=config.get("Database", "PortNumber", fallback="4000"),
+            dbname=config.get("Database", "DatabaseName", fallback="opendr"),
+            user=config.get("Database", "RootDatabaseUserName", fallback="postgres"),
+            password=config.get("Database", "RootDatabasePassword"),
+            sslmode=config.get("Database", "SSLMode"),
+            sslrootcert=config.get("Database", "SSLRootCert"),
+        ) as connection:
+            _ = connection.cursor()
+            connection.close()
+    except Exception as e:
+        print(e)
+        stop_event.set()
+        schedule.clear()
+        sys.exit(1)
 
-def execute_scripts(script):
-    print(script)
-    result = subprocess.run(['python', script], capture_output=True, text=True)
-    return script, result.stdout, result.stderr
+
+def execute_inf_script(class_obj) -> None:
+    try:
+        while not stop_event.is_set():
+            t = threading.Thread(target=class_obj.monitor_events)
+            t.start()
+            t.join()
+            time.sleep(class_obj.interval)
+    except Exception as e:
+        print(e)
+    finally:
+        print(f'stop logger event for class {type(class_obj).__name__}')
+        class_obj.stop_logger()
+
+
+def execute_script(func, class_obj, inf=False) -> None:
+    if stop_event.is_set():
+        if class_obj:
+            print(f'stop logger event for class {type(class_obj).__name__}')
+            class_obj.stop_logger()
+        return
+
+    if inf:
+        t = threading.Thread(target=func, args=(class_obj,))
+    else:
+        t = threading.Thread(target=func)
+    t.start()
+
 
 def run() -> None:
-  path_sep = '\\' if os_mode == 'Windows' else '/'
-  file_path = os_mode + path_sep + os_mode.lower() + '-'
-  logging_scripts = log_profiles[config.get('General', 'LogProfile', fallback='basic')]
-  generators = [file_path + script + '-log.py' for script in logging_scripts]
+    # path_sep = '\\' if os_mode == 'Windows' else '/'
+    file_path = os_mode.lower() + "-"
+    logging_scripts = log_profiles[
+        config.get("General", "LogProfile", fallback="basic")
+    ]
+    logging_scripts.extend(['system'])
+    generators = [os_mode + '.' + file_path + script + '-log' for script in logging_scripts]
+    # generators = [file_path + script + "-log" for script in logging_scripts]
+    classes = [os_mode + script.capitalize() + "Logger" for script in logging_scripts]
 
-  # this section governs local vs database mode - default is local
-  if config.getboolean('General', 'RunDatabaseOperations', fallback=False):
-    generators.append('Database' + path_sep + 'dboperations.py')
-    test_connection()
+    for i in range(len(generators)):
+        log_op = dynamic_imp(generators[i], classes[i])
+        if int(log_op.interval) < 1:
+            execute_script(execute_inf_script, log_op, True)
+        else:
+            schedule.every(int(log_op.interval)).seconds.do(
+                execute_script, log_op.monitor_events, log_op
+            )
 
-  if config.getboolean('General', 'RunAugmentOperations', fallback=False):
-    generators.extend(['Augment' + path_sep + aug + '.py' for aug in augment_profiles])
-    test_connection()
+    # this section governs local vs database mode - default is local
+    if config.getboolean("General", "RunDatabaseOperations", fallback=False):
+        test_connection()
+        db_op = dynamic_imp("Database.dboperations", "DatabaseOperations")
+        schedule.every(db_op.db_interval).seconds.do(
+            execute_script, db_op.monitor_directory, None
+        )
+        schedule.every(db_op.cleanup_interval).minutes.do(
+            execute_script, db_op.directory_cleanup, None
+        )
 
-  print('Starting Scripts')
-  with concurrent.futures.ThreadPoolExecutor(len(generators)) as executor:
-    results = executor.map(execute_scripts, generators)
-    for script, stdout, stderr in results:
-      print(f"Results from {script}:")
-      print(stdout)
-      if(stderr):
-        print(f"Errors from {script}:")
-        print(stderr)
+    if config.getboolean("General", "RunAugmentOperations", fallback=False):
+        for script, name in augment_profiles.items():
+            aug_op = dynamic_imp('Augment.' + script, name)
+            schedule.every(int(aug_op.interval)).seconds.do(
+                execute_script, aug_op.augment_events, None
+            )
+
+    time.sleep(1)
+    try:
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+    except KeyboardInterrupt:
+        stop_event.set()
+        schedule.run_all()
+        schedule.clear()
+        if config.getboolean("General", "RunDatabaseOperations", fallback=False):
+            time.sleep(1)
+            db_op.monitor_directory()
 
 run()

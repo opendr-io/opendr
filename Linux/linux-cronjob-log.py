@@ -6,70 +6,121 @@ from datetime import datetime
 import common.attributes as attr
 from common.logger import LoggingModule
 
-def get_crontab_jobs(filepath: str) -> list:
-    jobs: list = []
-    try:
-        with open(filepath, 'r', encoding='utf-8') as f:
-            for line in f:
-                line = line.strip()
-                if line and not line.startswith('#'):
-                    jobs.append(line)
-    except Exception as e:
-        jobs.append(f"ERROR reading {filepath}: {e}")
-    return jobs
+class LinuxCronjobLogger(attr.LoggerParent):
+    def __init__(self):
+        super().__init__()
+        self.interval: float = attr.get_config_value(
+            "Linux", "CronLogInterval", 60.0, "float"
+        )
+        self.previous_jobs: set = set()
+        self.cron_files: list[str] = ["/etc/crontab"] + [
+            os.path.join("/etc/cron.d", f)
+            for f in os.listdir("/etc/cron.d")
+            if os.path.isfile(os.path.join("/etc/cron.d", f))
+        ]
+        self.setup_logger()
+        self.log_existing()
+        print("LinuxCronjobLogger Initialization complete")
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: cronjob | platform: linux | event: start "
+        )
 
-def get_user_crontabs() -> list:
-    jobs: list = []
-    for user in pwd.getpwall():
-        username = user.pw_name
+    def setup_logger(self) -> None:
+        log_directory: str = (
+            "tmp-cron-job"
+            if attr.get_config_value("General", "RunDatabaseOperations", False, "bool")
+            else "tmp"
+        )
+        ready_directory: str = "ready"
+        debug_generator_directory: str = "debuggeneratorlogs"
+        os.makedirs(debug_generator_directory, exist_ok=True)
+        os.makedirs(log_directory, exist_ok=True)
+        os.makedirs(ready_directory, exist_ok=True)
+        self.logger: LoggingModule = LoggingModule(
+            log_directory, ready_directory, "CronJobMonitor", "cronjob"
+        )
+
+    def stop_logger(self) -> None:
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: cronjob | platform: linux | event: stop "
+        )
+        self.logger.clear_handlers()
+
+    @staticmethod
+    def get_crontab_jobs(filepath: str) -> list:
+        jobs: list = []
         try:
-            result = subprocess.run(['crontab', '-l', '-u', username], capture_output=True, text=True)
-            if result.returncode == 0:
-                for line in result.stdout.strip().splitlines():
+            with open(filepath, "r", encoding="utf-8") as f:
+                for line in f:
                     line = line.strip()
-                    if line and not line.startswith('#'):
-                        jobs.append(f"user: {username} | job: {line}")
-        except Exception:
-            continue
-    return jobs
+                    if line and not line.startswith("#"):
+                        jobs.append(line)
+        except Exception as e:
+            jobs.append(f"ERROR reading {filepath}: {e}")
+        return jobs
 
-def log_cron_jobs(log_directory: str, ready_directory: str) -> None:
-    logger = LoggingModule(log_directory, ready_directory, "CronJobMonitor", "cronjob")
-    hostname: str = attr.get_hostname()
-    timestamp: str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    @staticmethod
+    def get_user_crontabs() -> list:
+        jobs: list = []
+        for user in pwd.getpwall():
+            username = user.pw_name
+            try:
+                result = subprocess.run(
+                    ["crontab", "-l", "-u", username], capture_output=True, text=True
+                )
+                if result.returncode == 0:
+                    for line in result.stdout.strip().splitlines():
+                        line = line.strip()
+                        if line and not line.startswith("#"):
+                            jobs.append(f"user: {username} | job: {line}")
+            except Exception:
+                continue
+        return jobs
 
-    cron_files: list[str] = ['/etc/crontab'] + [
-        os.path.join('/etc/cron.d', f)
-        for f in os.listdir('/etc/cron.d')
-        if os.path.isfile(os.path.join('/etc/cron.d', f))
-    ]
+    def log_existing(self) -> None:
+        timestamp: str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        for path in self.cron_files:
+            for job in self.get_crontab_jobs(path):
+                if (path, job) in self.previous_jobs:
+                    continue
+                entry: str = f"timestamp: {timestamp} | hostname: {self.hostname} | event: existing cronjob | file: {path} | job: {job}"
+                self.logger.write_log(entry)
+                self.previous_jobs.add((path, job))
 
-    for path in cron_files:
-        for job in get_crontab_jobs(path):
-            entry: str = f"timestamp: {timestamp} | hostname: {hostname} | file: {path} | job: {job}"
-            logger.write_log(entry)
+        for job in self.get_user_crontabs():
+            if ("user_crontab", job) in self.previous_jobs:
+                continue
+            entry: str = f"timestamp: {timestamp} | hostname: {self.hostname} | event: existing cronjob | source: user_crontab | {job}"
+            self.logger.write_log(entry)
+            self.previous_jobs.add(("user_crontab", job))
 
-    for job in get_user_crontabs():
-        entry: str = f"timestamp: {timestamp} | hostname: {hostname} | source: user_crontab | {job}"
-        logger.write_log(entry)
+    def monitor_events(self) -> None:
+        timestamp: str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        for path in self.cron_files:
+            for job in self.get_crontab_jobs(path):
+                if (path, job) in self.previous_jobs:
+                    continue
+                entry: str = f"timestamp: {timestamp} | hostname: {self.hostname} | event: new cronjob detected | file: {path} | job: {job}"
+                self.logger.write_log(entry)
+                self.previous_jobs.add((path, job))
 
-    logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                        f'hostname: {hostname} | source: cronjob | platform: linux | event: progress | '
-                        f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
-    logger.clear_handlers()
+        for job in self.get_user_crontabs():
+            if ("user_crontab", job) in self.previous_jobs:
+                continue
+            entry: str = f"timestamp: {timestamp} | hostname: {self.hostname} | event: new cronjob detected | source: user_crontab | {job}"
+            self.logger.write_log(entry)
+            self.previous_jobs.add(("user_crontab", job))
 
-def run():
-    interval: float = attr.get_config_value('Linux', 'CronLogInterval', 43200.0, 'float')
-    log_directory: str = 'tmp-cron-job' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
-    ready_directory: str = 'ready'
-    debug_generator_directory: str = 'debuggeneratorlogs'
-    os.makedirs(debug_generator_directory, exist_ok=True)
-    os.makedirs(log_directory, exist_ok=True)
-    os.makedirs(ready_directory, exist_ok=True)
-    print("cronlog running")
-    while True:
-        log_cron_jobs(log_directory, ready_directory)
-        time.sleep(interval)
+        self.logger.write_debug_log(
+            f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+            f"hostname: {self.hostname} | source: cronjob | platform: linux | event: progress | "
+            f"message: {self.logger.log_line_count} log lines written | value: {self.logger.log_line_count}"
+        )
 
 if __name__ == "__main__":
-    run()
+    cronjob = LinuxCronjobLogger()
+    while True:
+        cronjob.monitor_events()
+        time.sleep(cronjob.interval)

@@ -113,3 +113,22 @@ def get_config_value(section: str, key: str, default, type: str='str'):
             return config.getboolean(section, key, fallback=default)
         case _:
             return config.get(section, key, fallback=default)
+
+class LoggerParent:
+    def __init__(self):
+        self.sid = get_system_uuid() or ""
+        self.hostname: str = get_hostname()
+        self.ec2_instance_id: str = get_ec2_instance_id() or ""
+        self.logger = None
+
+    def setup_logger(self) -> None:
+        print("setup_logger not created")
+
+    def stop_logger(self) -> None:
+        print("stop_logger not created")
+
+    def log_existing(self) -> None:
+        print("log_existing not created")
+
+    def monitor_events(self) -> None:
+        print("monitor_events not created")
