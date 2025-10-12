@@ -104,9 +104,9 @@ def monitor_process_events(logger: LoggingModule, interval: float) -> NoReturn:
 
     # Print the current running total of log lines every 10 seconds
     if int(time.time()) % 10 == 0:
-      logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                            f'hostname: {hostname} | source: process | platform: windows | event: progress | '
-                            f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+      logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                            f"hostname: {hostname} | source: process | platform: windows | event: progress | "
+                            f"message: {logger.log_line_count} log lines written | value: {logger.log_line_count}")
 
     # Update the previous process set
     previous_processes = current_processes
