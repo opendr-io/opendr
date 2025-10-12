@@ -36,26 +36,49 @@ def get_installed_software() -> list[tuple]:
       continue
   return software_list
 
-def log_installed_software(logger: LoggingModule) -> None:
+def log_initial_software(logger: LoggingModule) -> set:
   """Logs installed software with system metadata."""
   logger.check_logging_interval()
+  previous_software = set()
   for name, version in get_installed_software():
       log_entry = (
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-        f"hostname: {hostname} | "
+        f"hostname: {hostname} | event: existing software | "
         f"program: {name} | version: {version} | "
         f"instanceid: {instance_id} | sid: {sid}"
       )
       logger.write_log(log_entry)
+      previous_software.add((name, version))
       if int(time.time()) % 10 == 0:
         logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
                         f'hostname: {hostname} | source: software | platform: windows | event: progress | '
                         f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+  return previous_software
 
-  logger.clear_handlers()
+def log_installed_software(logger: LoggingModule) -> NoReturn:
+  """Logs installed software with system metadata."""
+  interval: float = attr.get_config_value('Windows', 'SoftwareInterval', 43200.0, 'float')
+  seen_software: set = log_initial_software(logger)
+  while True:
+    logger.check_logging_interval()
+    for name, version in get_installed_software():
+        if (name, version) in seen_software:
+          continue
+        log_entry = (
+          f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+          f"hostname: {hostname} | event: new software | "
+          f"program: {name} | version: {version} | "
+          f"instanceid: {instance_id} | sid: {sid}"
+        )
+        logger.write_log(log_entry)
+        seen_software.add((name, version))
+        if int(time.time()) % 10 == 0:
+          logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
+                          f'hostname: {hostname} | source: software | platform: windows | event: progress | '
+                          f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+    time.sleep(interval)
 
 def run() -> NoReturn:
-  interval: float = attr.get_config_value('Windows', 'SoftwareInterval', 43200.0, 'float')
   log_directory: str = 'tmp-software-inventory' if attr.get_config_value('General', 'RunDatabaseOperations', False, 'bool') else 'tmp'
   ready_directory: str = 'ready'
   debug_generator_directory: str = 'debuggeneratorlogs'
@@ -63,8 +86,6 @@ def run() -> NoReturn:
   os.makedirs(log_directory, exist_ok=True)
   os.makedirs(ready_directory, exist_ok=True)
   logger: LoggingModule  = LoggingModule(log_directory, ready_directory, "SoftwareMonitor", "installed_software")
-  while True:
-    log_installed_software(logger)
-    time.sleep(interval)  # Twice a day by default, can be increased or decreased
+  log_installed_software(logger)
 
 run()

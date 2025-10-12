@@ -36,15 +36,16 @@ def monitor_logged_in_users(log_directory, ready_directory, interval):
             login_time = datetime.fromtimestamp(user.started).strftime("%Y-%m-%d %H:%M:%S")
             user_entry = (user.name, user.terminal or "N/A", user.host or "N/A", login_time)
             
-            if user_entry not in seen_users:
-                logger.write_log(
-                    f"timestamp: {login_time} | "
-                    f"hostname: {hostname} | "
-                    f"event: new user detected | username: {user.name} | "
-                    f"sourceip: {user.host or 'n/a'} | "
-                    f"sid: {sid}"
-                )
-                seen_users.add(user_entry)
+            if user_entry in seen_users:
+                continue
+            logger.write_log(
+                f"timestamp: {login_time} | "
+                f"hostname: {hostname} | "
+                f"event: new user detected | username: {user.name} | "
+                f"sourceip: {user.host or 'n/a'} | "
+                f"sid: {sid}"
+            )
+            seen_users.add(user_entry)
         logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
                         f'hostname: {hostname} | source: user | platform: windows | event: progress | '
                         f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
