@@ -12,7 +12,7 @@ config.read(pathlib.Path(__file__).parent.absolute() / "dbconfig.ini")
 os_mode: str = config.get('General', 'OperatingSystem', fallback='Windows')
 os_log: dict[str, list[str]] = {
   "Windows": ['process', 'network', 'software', 'user', 'endpoint', 'service', 'hotfix', 'driver',  'defender', 'autorun', 'tasks'],
-  "Linux": ['process', 'network', 'software', 'user', 'endpoint', 'service', 'cronjob', 'kernel'],
+  "Linux": ['process', 'network', 'software', 'user', 'endpoint', 'service', 'cronjob', 'kernel', 'ssh'],
   "MacOS": ['process', 'network', 'user', 'endpoint']
 }
 log_profiles: dict[str, list[str]] = {
@@ -44,6 +44,7 @@ def run() -> None:
   path_sep = '\\' if os_mode == 'Windows' else '/'
   file_path = os_mode + path_sep + os_mode.lower() + '-'
   logging_scripts = log_profiles[config.get('General', 'LogProfile', fallback='basic')]
+  logging_scripts.extend(['system'])
   generators = [file_path + script + '-log.py' for script in logging_scripts]
 
   # this section governs local vs database mode - default is local

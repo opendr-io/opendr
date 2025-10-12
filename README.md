@@ -1,4 +1,4 @@
-![logo](/img/opendr.png?raw=true "text")  
+![logo](/img/opendr.jpg?raw=true "text")  
 # OpenDR
 A FOSS Endpoint Detection and Response (EDR) alternative implemented in Python using psutil and some Windows modules. Quick start:
 

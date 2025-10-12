@@ -7,3 +7,4 @@ pywin32; platform_system == "Windows"
 psycopg[binary]
 requests
 schedule
+watchdog
