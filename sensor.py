@@ -44,6 +44,7 @@ def run() -> None:
   path_sep = '\\' if os_mode == 'Windows' else '/'
   file_path = os_mode + path_sep + os_mode.lower() + '-'
   logging_scripts = log_profiles[config.get('General', 'LogProfile', fallback='basic')]
+  logging_scripts.extend(['system'])
   generators = [file_path + script + '-log.py' for script in logging_scripts]
 
   # this section governs local vs database mode - default is local
