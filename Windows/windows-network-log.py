@@ -94,9 +94,9 @@ def monitor_network_connections(logger: LoggingModule, interval: float) -> NoRet
       log_connection(logger, "connection terminated", previous_connections[key])
 
     if int(time.time()) % 10 == 0:
-      logger.write_debug_log(f'timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | '
-                      f'hostname: {hostname} | source: network | platform: windows | event: progress | '
-                      f'message: {logger.log_line_count} log lines written | value: {logger.log_line_count}')
+      logger.write_debug_log(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
+                      f"hostname: {hostname} | source: network | platform: windows | event: progress | "
+                      f"message: {logger.log_line_count} log lines written | value: {logger.log_line_count}")
 
     previous_connections = current_connections.copy()
     time.sleep(interval)
