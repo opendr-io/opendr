@@ -134,12 +134,12 @@ def run() -> None:
             if not matches:
                 continue
 
-            print("\n" + "="*50)
-            print(f"{rule.title}\n{rule.description}")
-            print("Matching log entries:\n")
-            for match in matches:
-                print(match)
-            print("="*50)
+            with open("sigma_alerts.txt", "a", encoding="utf-8") as f:
+                f.write(f"{rule.title}\n{rule.description}\n")
+                f.write("Matching log entries:\n")
+                for match in matches:
+                    f.write(f"{match[1]} | pid: {match[3]} | hostname:{match[5]} | exe: {match[17]} | commandline: {match[18]}\n")
+                f.write("=" * 50 + "\n")
             alerts_generated += len(matches)
 
         if alerts_generated:
