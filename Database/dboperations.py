@@ -1,8 +1,15 @@
+import sys
 import os
 import shutil
 from pathlib import Path
 import configparser
 import pathlib
+if "nt" in os.name:
+    custom_path = os.getcwd() + '\\Database'
+else:
+    custom_path = os.getcwd() + '/Database'
+if custom_path not in sys.path:
+    sys.path.insert(0, custom_path)
 from storedata import StoreData
 
 config = configparser.ConfigParser()
