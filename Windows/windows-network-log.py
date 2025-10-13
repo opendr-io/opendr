@@ -36,7 +36,7 @@ def log_connection(logger: LoggingModule, event: str, conn) -> None:
         f"status: {conn.status} | sid: {sid}"
     )
 
-def log_initial_connections(logger: LoggingModule) -> set:
+def log_initial_connections(logger: LoggingModule) -> dict:
   """Log all currently active connections before starting real-time monitoring."""
   logger.check_logging_interval()
 
@@ -46,15 +46,17 @@ def log_initial_connections(logger: LoggingModule) -> set:
     logging.error(f"Error retrieving existing network connections: {e}")
     return {}
 
-  initial_connections = set()
+  initial_connections = {}
 
   for conn in connections:
     if conn.laddr and conn.laddr[0] in ("127.0.0.1", "::1", "::", "0.0.0.0", "::127.0.0.1"):
       continue
     if conn.raddr and ipaddress.ip_address(conn.raddr[0]).is_private:
       continue
-    
-    initial_connections.add((conn.pid, conn.laddr, conn.raddr, conn.status))
+
+    key = (conn.pid, conn.laddr, conn.raddr, conn.status)
+    initial_connections[key] = conn
+
     log_connection(logger, "network_existing", conn)
   return initial_connections  # Return initial snapshot for comparison in monitoring
 
@@ -65,7 +67,7 @@ def monitor_network_connections(logger: LoggingModule, interval: float) -> NoRet
   while True:
     logger.check_logging_interval()
 
-    current_connections = set()
+    current_connections = {}
     try:
       connections = psutil.net_connections(kind='inet')
     except Exception as e:
@@ -79,10 +81,11 @@ def monitor_network_connections(logger: LoggingModule, interval: float) -> NoRet
       if conn.raddr and ipaddress.ip_address(conn.raddr[0]).is_private:
         continue
 
-      current_connections.add((conn.pid, conn.laddr, conn.raddr, conn.status))
+      key = (conn.pid, conn.laddr, conn.raddr, conn.status)
+      current_connections[key] = conn
 
-    created_keys = current_connections - previous_connections
-    terminated_keys = previous_connections - current_connections
+    created_keys = set(current_connections.keys()) - set(previous_connections.keys())
+    terminated_keys = set(previous_connections.keys()) - set(current_connections.keys())
 
     for key in created_keys:
       log_connection(logger, "network_connection", current_connections[key])
