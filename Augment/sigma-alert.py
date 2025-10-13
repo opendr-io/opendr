@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from win10toast import ToastNotifier
 from pathlib import Path
 import configparser
 import os
@@ -8,6 +7,7 @@ import subprocess
 import psycopg
 from sigma.collection import SigmaCollection
 from sigma.rule import SigmaDetection, SigmaDetectionItem, SigmaRuleBase
+subprocess.run(['sigma', 'plugin', 'install', 'sqlite'])
 from sigma.backends.sqlite import sqlite
 from sigma.processing.resolver import ProcessingPipelineResolver
 
@@ -17,7 +17,6 @@ config.read(Path(__file__).parent.absolute() / "../dbconfig.ini")
 os_mode = config.get('General', 'OperatingSystem', fallback='Windows')
 interval = config.getfloat('Augment', 'AlertGenInterval', fallback=43200.0)
 
-toaster = ToastNotifier()
 now = datetime.now()
 search_interval = now - timedelta(seconds=interval)
 
@@ -101,12 +100,7 @@ def translate_sigma_to_sql(sigma_rule: SigmaRuleBase, type: str, initial_query: 
     res_query = res_query[:ind+5] + f" timestamp >= '{search_interval}' AND timestamp < '{now}' AND" + res_query[ind+5:]
     return res_query
 
-def send_notification(title, message) -> None:
-    if os_mode == 'Windows':
-        toaster.show_toast(title, message, duration=15, threaded=True)  # toast for 15 seconds
-
 def run() -> None:
-    subprocess.run(['sigma', 'plugin', 'install', 'sqlite'])
     clone_or_update_repo()
     rule_collection = create_sigma_collection_from_repo()
     piperesolver = ProcessingPipelineResolver()
@@ -140,7 +134,6 @@ def run() -> None:
             if not matches:
                 continue
 
-            send_notification(rule.title, rule.description)
             print("\n" + "="*50)
             print(f"{rule.title}\n{rule.description}")
             print("Matching log entries:\n")
