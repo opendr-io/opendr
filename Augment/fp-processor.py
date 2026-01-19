@@ -1,4 +1,6 @@
 import hashlib
+import csv
+import ipaddress
 from pathlib import Path
 
 def parse_log_line(line: str) -> dict:
@@ -65,6 +67,106 @@ def load_process_fingerprints(fp_file: Path) -> list:
     print(f"Loaded {len(patterns)} process fingerprints from {fp_file.name}")
     return patterns
 
+def load_alert_rules(rules_file: Path) -> list:
+    """Load alert rules from CSV file."""
+    rules = []
+
+    with open(rules_file, 'r', encoding='utf-8', newline='') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            rules.append(row)
+
+    print(f"Loaded {len(rules)} alert rules from {rules_file.name}")
+    return rules
+
+def load_devtool_subnets(asn_file: Path) -> set:
+    """Load subnets from ASN list for devtool network filtering."""
+    subnets = set()
+
+    with open(asn_file, 'r', encoding='utf-8', newline='') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            subnet = row.get('subnet', '').strip()
+            if subnet and subnet != 'Error':
+                try:
+                    # Validate the subnet
+                    ipaddress.ip_network(subnet, strict=False)
+                    subnets.add(subnet)
+                except ValueError:
+                    pass  # Skip invalid subnets
+
+    print(f"Loaded {len(subnets)} subnets from {asn_file.name}")
+    return subnets
+
+def ip_in_subnets(ip_str: str, subnets: set) -> bool:
+    """Check if an IP address is in any of the given subnets."""
+    try:
+        ip = ipaddress.ip_address(ip_str)
+        for subnet_str in subnets:
+            try:
+                subnet = ipaddress.ip_network(subnet_str, strict=False)
+                if ip in subnet:
+                    return True
+            except ValueError:
+                continue
+        return False
+    except ValueError:
+        return False
+
+def is_network_false_positive(log_line: str, alert_rules: list, devtool_subnets: set) -> bool:
+    """Check if a network log line is a false positive (destination in known subnets).
+    Returns True if the alert should be filtered out (is a false positive).
+    """
+    fields = parse_log_line(log_line)
+    category = fields.get('category', '')
+
+    # Only process network events
+    if 'network' not in category.lower():
+        return False
+
+    # Check if this matches any DEVTOOL_NET alert rule
+    for rule in alert_rules:
+        if not rule['identifier'].endswith('_DEVTOOL_NET'):
+            continue
+
+        # Check if this log line matches the rule pattern
+        if matches_alert_pattern(fields, rule['pattern']):
+            # Check if destination IP is in known devtool subnets
+            dest_ip = fields.get('destinationip', '')
+            if dest_ip and ip_in_subnets(dest_ip, devtool_subnets):
+                # Filter out this alert (known devtool traffic)
+                return True
+            break  # Only match one rule per event
+
+    return False
+
+def matches_alert_pattern(log_fields: dict, pattern: str) -> bool:
+    """Check if log fields match an alert rule pattern."""
+    # Parse pattern like "category: network_connection | network_existing, process: python.exe"
+    pattern_parts = pattern.split(',')
+
+    for part in pattern_parts:
+        part = part.strip()
+        if ': ' not in part:
+            continue
+
+        key, value = part.split(': ', 1)
+        key = key.strip()
+        value = value.strip()
+
+        # Check for OR conditions (using |)
+        if '|' in value:
+            possible_values = [v.strip() for v in value.split('|')]
+            log_value = log_fields.get(key, '')
+            if not any(log_value == pv for pv in possible_values):
+                return False
+        else:
+            # Exact match required
+            if log_fields.get(key, '') != value:
+                return False
+
+    return True
+
 def matches_process_fingerprint(log_fields: dict, fingerprint: dict) -> bool:
     """Check if log fields match all fields in the fingerprint."""
     for key, expected_value in fingerprint.items():
@@ -77,7 +179,7 @@ def matches_process_fingerprint(log_fields: dict, fingerprint: dict) -> bool:
 
     return True
 
-def process_test_results(test_file: Path, driver_hashes: set, service_hashes: set, process_fingerprints: list, debug: bool = False) -> dict:
+def process_test_results(test_file: Path, driver_hashes: set, service_hashes: set, process_fingerprints: list, alert_rules: list, devtool_subnets: set, debug: bool = False) -> dict:
     """Process test results and count matches against fingerprints."""
     stats = {
         'total_lines': 0,
@@ -90,9 +192,12 @@ def process_test_results(test_file: Path, driver_hashes: set, service_hashes: se
         'process_events': 0,
         'process_matches': 0,
         'new_processes': 0,
+        'network_alerts': 0,
+        'network_filtered': 0,
         'driver_new_lines': [],
         'service_new_lines': [],
-        'process_new_lines': []
+        'process_new_lines': [],
+        'network_alert_lines': []
     }
 
     with open(test_file, 'r', encoding='utf-8') as f:
@@ -161,6 +266,31 @@ def process_test_results(test_file: Path, driver_hashes: set, service_hashes: se
                         'fields': fields
                     })
 
+            # Check network events against DEVTOOL_NET alert rules
+            category = fields.get('category', '')
+            if 'network' in category.lower():
+                for rule in alert_rules:
+                    # Only process DEVTOOL_NET rules
+                    if not rule['identifier'].endswith('_DEVTOOL_NET'):
+                        continue
+
+                    # Check if this log line matches the rule pattern
+                    if matches_alert_pattern(fields, rule['pattern']):
+                        # Check if destination IP is in known devtool subnets
+                        dest_ip = fields.get('destinationip', '')
+                        if dest_ip and ip_in_subnets(dest_ip, devtool_subnets):
+                            # Filter out this alert (known devtool traffic)
+                            stats['network_filtered'] += 1
+                        else:
+                            # This is a legitimate alert
+                            stats['network_alerts'] += 1
+                            stats['network_alert_lines'].append({
+                                'line': line.strip(),
+                                'fields': fields,
+                                'rule': rule
+                            })
+                        break  # Only match one rule per event
+
     return stats
 
 def main():
@@ -169,6 +299,8 @@ def main():
     driver_fp_file = base_dir / "fps" / "driver_hashes.txt"
     service_fp_file = base_dir / "fps" / "services_hashes.txt"
     process_fp_file = base_dir / "fps" / "process.txt"
+    alert_rules_file = base_dir / "alertrules.csv"
+    asn_list_file = base_dir / "fps" / "asn-list.csv"
 
     print("="*70)
     print("False Positive Processor")
@@ -177,17 +309,21 @@ def main():
     print(f"Driver fingerprints: {driver_fp_file}")
     print(f"Service fingerprints: {service_fp_file}")
     print(f"Process fingerprints: {process_fp_file}")
+    print(f"Alert rules: {alert_rules_file}")
+    print(f"ASN list: {asn_list_file}")
     print()
 
     # Load fingerprint hashes
     driver_hashes = load_fingerprint_hashes(driver_fp_file)
     service_hashes = load_fingerprint_hashes(service_fp_file)
     process_fingerprints = load_process_fingerprints(process_fp_file)
+    alert_rules = load_alert_rules(alert_rules_file)
+    devtool_subnets = load_devtool_subnets(asn_list_file)
     print()
 
     # Process test results
     print("Processing test results...")
-    stats = process_test_results(test_file, driver_hashes, service_hashes, process_fingerprints, debug=False)
+    stats = process_test_results(test_file, driver_hashes, service_hashes, process_fingerprints, alert_rules, devtool_subnets, debug=False)
     print()
 
     # Display results
@@ -210,6 +346,10 @@ def main():
     print(f"  Events found: {stats['process_events']}")
     print(f"  Matches with fingerprints: {stats['process_matches']}")
     print(f"  New/unknown processes: {stats['new_processes']}")
+    print()
+    print("NETWORK DEVTOOL ALERTS:")
+    print(f"  Alerts triggered: {stats['network_alerts']}")
+    print(f"  Alerts filtered (known subnets): {stats['network_filtered']}")
     print()
 
     # Show driver matches
@@ -244,6 +384,18 @@ def main():
         for item in stats['process_new_lines']:
             fields = item['fields']
             print(f"  - {fields.get('process', 'Unknown')} | Parent: {fields.get('parentimage', 'Unknown')} | Cmdline: {fields.get('commandline', 'N/A')[:80]}")
+
+    # Show network alerts
+    if stats['network_filtered'] > 0:
+        print(f"[+] {stats['network_filtered']} network alerts filtered (destination in known devtool subnets)")
+
+    if stats['network_alerts'] > 0:
+        print(f"[!] {stats['network_alerts']} network alerts triggered (destination NOT in known subnets)")
+        print("Network Alerts:")
+        for item in stats['network_alert_lines']:
+            fields = item['fields']
+            rule = item['rule']
+            print(f"  - {rule['title']}: {fields.get('process', 'Unknown')} -> {fields.get('destinationip', 'Unknown')}:{fields.get('destinationport', 'N/A')}")
 
     print()
     print("="*70)

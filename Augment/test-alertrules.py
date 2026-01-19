@@ -5,6 +5,22 @@ import hashlib
 import sys
 from datetime import datetime
 
+# Import network filtering from fp-processor
+try:
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("fp_processor", Path(__file__).parent / "fp-processor.py")
+    fp_processor = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(fp_processor)
+
+    load_devtool_subnets = fp_processor.load_devtool_subnets
+    load_alert_rules = fp_processor.load_alert_rules
+    is_network_false_positive = fp_processor.is_network_false_positive
+
+    FP_PROCESSOR_AVAILABLE = True
+except Exception as e:
+    FP_PROCESSOR_AVAILABLE = False
+    print(f"[!] Warning: Could not import fp-processor module. Network filtering will be disabled. Error: {e}")
+
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Test alert rules against log entries')
 parser.add_argument('--rule', type=str, help='Test only a specific rule by identifier')
@@ -31,7 +47,8 @@ log_directories = {
     'user': [tmp_dir, ready_dir],
     'service': [tmp_dir, ready_dir],
     'endpoint': [tmp_dir, ready_dir],
-    'driver': [tmp_dir, ready_dir]
+    'driver': [tmp_dir, ready_dir],
+    'autorun': [tmp_dir, ready_dir]
 }
 
 class DualOutput:
@@ -135,7 +152,8 @@ def matches_process_fingerprint(log_fields: dict, fingerprint: dict) -> bool:
 
     return True
 
-def is_false_positive(line: str, driver_hashes: set, service_hashes: set, process_fingerprints: list) -> bool:
+def is_false_positive(line: str, driver_hashes: set, service_hashes: set, process_fingerprints: list,
+                      alert_rules: list = None, devtool_subnets: set = None) -> bool:
     """Check if a log line is a false positive."""
     fields = parse_log_line(line)
 
@@ -155,6 +173,11 @@ def is_false_positive(line: str, driver_hashes: set, service_hashes: set, proces
             if matches_process_fingerprint(fields, fingerprint):
                 return True
         return False
+
+    # Check network events (if fp-processor is available)
+    elif 'network' in fields.get('category', '').lower():
+        if FP_PROCESSOR_AVAILABLE and alert_rules is not None and devtool_subnets is not None:
+            return is_network_false_positive(line, alert_rules, devtool_subnets)
 
     return False
 
@@ -281,6 +304,20 @@ def main():
         out.print(f"[FP Filter] Loaded {len(driver_hashes)} driver fingerprints")
         out.print(f"[FP Filter] Loaded {len(service_hashes)} service fingerprints")
         out.print(f"[FP Filter] Loaded {len(process_fingerprints)} process fingerprints")
+
+        # Load network filtering data
+        network_alert_rules = None
+        devtool_subnets = None
+        if FP_PROCESSOR_AVAILABLE:
+            alertrules_path = Path(__file__).parent.absolute() / 'alertrules.csv'
+            asn_list_path = fps_dir / 'asn-list.csv'
+            if alertrules_path.exists() and asn_list_path.exists():
+                network_alert_rules = load_alert_rules(alertrules_path)
+                devtool_subnets = load_devtool_subnets(asn_list_path)
+                out.print(f"[FP Filter] Loaded {len(devtool_subnets)} network subnets for filtering")
+            else:
+                out.print("[FP Filter] Network filtering disabled (missing alertrules.csv or asn-list.csv)")
+
         out.print()
 
         # Load alert rules
@@ -343,7 +380,8 @@ def main():
                 for match in all_matches:
                     # Extract the log line from the match string (format: "filename:linenum - log_line")
                     log_line = match.split(' - ', 1)[1] if ' - ' in match else match
-                    if not is_false_positive(log_line, driver_hashes, service_hashes, process_fingerprints):
+                    if not is_false_positive(log_line, driver_hashes, service_hashes, process_fingerprints,
+                                           network_alert_rules, devtool_subnets):
                         filtered_matches.append(match)
 
                 fp_count = original_match_count - len(filtered_matches)
