@@ -1,41 +1,69 @@
-License model is creative commons.
+openDR Research & Evaluation License v1.0
 
-Sharing is permitted — users may copy and redistribute the material in any medium or format.
-Adaptation is permitted — users may remix, transform, and build upon the material.
-Attribution — You must give appropriate credit, provide a link to the license, and indicate if changes were made.
-You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
-NonCommercial — You may not use the material, or derivatives thereof, for commercial purposes such as productization; resale;
-incorporation into, or integration with, a product or service for resale; or other activities involving renumeration or trade.
+Copyright © [ 2024 - 2026 ] by the openDR project (the "Affirmer.") All rights reserved.
 
-Usage by the following classes of entities is prohibited: security software product companies including but not limited to EDR, NDR, XDR or SIEM product companies.
+1. Definitions
 
-This provision shall not be construed to prohibit use by commercial entities, provided that the material or its derivatives are not incorporated into a product or service that is sold or resold for monetary gain or remuneration. No additional restrictions may be applied — you may not impose legal terms or technological measures that restrict others from engaging in any activities permitted by this license. For the purposes of this license, “monetary gain or remuneration” includes any activities involving the exchange of money, goods, or services, whether for profit or cost recovery. This includes, but is not limited to:
+“Work” means the openDR materials made available by Licensor, including documentation, specifications, text, data, models, software, and related materials.
 
-1. Generating revenue through the sale, resale, or licensing of the material or its derivatives.
-2. Charging fees to recover costs associated with the material’s use, integration, or distribution.
+“Licensor” means Affirmer.
 
-This does not include incidental reimbursement for actual expenses incurred during noncommercial activities, such as academic or research use, provided no profit is generated. 
+“You” means the individual or legal entity exercising rights under this License.
 
-All terms, conditions, and restrictions of this license, including the prohibition on commercial use and incorporation into products or services, apply equally to derivative works based on the licensed material, including modifications, adaptations, or extensions. If any provision of this license is held to be invalid or unenforceable under applicable law, the remaining provisions of the license shall remain in full force and effect. The invalid or unenforceable provision shall be construed, to the extent possible, to reflect the original intent of the parties, and if not possible, shall be deemed severed from this license without affecting the validity or enforceability of the remaining provisions.
+“Commercial Use” means any use of the Work in connection with a product, service, offering, or activity that generates or is intended to generate monetary consideration, revenue, subscription fees, resale value, licensing income, cost recovery, or other commercial advantage.
 
-Disclaimer of Warranty. Unless required by applicable law or
-      agreed to in writing, Licensor provides the Work (and each
-      Contributor provides its Contributions) on an "AS IS" BASIS,
-      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-      implied, including, without limitation, any warranties or conditions
-      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
-      PARTICULAR PURPOSE. You are solely responsible for determining the
-      appropriateness of using or redistributing the Work and assume any
-      risks associated with Your exercise of permissions under this License.
+2. Grant of Limited License
 
-Limitation of Liability. In no event and under no legal theory,
-      whether in tort (including negligence), contract, or otherwise,
-      unless required by applicable law (such as deliberate and grossly
-      negligent acts) or agreed to in writing, shall any Contributor be
-      liable to You for damages, including any direct, indirect, special,
-      incidental, or consequential damages of any character arising as a
-      result of this License or out of the use or inability to use the
-      Work (including but not limited to damages for loss of goodwill,
-      work stoppage, computer failure or malfunction, or any and all
-      other commercial damages or losses), even if such Contributor
-      has been advised of the possibility of such damages.
+Subject to the terms of this License, Licensor grants You a limited, non-exclusive, non-transferable, revocable license to:
+
+Use, copy, and reproduce the Work for internal research, academic study, evaluation, and other noncommercial purposes.
+
+Create derivative works solely for such permitted noncommercial purposes.
+
+This License does not grant ownership rights in the Work.
+
+3. Commercial Use Requires Separate Written Agreement
+
+You may not engage in Commercial Use of the Work or any derivative work without a separate written commercial license agreement executed by Licensor.
+
+Without limitation, Commercial Use includes:
+
+Incorporation of the Work into any product or service offered for sale, subscription, license, or other compensation.
+
+Use of the Work to provide paid services, managed services, hosted services, consulting services, or commercial offerings.
+
+Distribution of the Work in connection with revenue-generating activities.
+
+No rights for Commercial Use are granted under this License.
+
+4. No Patent or Trademark License
+
+Except as expressly provided herein, this License does not grant, by implication, estoppel, or otherwise, any rights under any patents, patent applications, trademarks, service marks, trade names, or other intellectual property rights of Licensor.
+
+All such rights are expressly reserved.
+
+5. Reservation of Rights
+
+All rights not expressly granted under this License are reserved by Licensor.
+
+Nothing in this License shall be construed as a waiver, abandonment, surrender, or transfer of any intellectual property rights of Licensor.
+
+6. Attribution
+
+If You redistribute the Work for permitted noncommercial purposes, You must provide reasonable attribution to Licensor.
+
+7. No Sublicensing for Commercial Purposes
+
+You may not sublicense the Work or any derivative work for Commercial Use.
+
+8. Disclaimer of Warranty
+
+THE WORK IS PROVIDED “AS IS,” WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+9. Limitation of Liability
+
+IN NO EVENT SHALL LICENSOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR EXEMPLARY DAMAGES ARISING OUT OF OR RELATED TO THE WORK OR THIS LICENSE.
+
+10. Termination
+
+This License terminates automatically upon any breach of its terms. Upon termination, You must cease all use of the Work.
