@@ -35,7 +35,9 @@ def monitor_directory(dir, pat) -> NoReturn:
         continue            
       for new_file in new_files:
         fn = str(new_file)
-        if ('process' in fn):
+        if ('debug' in fn):
+          dataStorage.store_debug_events(fn)
+        elif ('process' in fn):
           dataStorage.store_process_events(fn)
         elif ('network' in fn):
           dataStorage.store_network_events(fn)
@@ -51,6 +53,12 @@ def monitor_directory(dir, pat) -> NoReturn:
           dataStorage.store_hotfix_info(fn)
         elif ('defender' in fn):
           dataStorage.store_defender_info(fn)
+        elif ('driver' in fn):
+          dataStorage.store_driver_info(fn)
+        elif ('autoruns' in fn):
+          dataStorage.store_autorun_info(fn)
+        elif ('scheduled_task' in fn):
+          dataStorage.store_scheduled_task_info(fn)
         processed_files.add(new_file)
         schedule.run_pending()
         shutil.move(fn, 'done/' + fn)

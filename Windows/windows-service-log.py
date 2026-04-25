@@ -18,7 +18,7 @@ def log_existing_services(logger: LoggingModule) -> list:
     for service in psutil.win_service_iter():
         try:
             info = service.as_dict()
-            if str((info['pid'], info['name'])) not in previous_services:
+            if str((info['name'], info['binpath'])) not in previous_services:
                 service_info = (
                     f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
                     f"hostname: {hostname} | username: {info['username']} | event: existing service | "
@@ -27,7 +27,7 @@ def log_existing_services(logger: LoggingModule) -> list:
                     f"executable: {info['binpath']} | sid: {computer_sid}"
                 )
                 logger.write_log(service_info)
-                previous_services.append(str((info['pid'], info['name'])))
+                previous_services.append(str((info['name'], info['binpath'])))
         except Exception as e:
             print(e)
 
@@ -42,7 +42,7 @@ def log_services(logger: LoggingModule, interval: float) -> NoReturn:
         for service in psutil.win_service_iter():
             try:
                 info = service.as_dict()
-                if str((info['pid'], info['name'])) not in previous_services:
+                if str((info['name'], info['binpath'])) not in previous_services:
                     service_info = (
                         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
                         f"hostname: {hostname} | username: {info['username']} | event: new service | "
@@ -51,7 +51,7 @@ def log_services(logger: LoggingModule, interval: float) -> NoReturn:
                         f"executable: {info['binpath']} | sid: {computer_sid}"
                     )
                     logger.write_log(service_info)
-                    previous_services.append(str((info['pid'], info['name'])))
+                    previous_services.append(str((info['name'], info['binpath'])))
             except Exception as e:
                 print(e)
         time.sleep(interval)

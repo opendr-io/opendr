@@ -1,0 +1,311 @@
+category,process,processid,sourceip,destinationip,destinationport,source_file,source_dir,line_number,subnet,organization,country,asn,description
+network_existing,python.exe,8280,192.168.1.48,44.198.34.118,443,network_920_2025-12-27_15-40.log,tmp,4,44.198.34.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,sublime_text.exe,11864,192.168.1.48,23.33.253.54,80,network_920_2025-12-27_15-40.log,tmp,455,23.33.253.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,sublime_text.exe,11864,192.168.1.48,104.18.21.213,80,network_920_2025-12-27_15-40.log,tmp,456,104.18.21.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,devenv.exe,11244,192.168.1.48,40.70.147.9,443,network_386_2025-12-28_07-52.log,tmp,542,40.70.147.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,devenv.exe,2140,192.168.1.48,23.209.72.136,443,network_304_2025-12-28_08-50.log,ready,563,23.209.72.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,1016,192.168.1.48,44.205.50.24,443,network_304_2025-12-28_08-50.log,ready,1114,44.205.50.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,1016,192.168.1.48,98.87.92.239,443,network_304_2025-12-28_08-50.log,ready,1115,98.87.92.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,100.51.120.98,443,network_304_2025-12-28_08-50.log,ready,1116,100.51.120.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,104.18.18.125,443,network_304_2025-12-28_08-50.log,ready,1126,104.18.18.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Cursor.exe,11072,192.168.1.48,35.71.162.24,443,network_304_2025-12-28_08-50.log,ready,1196,35.71.162.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,13.216.203.243,443,network_304_2025-12-28_08-50.log,ready,1258,13.216.203.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,GitHubDesktop.exe,11768,192.168.1.48,140.82.113.26,443,network_304_2025-12-28_08-50.log,ready,1278,140.82.113.0/24,"GitHub, Inc.",US,AS36459,GitHub Services
+network_connection,GitHubDesktop.exe,11768,192.168.1.48,185.199.108.133,443,network_304_2025-12-28_08-50.log,ready,1290,185.199.108.0/24,"GitHub, Inc.",US,AS36459,GitHub Services
+network_connection,Cursor.exe,11072,192.168.1.48,34.200.101.180,443,network_304_2025-12-28_08-50.log,ready,1328,34.200.101.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,100.52.79.6,443,network_304_2025-12-28_08-50.log,ready,1368,100.52.79.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,3.220.28.60,443,network_304_2025-12-28_08-50.log,ready,1428,3.220.28.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,100.51.176.231,443,network_304_2025-12-28_08-50.log,ready,1445,100.51.176.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,100.50.164.128,443,network_304_2025-12-28_08-50.log,ready,1459,100.50.164.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,52.2.40.148,443,network_304_2025-12-28_08-50.log,ready,1522,52.2.40.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,44.205.76.5,443,network_304_2025-12-28_08-50.log,ready,1548,44.205.76.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,18.215.160.32,443,network_304_2025-12-28_08-50.log,ready,1574,18.215.160.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,34.195.213.181,443,network_304_2025-12-28_08-50.log,ready,1614,34.195.213.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,100.50.212.73,443,network_304_2025-12-28_08-50.log,ready,1656,100.50.212.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,100.52.102.154,443,network_304_2025-12-28_08-50.log,ready,1671,100.52.102.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,100.52.127.51,443,network_304_2025-12-28_08-50.log,ready,1686,100.52.127.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,52.206.125.131,443,network_304_2025-12-28_08-50.log,ready,1722,52.206.125.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,3.228.165.35,443,network_304_2025-12-28_08-50.log,ready,1729,3.228.165.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,34.203.39.133,443,network_304_2025-12-28_08-50.log,ready,1738,34.203.39.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,35.173.28.245,443,network_304_2025-12-28_08-50.log,ready,1751,35.173.28.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,44.194.137.253,443,network_304_2025-12-28_08-50.log,ready,1766,44.194.137.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,54.152.166.76,443,network_304_2025-12-28_08-50.log,ready,1807,54.152.166.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,34.206.8.72,443,network_304_2025-12-28_08-50.log,ready,1847,34.206.8.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,44.219.131.80,443,network_304_2025-12-28_08-50.log,ready,1859,44.219.131.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,100.52.43.1,443,network_304_2025-12-28_08-50.log,ready,1861,100.52.43.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,34.233.109.35,443,network_304_2025-12-28_08-50.log,ready,1885,34.233.109.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,3.214.93.161,443,network_304_2025-12-28_08-50.log,ready,1909,3.214.93.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,100.52.131.34,443,network_304_2025-12-28_08-50.log,ready,1935,100.52.131.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,13.217.125.230,443,network_304_2025-12-28_08-50.log,ready,1964,13.217.125.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Cursor.exe,11072,192.168.1.48,98.89.94.234,443,network_304_2025-12-28_08-50.log,ready,1976,98.89.94.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,98.90.151.46,443,network_304_2025-12-28_08-50.log,ready,1992,98.90.151.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,100.51.13.118,443,network_304_2025-12-28_08-50.log,ready,2003,100.51.13.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,184.72.221.227,443,network_304_2025-12-28_08-50.log,ready,2016,184.72.221.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,100.52.86.188,443,network_304_2025-12-28_08-50.log,ready,2046,100.52.86.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,3.216.112.196,443,network_304_2025-12-28_08-50.log,ready,2080,3.216.112.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,52.22.231.116,443,network_304_2025-12-28_08-50.log,ready,2094,52.22.231.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,100.48.160.44,443,network_304_2025-12-28_08-50.log,ready,2096,100.48.160.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,1016,192.168.1.48,52.206.241.160,443,network_304_2025-12-28_08-50.log,ready,2098,52.206.241.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,44.221.38.230,443,network_304_2025-12-28_08-50.log,ready,2130,44.221.38.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,18.207.25.133,443,network_304_2025-12-28_08-50.log,ready,2140,18.207.25.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,34.198.72.197,443,network_304_2025-12-28_08-50.log,ready,2180,34.198.72.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,100.52.112.90,443,network_304_2025-12-28_08-50.log,ready,2196,100.52.112.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,54.235.168.53,443,network_304_2025-12-28_08-50.log,ready,2211,54.235.168.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,35.173.71.7,443,network_304_2025-12-28_08-50.log,ready,2219,35.173.71.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,52.91.148.64,443,network_304_2025-12-28_08-50.log,ready,2275,52.91.148.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,54.243.172.121,443,network_304_2025-12-28_08-50.log,ready,2325,54.243.172.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,3.213.46.132,443,network_304_2025-12-28_08-50.log,ready,2347,3.213.46.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,44.209.105.133,443,network_304_2025-12-28_08-50.log,ready,2363,44.209.105.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,100.51.53.12,443,network_304_2025-12-28_08-50.log,ready,2383,100.51.53.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,23.22.165.200,443,network_304_2025-12-28_08-50.log,ready,2411,23.22.165.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,1016,192.168.1.48,100.52.38.63,443,network_304_2025-12-28_08-50.log,ready,2471,100.52.38.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,18.204.151.96,443,network_304_2025-12-28_08-50.log,ready,2513,18.204.151.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,44.194.86.76,443,network_304_2025-12-28_08-50.log,ready,2521,44.194.86.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,3.220.19.206,443,network_304_2025-12-28_08-50.log,ready,2565,3.220.19.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,54.209.223.199,443,network_304_2025-12-28_08-50.log,ready,2584,54.209.223.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,100.52.130.99,443,network_304_2025-12-28_08-50.log,ready,2595,100.52.130.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,100.52.33.58,443,network_304_2025-12-28_08-50.log,ready,2604,100.52.33.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,44.215.206.224,443,network_304_2025-12-28_08-50.log,ready,2625,44.215.206.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,python.exe,5540,192.168.1.48,151.101.0.223,443,network_304_2025-12-28_08-50.log,ready,2629,151.101.0.0/24,SKYCA-3,US,AS54113,"FASTLY, US"
+network_connection,python.exe,5540,192.168.1.48,151.101.192.223,443,network_304_2025-12-28_08-50.log,ready,2630,151.101.192.0/24,SKYCA-3,US,AS54113,"FASTLY, US"
+network_connection,Cursor.exe,11072,192.168.1.48,3.211.193.223,443,network_304_2025-12-28_08-50.log,ready,2647,3.211.193.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,1016,192.168.1.48,54.243.161.175,443,network_304_2025-12-28_08-50.log,ready,2664,54.243.161.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,100.51.52.105,443,network_304_2025-12-28_08-50.log,ready,2681,100.51.52.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Windsurf.exe,7544,192.168.1.48,34.149.234.98,443,network_304_2025-12-28_08-50.log,ready,2813,34.149.234.0/24,GOOGL-2,US,AS396982,"GOOGLE-CLOUD-PLATFORM, US"
+network_termination,Windsurf.exe,8360,192.168.1.48,52.178.17.233,443,network_304_2025-12-28_08-50.log,ready,2838,52.178.17.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,100.50.56.121,443,network_304_2025-12-28_08-50.log,ready,2892,100.50.56.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,100.52.146.135,443,network_304_2025-12-28_08-50.log,ready,2992,100.52.146.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,34.193.36.24,443,network_304_2025-12-28_08-50.log,ready,3050,34.193.36.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,1016,192.168.1.48,3.218.133.144,443,network_304_2025-12-28_08-50.log,ready,3070,3.218.133.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,44.210.223.165,443,network_304_2025-12-28_08-50.log,ready,3090,44.210.223.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,3.228.241.206,443,network_304_2025-12-28_08-50.log,ready,3217,3.228.241.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,100.52.24.219,443,network_304_2025-12-28_08-50.log,ready,3284,100.52.24.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,54.152.128.254,443,network_304_2025-12-28_08-50.log,ready,3315,54.152.128.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,1016,192.168.1.48,54.235.80.122,443,network_304_2025-12-28_08-50.log,ready,3328,54.235.80.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,100.52.75.221,443,network_304_2025-12-28_08-50.log,ready,3384,100.52.75.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,100.52.3.237,443,network_304_2025-12-28_08-50.log,ready,3398,100.52.3.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,13.223.24.180,443,network_304_2025-12-28_08-50.log,ready,3446,13.223.24.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Cursor.exe,11072,192.168.1.48,52.7.79.38,443,network_304_2025-12-28_08-50.log,ready,3476,52.7.79.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,34.235.179.121,443,network_304_2025-12-28_08-50.log,ready,3505,34.235.179.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,23.22.5.222,443,network_304_2025-12-28_08-50.log,ready,3522,23.22.5.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,18.209.223.38,443,network_304_2025-12-28_08-50.log,ready,3558,18.209.223.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,100.48.108.41,443,network_304_2025-12-28_08-50.log,ready,3565,100.48.108.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,54.235.205.77,443,network_304_2025-12-28_08-50.log,ready,3602,54.235.205.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,54.88.85.135,443,network_304_2025-12-28_08-50.log,ready,3610,54.88.85.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,98.94.217.169,443,network_304_2025-12-28_08-50.log,ready,3628,98.94.217.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,100.52.132.157,443,network_304_2025-12-28_08-50.log,ready,3662,100.52.132.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,100.51.209.230,443,network_304_2025-12-28_08-50.log,ready,3684,100.51.209.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,100.50.132.124,443,network_304_2025-12-28_08-50.log,ready,3708,100.50.132.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,3.208.41.204,443,network_304_2025-12-28_08-50.log,ready,3722,3.208.41.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,100.51.41.151,443,network_304_2025-12-28_08-50.log,ready,3749,100.51.41.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,54.210.228.208,443,network_304_2025-12-28_08-50.log,ready,3795,54.210.228.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,100.26.120.153,443,network_304_2025-12-28_08-50.log,ready,3807,100.26.120.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,44.209.54.114,443,network_304_2025-12-28_08-50.log,ready,3835,44.209.54.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,1016,192.168.1.48,34.236.182.185,443,network_304_2025-12-28_08-50.log,ready,3847,34.236.182.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,100.51.82.225,443,network_304_2025-12-28_08-50.log,ready,3915,100.51.82.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,34.225.90.73,443,network_304_2025-12-28_08-50.log,ready,3970,34.225.90.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,100.49.179.83,443,network_304_2025-12-28_08-50.log,ready,3997,100.49.179.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,34.232.233.159,443,network_304_2025-12-28_08-50.log,ready,4066,34.232.233.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,3.221.202.189,443,network_304_2025-12-28_08-50.log,ready,4087,3.221.202.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,1016,192.168.1.48,3.86.137.89,443,network_304_2025-12-28_08-50.log,ready,4219,3.86.137.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,44.221.238.24,443,network_304_2025-12-28_08-50.log,ready,4222,44.221.238.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,44.219.4.152,443,network_304_2025-12-28_08-50.log,ready,4249,44.219.4.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,54.156.154.21,443,network_304_2025-12-28_08-50.log,ready,4257,54.156.154.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,54.83.140.254,443,network_304_2025-12-28_08-50.log,ready,4317,54.83.140.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,100.51.245.199,443,network_304_2025-12-28_08-50.log,ready,4339,100.51.245.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,100.50.253.249,443,network_304_2025-12-28_08-50.log,ready,4356,100.50.253.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,98.91.109.132,443,network_304_2025-12-28_08-50.log,ready,4434,98.91.109.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,35.171.177.35,443,network_304_2025-12-28_08-50.log,ready,4445,35.171.177.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,54.147.17.243,443,network_304_2025-12-28_08-50.log,ready,4465,54.147.17.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,35.174.31.74,443,network_304_2025-12-28_08-50.log,ready,4578,35.174.31.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,98.91.135.254,443,network_304_2025-12-28_08-50.log,ready,4634,98.91.135.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,100.51.225.64,443,network_304_2025-12-28_08-50.log,ready,4722,100.51.225.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,1016,192.168.1.48,3.234.203.114,443,network_304_2025-12-28_08-50.log,ready,4725,3.234.203.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,100.52.61.53,443,network_304_2025-12-28_08-50.log,ready,4746,100.52.61.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,44.219.223.51,443,network_304_2025-12-28_08-50.log,ready,4796,44.219.223.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,107.23.166.42,443,network_304_2025-12-28_08-50.log,ready,4840,107.23.166.0/24,AMAZON-EC2-8,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,52.22.228.94,443,network_304_2025-12-28_08-50.log,ready,4872,52.22.228.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,35.170.165.94,443,network_304_2025-12-28_08-50.log,ready,4892,35.170.165.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,1016,192.168.1.48,100.52.18.56,443,network_304_2025-12-28_08-50.log,ready,4919,100.52.18.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,1016,192.168.1.48,54.147.212.33,443,network_304_2025-12-28_08-50.log,ready,4941,54.147.212.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,50.19.251.120,443,network_304_2025-12-28_08-50.log,ready,4975,50.19.251.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,18.214.173.216,443,network_304_2025-12-28_08-50.log,ready,4990,18.214.173.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_termination,Windsurf.exe,9764,192.168.1.48,108.139.47.47,443,network_304_2025-12-28_08-50.log,ready,5180,108.139.47.0/24,AMAZON-CF,US,AS16509,"AMAZON-02, US"
+network_connection,Windsurf.exe,9764,192.168.1.48,198.41.30.195,443,network_304_2025-12-28_08-50.log,ready,5173,198.41.30.0/24,BLK-198-41-30-0-7,CA,AS29988,"RCC-RDC-AS, CA"
+network_connection,Windsurf.exe,9764,192.168.1.48,151.101.116.193,443,network_304_2025-12-28_08-50.log,ready,5195,151.101.116.0/24,SKYCA-3,US,AS54113,"FASTLY, US"
+network_termination,Windsurf.exe,5352,192.168.1.48,40.79.189.59,443,network_304_2025-12-28_08-50.log,ready,5213,40.79.189.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,python.exe,13556,192.168.1.48,151.101.128.223,443,network_304_2025-12-28_08-50.log,ready,5215,151.101.128.0/24,SKYCA-3,US,AS54113,"FASTLY, US"
+network_connection,Cursor.exe,11072,192.168.1.48,18.233.245.59,443,network_304_2025-12-28_08-50.log,ready,5253,18.233.245.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,34.233.46.77,443,network_304_2025-12-28_08-50.log,ready,5402,34.233.46.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,34.205.230.207,443,network_304_2025-12-28_08-50.log,ready,5454,34.205.230.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,54.204.45.196,443,network_304_2025-12-28_08-50.log,ready,5478,54.204.45.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,13.219.155.123,443,network_304_2025-12-28_08-50.log,ready,5515,13.219.155.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_termination,Cursor.exe,11072,192.168.1.48,100.51.55.79,443,network_304_2025-12-28_08-50.log,ready,5551,100.51.55.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,54.205.165.162,443,network_304_2025-12-28_08-50.log,ready,5598,54.205.165.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,52.21.110.60,443,network_304_2025-12-28_08-50.log,ready,5683,52.21.110.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,44.212.116.29,443,network_304_2025-12-28_08-50.log,ready,5729,44.212.116.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,100.52.81.43,443,network_304_2025-12-28_08-50.log,ready,5853,100.52.81.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,52.3.184.127,443,network_304_2025-12-28_08-50.log,ready,5989,52.3.184.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,54.167.174.144,443,network_304_2025-12-28_08-50.log,ready,6018,54.167.174.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,98.90.130.114,443,network_304_2025-12-28_08-50.log,ready,6062,98.90.130.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,100.52.2.144,443,network_304_2025-12-28_08-50.log,ready,6115,100.52.2.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,1016,192.168.1.48,98.83.49.182,443,network_304_2025-12-28_08-50.log,ready,6188,98.83.49.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,34.199.138.210,443,network_304_2025-12-28_08-50.log,ready,6198,34.199.138.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,35.175.35.212,443,network_304_2025-12-28_08-50.log,ready,6276,35.175.35.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,1016,192.168.1.48,34.192.65.16,443,network_304_2025-12-28_08-50.log,ready,6387,34.192.65.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,98.89.77.104,443,network_304_2025-12-28_08-50.log,ready,6399,98.89.77.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,35.168.72.209,443,network_304_2025-12-28_08-50.log,ready,6430,35.168.72.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,3.234.162.108,443,network_304_2025-12-28_08-50.log,ready,6668,3.234.162.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,100.30.84.137,443,network_304_2025-12-28_08-50.log,ready,6748,100.30.84.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,100.52.49.142,443,network_304_2025-12-28_08-50.log,ready,6771,100.52.49.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,100.52.65.73,443,network_304_2025-12-28_08-50.log,ready,6864,100.52.65.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,100.49.96.132,443,network_304_2025-12-28_08-50.log,ready,6944,100.49.96.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,3.224.54.232,443,network_304_2025-12-28_08-50.log,ready,6994,3.224.54.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,52.1.194.173,443,network_304_2025-12-28_08-50.log,ready,7009,52.1.194.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,1016,192.168.1.48,100.49.139.221,443,network_304_2025-12-28_08-50.log,ready,7054,100.49.139.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,44.194.247.60,443,network_304_2025-12-28_08-50.log,ready,7064,44.194.247.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,98.82.248.206,443,network_304_2025-12-28_08-50.log,ready,7116,98.82.248.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,3.232.80.56,443,network_304_2025-12-28_08-50.log,ready,7252,3.232.80.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,50.16.161.49,443,network_304_2025-12-28_08-50.log,ready,7317,50.16.161.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,54.158.171.166,443,network_304_2025-12-28_08-50.log,ready,7333,54.158.171.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,52.86.244.200,443,network_304_2025-12-28_08-50.log,ready,7458,52.86.244.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,54.167.139.47,443,network_304_2025-12-28_08-50.log,ready,7549,54.167.139.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,34.228.203.77,443,network_304_2025-12-28_08-50.log,ready,8123,34.228.203.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,100.48.235.214,443,network_304_2025-12-28_08-50.log,ready,8175,100.48.235.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,100.51.29.105,443,network_304_2025-12-28_08-50.log,ready,8268,100.51.29.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,3.212.153.72,443,network_304_2025-12-28_08-50.log,ready,8367,3.212.153.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,50.17.23.209,443,network_304_2025-12-28_08-50.log,ready,8400,50.17.23.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,34.194.245.13,443,network_304_2025-12-28_08-50.log,ready,8800,34.194.245.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,1016,192.168.1.48,52.45.189.187,443,network_304_2025-12-28_08-50.log,ready,8824,52.45.189.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,1016,192.168.1.48,100.50.21.129,443,network_304_2025-12-28_08-50.log,ready,8978,100.50.21.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,44.208.52.43,443,network_304_2025-12-28_08-50.log,ready,9065,44.208.52.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,44.196.17.58,443,network_304_2025-12-28_08-50.log,ready,9519,44.196.17.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,1016,192.168.1.48,23.23.24.184,443,network_304_2025-12-28_08-50.log,ready,9784,23.23.24.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,1016,192.168.1.48,100.52.153.90,443,network_304_2025-12-28_08-50.log,ready,10058,100.52.153.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,1016,192.168.1.48,54.165.160.253,443,network_304_2025-12-28_08-50.log,ready,10122,54.165.160.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,100.50.11.243,443,network_304_2025-12-28_08-50.log,ready,10369,100.50.11.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,34.225.145.156,443,network_304_2025-12-28_08-50.log,ready,10443,34.225.145.0/24,AT-88-Z,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,100.51.171.88,443,network_304_2025-12-28_08-50.log,ready,11046,100.51.171.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,100.51.107.156,443,network_304_2025-12-28_08-50.log,ready,11722,100.51.107.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,98.89.132.230,443,network_304_2025-12-28_08-50.log,ready,12521,98.89.132.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_termination,Cursor.exe,11072,192.168.1.48,100.52.147.202,443,network_304_2025-12-28_08-50.log,ready,13297,100.52.147.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,Cursor.exe,11072,192.168.1.48,44.205.75.81,443,network_304_2025-12-28_08-50.log,ready,14191,44.205.75.0/24,AMAZON-IAD,US,AS14618,"AMAZON-AES, US"
+network_connection,Cursor.exe,11072,192.168.1.48,100.51.67.95,443,network_304_2025-12-28_08-50.log,ready,15688,100.51.67.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,11072,192.168.1.48,52.5.146.27,443,network_304_2025-12-28_08-50.log,ready,15973,52.5.146.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_connection,Cursor.exe,1016,192.168.1.48,3.89.203.156,443,network_304_2025-12-28_08-50.log,ready,16320,3.89.203.0/24,Amazon Technologies Inc.,US,AS16509,AWS Cloud
+network_termination,python.exe,72,192.168.1.48,20.150.70.36,443,network_244_2025-12-29_14-31.log,ready,560,20.150.70.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,claude.exe,2512,192.168.1.48,160.79.104.10,443,network_367_2025-12-30_00-00.log,ready,4895,160.79.104.0/24,AP-2440,US,AS399358,"ANTHROPIC, US"
+network_connection,claude.exe,2512,192.168.1.48,34.36.57.103,443,network_367_2025-12-30_00-00.log,ready,4897,34.36.57.0/24,GOOGL-2,US,AS396982,"GOOGLE-CLOUD-PLATFORM, US"
+network_connection,claude.exe,11416,192.168.1.48,34.149.66.137,443,network_367_2025-12-30_00-00.log,ready,4976,34.149.66.0/24,GOOGL-2,US,AS396982,"GOOGLE-CLOUD-PLATFORM, US"
+network_connection,Code.exe,8468,192.168.1.48,20.209.244.228,443,network_367_2025-12-30_00-00.log,ready,6950,20.209.244.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_termination,Code.exe,16664,192.168.1.48,20.189.172.33,443,network_367_2025-12-30_00-00.log,ready,6962,20.189.172.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Code.exe,8468,192.168.1.48,4.249.131.160,443,network_367_2025-12-30_00-00.log,ready,6958,4.249.131.0/24,MSFT,US,AS8075,"MICROSOFT-CORP-MSN-AS-BLOCK, US"
+network_termination,Code.exe,15452,192.168.1.48,13.69.116.104,443,network_367_2025-12-30_00-00.log,ready,7751,13.69.116.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Code.exe,8468,192.168.1.48,104.21.80.27,443,network_367_2025-12-30_00-00.log,ready,7791,104.21.80.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Code.exe,15452,192.168.1.48,51.104.15.252,443,network_367_2025-12-30_00-00.log,ready,7795,51.104.15.0/24,cloud,GB,AS8075,"MICROSOFT-CORP-MSN-AS-BLOCK, US"
+network_termination,Code.exe,15452,192.168.1.48,13.78.111.199,443,network_367_2025-12-30_00-00.log,ready,8582,13.78.111.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Code.exe,15452,192.168.1.48,40.79.141.154,443,network_367_2025-12-30_00-00.log,ready,9071,40.79.141.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Code.exe,15452,192.168.1.48,40.74.98.193,443,network_367_2025-12-30_00-00.log,ready,9785,40.74.98.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,python.exe,39884,192.168.1.48,151.101.64.223,443,network_367_2025-12-30_00-00.log,ready,17040,151.101.64.0/24,SKYCA-3,US,AS54113,"FASTLY, US"
+network_termination,Code.exe,8468,192.168.1.48,13.70.79.200,443,network_367_2025-12-30_00-00.log,ready,20157,13.70.79.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_termination,python.exe,89408,192.168.1.48,20.150.79.68,443,network_816_2025-12-31_00-00.log,ready,21515,20.150.79.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Windsurf.exe,1440,192.168.1.48,40.90.64.7,443,network_827_2026-01-07_00-00.log,ready,12149,40.90.64.0/24,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_termination,python.exe,2752,192.168.1.48,199.71.0.160,443,network_582_2026-01-11_09-34.log,ready,330,199.71.0.0/24,ARIN-PFS-SJC,US,AS393220,"ARIN-PFS-SJC, US"
+network_connection,python.exe,0,192.168.1.48,185.199.109.133,443,manual_addition,fps,0,185.199.108.0/22,"GitHub, Inc.",US,AS36459,GitHub Pages
+network_connection,python.exe,0,192.168.1.48,185.199.110.133,443,manual_addition,fps,0,185.199.108.0/22,"GitHub, Inc.",US,AS36459,GitHub Pages
+network_connection,python.exe,0,192.168.1.48,193.0.6.151,443,manual_addition,fps,0,193.0.6.0/24,RIPE Network Coordination Centre,NL,AS3333,RIPE NCC Infrastructure
+network_connection,python.exe,0,192.168.1.48,199.212.0.160,443,manual_addition,fps,0,199.212.0.0/22,Akamai Technologies,US,AS20940,Akamai CDN
+network_connection,python.exe,0,192.168.1.48,204.79.197.219,80,manual_addition,fps,0,204.79.197.0/24,Microsoft Corporation,US,AS8075,Microsoft Corporation
+network_connection,Windsurf.exe,0,192.168.1.48,104.212.67.124,443,manual_addition,fps,0,104.212.0.0/16,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Windsurf.exe,0,192.168.1.48,13.107.213.40,443,manual_addition,fps,0,13.107.0.0/16,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Windsurf.exe,0,192.168.1.48,13.33.82.116,443,manual_addition,fps,0,13.33.0.0/16,Amazon Technologies Inc.,US,AS16509,AWS CloudFront
+network_connection,Windsurf.exe,0,192.168.1.48,13.89.179.8,443,manual_addition,fps,0,13.89.0.0/16,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Windsurf.exe,0,192.168.1.48,172.64.155.209,443,manual_addition,fps,0,172.64.0.0/13,"Cloudflare, Inc.",US,AS13335,Cloudflare CDN
+network_connection,Windsurf.exe,0,192.168.1.48,20.189.173.2,443,manual_addition,fps,0,20.189.0.0/16,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Windsurf.exe,0,192.168.1.48,20.42.73.24,443,manual_addition,fps,0,20.42.0.0/16,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Windsurf.exe,0,192.168.1.48,20.50.201.205,443,manual_addition,fps,0,20.50.0.0/16,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Windsurf.exe,0,192.168.1.48,34.120.195.249,443,manual_addition,fps,0,34.120.0.0/16,Google LLC,US,AS15169,Google Cloud
+network_connection,Windsurf.exe,0,192.168.1.48,34.49.14.144,443,manual_addition,fps,0,34.49.0.0/16,Google LLC,US,AS15169,Google Cloud
+network_connection,Windsurf.exe,0,192.168.1.48,35.223.238.178,443,manual_addition,fps,0,35.223.0.0/16,Google LLC,US,AS15169,Google Cloud
+network_connection,Windsurf.exe,0,192.168.1.48,51.116.246.106,443,manual_addition,fps,0,51.116.0.0/16,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Windsurf.exe,0,192.168.1.48,52.182.143.214,443,manual_addition,fps,0,52.182.0.0/16,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,GitHubDesktop.exe,0,192.168.1.48,140.82.112.21,443,manual_addition,fps,0,140.82.112.0/20,"GitHub, Inc.",US,AS36459,GitHub Infrastructure
+network_connection,Code.exe,0,192.168.1.48,104.46.162.224,443,manual_addition,fps,0,104.46.0.0/16,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Code.exe,0,192.168.1.48,104.98.115.136,443,manual_addition,fps,0,104.98.0.0/16,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Code.exe,0,192.168.1.48,13.69.239.79,443,manual_addition,fps,0,13.69.0.0/16,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Code.exe,0,192.168.1.48,150.171.73.16,443,manual_addition,fps,0,150.171.0.0/16,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Code.exe,0,192.168.1.48,20.44.10.122,443,manual_addition,fps,0,20.44.0.0/16,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Code.exe,0,192.168.1.48,23.200.3.10,443,manual_addition,fps,0,23.200.0.0/16,Akamai Technologies,US,AS20940,Akamai CDN
+network_connection,Code.exe,0,192.168.1.48,23.221.236.105,443,manual_addition,fps,0,23.221.0.0/16,Akamai Technologies,US,AS20940,Akamai CDN
+network_connection,Code.exe,0,192.168.1.48,23.44.201.207,443,manual_addition,fps,0,23.44.0.0/16,Akamai Technologies,US,AS20940,Akamai CDN
+network_connection,Code.exe,0,192.168.1.48,40.79.150.122,443,manual_addition,fps,0,40.79.0.0/16,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Code.exe,0,192.168.1.48,51.105.71.136,443,manual_addition,fps,0,51.105.0.0/16,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Code.exe,0,192.168.1.48,51.132.193.104,443,manual_addition,fps,0,51.132.0.0/16,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Code.exe,0,192.168.1.48,52.168.112.67,443,manual_addition,fps,0,52.168.0.0/16,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,Cursor.exe,0,192.168.1.48,100.49.136.57,443,manual_addition,fps,0,100.49.0.0/16,Amazon Technologies Inc.,US,AS16509,AWS CloudFront
+network_connection,Cursor.exe,0,192.168.1.48,100.50.1.28,443,manual_addition,fps,0,100.50.0.0/16,Amazon Technologies Inc.,US,AS16509,AWS CloudFront
+network_connection,Cursor.exe,0,192.168.1.48,100.51.11.223,443,manual_addition,fps,0,100.51.0.0/16,Amazon Technologies Inc.,US,AS16509,AWS CloudFront
+network_connection,Cursor.exe,0,192.168.1.48,104.18.16.128,443,manual_addition,fps,0,104.18.0.0/15,"Cloudflare, Inc.",US,AS13335,Cloudflare CDN
+network_connection,Cursor.exe,0,192.168.1.48,104.20.38.66,443,manual_addition,fps,0,104.20.0.0/16,"Cloudflare, Inc.",US,AS13335,Cloudflare CDN
+network_connection,Cursor.exe,0,192.168.1.48,104.26.8.156,443,manual_addition,fps,0,104.26.0.0/16,"Cloudflare, Inc.",US,AS13335,Cloudflare CDN
+network_connection,Cursor.exe,0,192.168.1.48,13.216.183.89,443,manual_addition,fps,0,13.216.0.0/14,Amazon Technologies Inc.,US,AS16509,AWS CloudFront
+network_connection,Cursor.exe,0,192.168.1.48,13.248.241.7,443,manual_addition,fps,0,13.248.0.0/16,Amazon Technologies Inc.,US,AS16509,AWS CloudFront
+network_connection,Cursor.exe,0,192.168.1.48,18.233.176.207,443,manual_addition,fps,0,18.233.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,18.235.180.212,443,manual_addition,fps,0,18.235.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,3.218.117.119,443,manual_addition,fps,0,3.218.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,3.222.55.113,443,manual_addition,fps,0,3.222.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,3.228.76.222,443,manual_addition,fps,0,3.228.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,3.229.121.154,443,manual_addition,fps,0,3.229.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,34.193.215.45,443,manual_addition,fps,0,34.193.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,34.195.35.244,443,manual_addition,fps,0,34.195.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,34.199.141.235,443,manual_addition,fps,0,34.199.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,34.202.22.152,443,manual_addition,fps,0,34.202.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,34.204.28.24,443,manual_addition,fps,0,34.204.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,34.205.97.182,443,manual_addition,fps,0,34.205.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,34.237.110.89,443,manual_addition,fps,0,34.237.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,44.199.167.188,443,manual_addition,fps,0,44.199.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,44.213.139.177,443,manual_addition,fps,0,44.213.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,44.214.245.126,443,manual_addition,fps,0,44.214.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,50.16.188.79,443,manual_addition,fps,0,50.16.0.0/14,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,52.45.88.155,443,manual_addition,fps,0,52.45.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,52.54.37.82,443,manual_addition,fps,0,52.54.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,52.87.60.79,443,manual_addition,fps,0,52.87.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,54.145.54.101,443,manual_addition,fps,0,54.145.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,54.205.252.0,443,manual_addition,fps,0,54.205.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,54.209.129.199,443,manual_addition,fps,0,54.209.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,54.211.131.226,443,manual_addition,fps,0,54.211.0.0/16,Amazon Technologies Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,0,192.168.1.48,98.90.111.231,443,manual_addition,fps,0,98.90.0.0/16,Amazon Technologies Inc.,US,AS16509,AWS CloudFront
+network_connection,Cursor.exe,0,192.168.1.48,98.91.134.130,443,manual_addition,fps,0,98.91.0.0/16,Amazon Technologies Inc.,US,AS16509,AWS CloudFront
+network_connection,Cursor.exe,0,192.168.1.48,98.95.0.46,443,manual_addition,fps,0,98.95.0.0/16,Amazon Technologies Inc.,US,AS16509,AWS CloudFront
+network_connection,Code.exe,0,192.168.1.48,104.208.16.88,443,manual_addition,fps,0,104.208.16.0/20,Microsoft Corporation,US,AS8075,Microsoft Azure
+network_connection,devenv.exe,0,192.168.1.48,23.210.73.150,443,manual_addition,fps,0,23.210.0.0/16,Akamai Technologies,US,AS20940,Akamai CDN
+network_connection,devenv.exe,0,192.168.1.48,23.219.161.153,443,manual_addition,fps,0,23.219.0.0/16,Akamai Technologies,US,AS20940,Akamai CDN
+network_connection,devenv.exe,0,192.168.1.48,23.34.122.211,443,manual_addition,fps,0,23.34.0.0/16,Akamai Technologies,US,AS20940,Akamai CDN
+network_connection,Cursor.exe,88728,192.168.1.48,100.30.79.224,443,network_623_2026-01-16_05-42.log,ready,3720,100.24.0.0/13,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,18.215.193.114,443,network_422_2026-01-15_06-07.log,ready,7160,18.208.0.0/13,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,3.224.180.194,443,network_623_2026-01-16_05-42.log,ready,890,3.224.0.0/12,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,98.85.72.75,443,network_422_2026-01-15_06-07.log,ready,1059,98.80.0.0/13,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,sublime_text.exe,12168,192.168.1.48,45.55.41.223,443,network_888_2026-01-10_09-43.log,ready,621,45.55.32.0/19,DigitalOcean LLC,US,AS14061,DigitalOcean - Sublime Text
+network_connection,sublime_text.exe,9128,192.168.1.48,104.236.0.104,80,network_859_2025-12-29_00-30.log,tmp,7498,104.236.0.0/18,DigitalOcean LLC,US,AS14061,DigitalOcean - Sublime Text
+network_connection,Cursor.exe,88728,192.168.1.48,174.129.211.26,443,network_2026-01-19.log,ready,1,174.129.0.0/16,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,18.207.2.146,443,network_2026-01-19.log,ready,1,18.204.0.0/14,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,184.73.249.78,443,network_2026-01-19.log,ready,1,184.73.0.0/16,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,3.210.73.191,443,network_2026-01-19.log,ready,1,3.208.0.0/12,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,34.228.251.24,443,network_2026-01-19.log,ready,1,34.224.0.0/12,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,35.153.163.243,443,network_2026-01-19.log,ready,1,35.153.0.0/16,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,35.168.92.178,443,network_2026-01-19.log,ready,1,35.168.0.0/13,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,44.210.186.124,443,network_2026-01-19.log,ready,1,44.192.0.0/11,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,52.0.116.177,443,network_2026-01-19.log,ready,1,52.0.0.0/15,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,52.20.54.61,443,network_2026-01-19.log,ready,1,52.20.0.0/14,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,52.6.240.209,443,network_2026-01-19.log,ready,1,52.4.0.0/14,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,52.72.248.196,443,network_2026-01-19.log,ready,1,52.72.0.0/15,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,52.86.183.173,443,network_2026-01-19.log,ready,1,52.86.0.0/15,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,54.160.1.146,443,network_2026-01-19.log,ready,1,54.160.0.0/14,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,54.174.124.85,443,network_2026-01-19.log,ready,1,54.174.0.0/15,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,54.80.0.0,443,network_2026-01-19.log,ready,1,54.80.0.0/14,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,54.87.217.134,443,network_2026-01-19.log,ready,1,54.87.0.0/16,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,67.202.23.224,443,network_2026-01-19.log,ready,1,67.202.0.0/18,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,Cursor.exe,88728,192.168.1.48,98.88.98.217,443,network_2026-01-19.log,ready,1,98.88.0.0/13,Amazon.com Inc.,US,AS14618,AWS EC2 us-east-1
+network_connection,python.exe,1234,192.168.1.48,34.117.59.81,443,network_2026-01-19.log,ready,1,34.116.0.0/14,Google LLC,US,AS396982,Google Cloud
+network_connection,Windsurf.exe,1234,192.168.1.48,34.160.81.0,443,network_2026-01-19.log,ready,1,34.160.0.0/16,Google LLC,US,AS396982,Google Cloud
+network_connection,Windsurf.exe,1234,192.168.1.48,40.90.70.52,443,network_2026-01-19.log,ready,1,40.80.0.0/12,Microsoft Corporation,US,AS8075,Microsoft Azure

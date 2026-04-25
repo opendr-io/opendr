@@ -8,3 +8,4 @@ psycopg[binary]
 requests
 schedule
 watchdog
+sigma-cli
