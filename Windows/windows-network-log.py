@@ -12,28 +12,68 @@ from typing import NoReturn
 sid: str = attr.get_computer_sid()
 hostname: str = attr.get_hostname()
 
-def log_connection(logger: LoggingModule, event: str, conn) -> None:
-    """Logs a network connection event (created/terminated/existing)."""
-    process_name: str = attr.get_process_name(conn.pid)
+def get_process_details(pid: int|None) -> dict:
+    if pid is None:
+        return {
+            'process_name': 'N/A',
+            'username': 'N/A',
+            'creation_time': 'N/A',
+        }
 
-    # Get remote address
+    try:
+        proc = psutil.Process(pid)
+        return {
+            'process_name': proc.name(),
+            'username': proc.username(),
+            'creation_time': proc.create_time(),
+        }
+    except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+        return {
+            'process_name': 'Unknown',
+            'username': 'N/A',
+            'creation_time': 'N/A',
+        }
+
+def format_creation_time(creation_time) -> str:
+    if creation_time == 'N/A':
+        return 'N/A'
+    return datetime.fromtimestamp(creation_time).strftime('%Y-%m-%d %H:%M:%S.%f')
+
+def build_connection_snapshot(conn) -> tuple[tuple, dict]:
+    process_details = get_process_details(conn.pid)
     remote_ip = conn.raddr[0] if conn.raddr else "N/A"
     remote_port = conn.raddr[1] if conn.raddr else "N/A"
 
-    # Get username if possible
-    username: str
-    try:
-        username = psutil.Process(conn.pid).username()
-    except (psutil.NoSuchProcess, psutil.AccessDenied):
-        username = "N/A"
+    data = {
+        'pid': conn.pid,
+        'process_name': process_details['process_name'],
+        'username': process_details['username'],
+        'creation_time': process_details['creation_time'],
+        'source_ip': conn.laddr[0],
+        'source_port': conn.laddr[1],
+        'destination_ip': remote_ip,
+        'destination_port': remote_port,
+        'status': conn.status,
+    }
+    key = (
+        conn.pid,
+        process_details['creation_time'],
+        conn.laddr,
+        conn.raddr,
+        conn.status,
+    )
+    return key, data
 
+def log_connection(logger: LoggingModule, event: str, conn_info: dict) -> None:
+    """Logs a network connection event (created/terminated/existing)."""
     logger.write_log(
         f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-        f"hostname: {hostname} | username: {username} | "
-        f"category: {event} | process: {process_name} | processid: {conn.pid} | "
-        f"sourceip: {conn.laddr[0]} | sourceport: {conn.laddr[1]} | "
-        f"destinationip: {remote_ip} | destinationport: {remote_port} | "
-        f"status: {conn.status} | sid: {sid}"
+        f"hostname: {hostname} | username: {conn_info['username']} | "
+        f"category: {event} | process: {conn_info['process_name']} | processid: {conn_info['pid']} | "
+        f"creationtime: {format_creation_time(conn_info['creation_time'])} | "
+        f"sourceip: {conn_info['source_ip']} | sourceport: {conn_info['source_port']} | "
+        f"destinationip: {conn_info['destination_ip']} | destinationport: {conn_info['destination_port']} | "
+        f"status: {conn_info['status']} | sid: {sid}"
     )
 
 def log_initial_connections(logger: LoggingModule) -> dict:
@@ -54,10 +94,10 @@ def log_initial_connections(logger: LoggingModule) -> dict:
     if conn.raddr and ipaddress.ip_address(conn.raddr[0]).is_private:
       continue
 
-    key = (conn.pid, conn.laddr, conn.raddr, conn.status)
-    initial_connections[key] = conn
+    key, conn_info = build_connection_snapshot(conn)
+    initial_connections[key] = conn_info
 
-    log_connection(logger, "network_existing", conn)
+    log_connection(logger, "network_existing", conn_info)
   return initial_connections  # Return initial snapshot for comparison in monitoring
 
 def monitor_network_connections(logger: LoggingModule, interval: float) -> NoReturn:
@@ -81,8 +121,8 @@ def monitor_network_connections(logger: LoggingModule, interval: float) -> NoRet
       if conn.raddr and ipaddress.ip_address(conn.raddr[0]).is_private:
         continue
 
-      key = (conn.pid, conn.laddr, conn.raddr, conn.status)
-      current_connections[key] = conn
+      key, conn_info = build_connection_snapshot(conn)
+      current_connections[key] = conn_info
 
     created_keys = set(current_connections.keys()) - set(previous_connections.keys())
     terminated_keys = set(previous_connections.keys()) - set(current_connections.keys())
