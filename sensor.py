@@ -21,7 +21,7 @@ log_profiles: dict[str, list[str]] = {
   "complete": os_log[os_mode],
   "custom": config.get(os_mode, 'Scripts', fallback='').split(', ')
 }
-augment_profiles: list[str] = ["network-aug", "alert-gen"]
+augment_profiles: list[str] = ["network-aug", "alert-gen", "windows-sign-aug"]
 
 def test_connection() -> None:
   try:
