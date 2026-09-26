@@ -37,7 +37,7 @@ def test_connection() -> None:
 
 def execute_scripts(script):
     print(script)
-    result = subprocess.run(['python', script], capture_output=True, text=True)
+    result = subprocess.run([sys.executable, script], capture_output=True, text=True)
     return script, result.stdout, result.stderr
 
 def run() -> None:
